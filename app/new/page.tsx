@@ -73,8 +73,13 @@ export default function New() {
   return (
     <>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="flex justify-center items-start gap-8 w-full max-w-6xl mx-auto mb-10">
+        <div className="flex justify-center items-end gap-8 w-full max-w-6xl mx-auto my-10">
           <div className="flex-1 max-w-xl shrink-0">
+            <div className="p-2">
+              <h1 className="text-2xl font-bold text-primary">schedutch</h1>
+              <p>ここにロゴとか説明を書く</p>
+            </div>
+            
             <InputEventInfo control={form.control} />
           </div>
           

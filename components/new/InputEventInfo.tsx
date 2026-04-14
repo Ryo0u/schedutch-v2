@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '../ui/card';
-import { Field, FieldGroup, FieldLabel, FieldError } from '../ui/field';
+import { Field, FieldGroup, FieldLabel, FieldError, FieldDescription } from '../ui/field';
 import { Separator } from '../ui/separator';
 import { InputGroup, InputGroupAddon, InputGroupText, InputGroupTextarea } from '../ui/input-group';
 
@@ -67,6 +67,9 @@ const InputEventInfo = ({ control }: InputEventProps) => {
                     {...field}
                     aria-invalid={fieldState.invalid}
                   />
+                  <FieldDescription>
+                    イベントの削除の際に必要となります
+                  </FieldDescription>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
