@@ -36,7 +36,7 @@ const formSchema = z.object({
         startTime: z.string(),
         endTime: z.string(),
       })
-    ).min(1, '候補日を1つ以上追加してください'),
+    ).min(1, '候補日を1つ以上選択し、追加ボタンを押してください'),
 });
 
 export default function New() {
