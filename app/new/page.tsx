@@ -6,6 +6,7 @@ import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import InputEventInfo from '@/components/new/InputEventInfo';
 import InputEventCandidates from '@/components/new/InputEventCandidates';
+import CandidatesList from '@/components/new/CandidatesList';
 
 export type FormData = {
   title: string;
@@ -57,7 +58,7 @@ export default function New() {
   return (
     <>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="flex justify-center items-start gap-8 w-full max-w-6xl mx-auto">
+        <div className="flex justify-center items-start gap-8 w-full max-w-6xl mx-auto mb-10">
           <div className="flex-1 max-w-xl shrink-0">
             <InputEventInfo control={form.control} />
           </div>
@@ -65,6 +66,10 @@ export default function New() {
           <div className="flex-1 max-w-xl">
             <InputEventCandidates control={form.control} />
           </div>
+        </div>
+        
+        <div className='flex-row justify-center w-full max-w-6xl mx-auto'>
+          <CandidatesList control={form.control}/>
         </div>
         
         <Button className='max-w-md' type="submit">送信</Button>

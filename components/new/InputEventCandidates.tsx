@@ -147,6 +147,7 @@ const InputEventCandidates = ({ control }: InputEventProps) => {
 						日付と時間を選択したらこちらのボタンを押して候補日を追加してください
 					</CardDescription>
 					<Button
+						type='button'
 						onClick={handleAddCandidates}
 						disabled={!selectedDates?.from || !selectedDates?.to}
 					>
