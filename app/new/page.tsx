@@ -9,6 +9,7 @@ import InputEventInfo from '@/components/new/InputEventInfo';
 export type FormData = {
   title: string;
   password: string;
+  comment: string;
 };
 
 const formSchema = z.object({
@@ -20,6 +21,8 @@ const formSchema = z.object({
     z.string()
      .min(3, 'パスワードを3文字以上で入力してください')
      .max(12, 'パスワードを12字以内で入力してください'),
+  comment:
+    z.string().max(30, 'コメントは30文字以内で入力してください'),
 });
 
 export default function New() {
@@ -28,6 +31,7 @@ export default function New() {
     defaultValues: {
       title: '',
       password: '',
+      comment: '',
     },
   });
 

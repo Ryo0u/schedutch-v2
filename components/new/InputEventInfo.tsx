@@ -10,6 +10,7 @@ import {
 } from '../ui/card';
 import { Field, FieldGroup, FieldLabel, FieldError } from '../ui/field';
 import { Separator } from '../ui/separator';
+import { InputGroup, InputGroupAddon, InputGroupText, InputGroupTextarea } from '../ui/input-group';
 
 interface InputEventInfoProps {
   control: Control<FormData>;
@@ -23,7 +24,7 @@ const InputEventInfo = ({ control }: InputEventInfoProps) => {
           <CardTitle className="text-center text-xl font-bold">
             基本情報
           </CardTitle>
-          <CardDescription className="px-4">
+          <CardDescription className="text-center">
             イベント名と編集用パスワードを入力してください
           </CardDescription>
         </CardHeader>
@@ -69,6 +70,30 @@ const InputEventInfo = ({ control }: InputEventInfoProps) => {
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
+                </Field>
+              )}
+            />
+            
+            <Controller
+              name='comment'
+              control={control}
+              render={({ field }) => (
+                <Field>
+                  <FieldLabel htmlFor='comment'>コメント</FieldLabel>
+                  <InputGroup>
+                    <InputGroupTextarea
+                      id='comment'
+                      {...field}
+                      rows={10}
+                      className="min-h-18 resize-none"
+                      placeholder="頑張ります！！"
+                    />
+                    <InputGroupAddon align="block-end">
+                      <InputGroupText className="tabular-nums">
+                        {field.value.length}/30文字
+                      </InputGroupText>
+                    </InputGroupAddon>
+                  </InputGroup>
                 </Field>
               )}
             />
