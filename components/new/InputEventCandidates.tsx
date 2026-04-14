@@ -32,6 +32,30 @@ const InputEventCandidates = ({ control }: InputEventProps) => {
 		return `${hours}:${minutes}`;
 	});
 	
+	const handleAddCandidates = () => {
+		if (!selectedDates?.from || !selectedDates?.to) return;
+		
+		let current = new Date(selectedDates.from);
+    const end = new Date(selectedDates.to);
+		
+		while (current <= end) {
+			append({
+				date: new Date(current),
+				startTime: startTime,
+				endTime: endTime,
+			})
+			
+			current.setDate(current.getDate() + 1)
+		}
+		
+		// 日付選択リセット
+		setSelectedDates({
+			from: new Date(),
+    	to: addDays(new Date(), 30),
+		})
+		
+	}
+	
   return (
     <div>
       <Card>
@@ -69,7 +93,7 @@ const InputEventCandidates = ({ control }: InputEventProps) => {
 									
 									<div className='flex gap-4'>
 										<Field>
-											<FieldLabel htmlFor="time-from">開始時間</FieldLabel>
+											<FieldLabel htmlFor="time-from">開始</FieldLabel>
 											<Select value={startTime} onValueChange={(val) => setStartTime(val ?? "")}>
 												<SelectTrigger>
 													<SelectValue />
@@ -89,7 +113,7 @@ const InputEventCandidates = ({ control }: InputEventProps) => {
 										</Field>
 
 										<Field>
-											<FieldLabel htmlFor="time-from">終了時間</FieldLabel>
+											<FieldLabel htmlFor="time-from">終了</FieldLabel>
 											<Select value={endTime} onValueChange={(val) => setEndTime(val ?? "")}>
 												<SelectTrigger>
 													<SelectValue />
@@ -115,7 +139,6 @@ const InputEventCandidates = ({ control }: InputEventProps) => {
 								</>
 							)}
 						/>
-						
 					</FieldGroup>
 				</CardContent>
 				
@@ -123,7 +146,10 @@ const InputEventCandidates = ({ control }: InputEventProps) => {
 					<CardDescription className='text-xs'>
 						日付と時間を選択したらこちらのボタンを押して候補日を追加してください
 					</CardDescription>
-					<Button>
+					<Button
+						onClick={handleAddCandidates}
+						disabled={!selectedDates?.from || !selectedDates?.to}
+					>
 						<Plus/>追加
 					</Button>
 				</CardFooter>
