@@ -2,13 +2,14 @@ import { FormData } from '@/app/new/page';
 import { Control, Controller, useFieldArray, useFormState, useWatch } from 'react-hook-form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card"
 import { Separator } from "../ui/separator"
-import { Field, FieldError, FieldGroup, FieldLabel } from '../ui/field';
+import { Field, FieldGroup, FieldLabel } from '../ui/field';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Button } from '../ui/button';
 import { Trash2 } from 'lucide-react'; 
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { Item, ItemActions, ItemContent, ItemGroup, ItemTitle } from '../ui/item';
+import EmptyList from './EmptyList';
 
 interface InputEventProps {
 	control: Control<FormData>;
@@ -45,82 +46,86 @@ function CandidatesList({ control }: InputEventProps) {
 				
 				<Separator/>
 				
-				<CardContent>
-					<ItemGroup className="grid grid-cols-4 justify-center gap-4">
-						{sortedFields.map((item) => {
-							const actualIndex = item.originalIndex
-							const hasError = !!errors.candidates?.[actualIndex];
-							
-							return (
-								<Item 
-									key={actualIndex}
-									variant="outline"
-									className="items-center justify-between max-w-sm w-full mb-3"
-								>
-									<ItemTitle className="text-sm font-bold truncate">
-										{format(new Date(item.date), 'MM/dd (eee)', { locale: ja })}
-									</ItemTitle>
-									<ItemActions>
-										<Button
-											type="button"
-											variant="ghost"
-											size="icon"
-											className="h-7 w-7 text-destructive hover:bg-destructive/10"
-											onClick={() => remove(actualIndex)}
-										>
-											<Trash2 className="h-4 w-4" />
-										</Button>
-									</ItemActions>
-									
-									<Separator/>
-									
-									<ItemContent>
-										<FieldGroup className='flex-row gap-3'>
-											<Controller
-												name={`candidates.${actualIndex}.startTime`}
-												control={control}
-												render={({ field }) => (
-													<Field data-invalid={hasError}>
-														<FieldLabel className='text-xs'>開始</FieldLabel>
-														<Select value={field.value} onValueChange={field.onChange}>
-															<SelectTrigger aria-invalid={hasError}>
-																<SelectValue/>
-															</SelectTrigger>
-															<SelectContent>
-																{timeOptions.map((time) => (
-																	<SelectItem key={`from-${time}`} value={time}>{time}</SelectItem>
-																))}
-															</SelectContent>
-														</Select>
-													</Field>
-												)}
-											/>
-											
-											<Controller
-												name={`candidates.${actualIndex}.endTime`}
-												control={control}
-												render={({ field }) => (
-													<Field data-invalid={hasError}>
-														<FieldLabel className='text-xs'>終了</FieldLabel>
-														<Select value={field.value} onValueChange={field.onChange}>
-															<SelectTrigger aria-invalid={hasError}>
-																<SelectValue/>
-															</SelectTrigger>
-															<SelectContent>
-																{timeOptions.map((time) => (
-																	<SelectItem key={`to-${time}`} value={time}>{time}</SelectItem>
-																))}
-															</SelectContent>
-														</Select>
-													</Field>
-												)}
-											/>
-										</FieldGroup>
-									</ItemContent>
-								</Item>
-							)
-						})}
-					</ItemGroup>
+				<CardContent className='max-h-150 overflow-y-auto'>	
+					{watchedFields.length === 0 ? (
+						<EmptyList/>
+					): (
+						<ItemGroup className="grid grid-cols-4 justify-center gap-4">
+							{sortedFields.map((item) => {
+								const actualIndex = item.originalIndex
+								const hasError = !!errors.candidates?.[actualIndex];
+								
+								return (
+									<Item 
+										key={actualIndex}
+										variant="outline"
+										className="items-center justify-between max-w-sm w-full mb-3"
+									>
+										<ItemTitle className="text-sm font-bold truncate">
+											{format(new Date(item.date), 'MM/dd (eee)', { locale: ja })}
+										</ItemTitle>
+										<ItemActions>
+											<Button
+												type="button"
+												variant="ghost"
+												size="icon"
+												className="h-7 w-7 text-destructive hover:bg-destructive/10"
+												onClick={() => remove(actualIndex)}
+											>
+												<Trash2 className="h-4 w-4" />
+											</Button>
+										</ItemActions>
+										
+										<Separator/>
+										
+										<ItemContent>
+											<FieldGroup className='flex-row gap-3'>
+												<Controller
+													name={`candidates.${actualIndex}.startTime`}
+													control={control}
+													render={({ field }) => (
+														<Field data-invalid={hasError}>
+															<FieldLabel className='text-xs'>開始</FieldLabel>
+															<Select value={field.value} onValueChange={field.onChange}>
+																<SelectTrigger aria-invalid={hasError}>
+																	<SelectValue/>
+																</SelectTrigger>
+																<SelectContent>
+																	{timeOptions.map((time) => (
+																		<SelectItem key={`from-${time}`} value={time}>{time}</SelectItem>
+																	))}
+																</SelectContent>
+															</Select>
+														</Field>
+													)}
+												/>
+												
+												<Controller
+													name={`candidates.${actualIndex}.endTime`}
+													control={control}
+													render={({ field }) => (
+														<Field data-invalid={hasError}>
+															<FieldLabel className='text-xs'>終了</FieldLabel>
+															<Select value={field.value} onValueChange={field.onChange}>
+																<SelectTrigger aria-invalid={hasError}>
+																	<SelectValue/>
+																</SelectTrigger>
+																<SelectContent>
+																	{timeOptions.map((time) => (
+																		<SelectItem key={`to-${time}`} value={time}>{time}</SelectItem>
+																	))}
+																</SelectContent>
+															</Select>
+														</Field>
+													)}
+												/>
+											</FieldGroup>
+										</ItemContent>
+									</Item>
+								)
+							})}
+						</ItemGroup>
+					)}
 				</CardContent>
 			</Card>
     </div>
