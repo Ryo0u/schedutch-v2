@@ -1,5 +1,5 @@
 import { FormData } from '@/app/new/page';
-import { Control, Controller, useFieldArray } from 'react-hook-form';
+import { Control, Controller, useFieldArray, useWatch } from 'react-hook-form';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card"
 import { Separator } from "../ui/separator"
 import { Calendar } from '../ui/calendar';
@@ -25,12 +25,20 @@ const InputEventCandidates = ({ control }: InputEventProps) => {
     to: addDays(new Date(), 30),
   })
 	
+	const watchedFields = useWatch({ control, name: "candidates" });
+	
 	// セレクトの時間オプション
 	const timeOptions = Array.from({ length: 48 }).map((_, i) => {
 		const hours = Math.floor(i / 2).toString().padStart(2, '0');
 		const minutes = (i % 2 === 0 ? '00' : '30');
 		return `${hours}:${minutes}`;
 	});
+	
+	// 追加された候補日はカレンダーから除外する
+	const disabledDates = watchedFields
+		.filter(item => item && item.date)
+		.map(item => new Date(item.date));
+	
 	
 	const handleAddCandidates = () => {
 		if (!selectedDates?.from || !selectedDates?.to) return;
@@ -49,10 +57,7 @@ const InputEventCandidates = ({ control }: InputEventProps) => {
 		}
 		
 		// 日付選択リセット
-		setSelectedDates({
-			from: new Date(),
-    	to: addDays(new Date(), 30),
-		})
+		setSelectedDates(undefined)
 		
 	}
 	
@@ -86,6 +91,7 @@ const InputEventCandidates = ({ control }: InputEventProps) => {
 											defaultMonth={selectedDates?.from}
 											selected={selectedDates}
 											onSelect={setSelectedDates}
+											disabled={disabledDates}
 											numberOfMonths={2}
 											className="h-80"
 										/>

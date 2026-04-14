@@ -26,6 +26,10 @@ function CandidatesList({ control }: InputEventProps) {
 		return `${hours}:${minutes}`;
 	});
 	
+	const sortedFields = [...watchedFields]
+		.filter(item => item && item.date)
+		.map((item, originalIndex) => ({ ...item, originalIndex })) //元のインデックスを保持し処理を正常に行えるようにする
+		.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 	
   return (
     <div>
@@ -43,12 +47,13 @@ function CandidatesList({ control }: InputEventProps) {
 				
 				<CardContent>
 					<ItemGroup className="grid grid-cols-4 justify-center gap-4">
-						{watchedFields.filter(item => item && item.date).map((item, index) => {
-							const hasError = !!errors.candidates?.[index];
+						{sortedFields.map((item) => {
+							const actualIndex = item.originalIndex
+							const hasError = !!errors.candidates?.[actualIndex];
 							
 							return (
 								<Item 
-									key={index}
+									key={actualIndex}
 									variant="outline"
 									className="items-center justify-between max-w-sm w-full mb-3"
 								>
@@ -61,7 +66,7 @@ function CandidatesList({ control }: InputEventProps) {
 											variant="ghost"
 											size="icon"
 											className="h-7 w-7 text-destructive hover:bg-destructive/10"
-											onClick={() => remove(index)}
+											onClick={() => remove(actualIndex)}
 										>
 											<Trash2 className="h-4 w-4" />
 										</Button>
@@ -72,7 +77,7 @@ function CandidatesList({ control }: InputEventProps) {
 									<ItemContent>
 										<FieldGroup className='flex-row gap-3'>
 											<Controller
-												name={`candidates.${index}.startTime`}
+												name={`candidates.${actualIndex}.startTime`}
 												control={control}
 												render={({ field }) => (
 													<Field data-invalid={hasError}>
@@ -92,7 +97,7 @@ function CandidatesList({ control }: InputEventProps) {
 											/>
 											
 											<Controller
-												name={`candidates.${index}.endTime`}
+												name={`candidates.${actualIndex}.endTime`}
 												control={control}
 												render={({ field }) => (
 													<Field data-invalid={hasError}>
