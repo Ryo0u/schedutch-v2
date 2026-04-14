@@ -5,11 +5,17 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import InputEventInfo from '@/components/new/InputEventInfo';
+import InputEventCandidates from '@/components/new/InputEventCandidates';
 
 export type FormData = {
   title: string;
   password: string;
   comment: string;
+  candidates: {
+    date: Date;
+    startTime: string;
+    endTime: string;
+  }[],
 };
 
 const formSchema = z.object({
@@ -23,6 +29,14 @@ const formSchema = z.object({
      .max(12, 'パスワードを12字以内で入力してください'),
   comment:
     z.string().max(30, 'コメントは30文字以内で入力してください'),
+  candidates:
+    z.array(
+      z.object({
+        date: z.date(),
+        startTime: z.string(),
+        endTime: z.string(),
+      })
+    ).min(1, '候補日を1つ以上追加してください'),
 });
 
 export default function New() {
@@ -32,6 +46,7 @@ export default function New() {
       title: '',
       password: '',
       comment: '',
+      candidates: [],
     },
   });
 
@@ -41,9 +56,18 @@ export default function New() {
 
   return (
     <>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <InputEventInfo control={form.control} />
-        <Button type="submit">送信</Button>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <div className="flex justify-center items-start gap-8 w-full max-w-6xl mx-auto">
+          <div className="flex-1 max-w-xl shrink-0">
+            <InputEventInfo control={form.control} />
+          </div>
+          
+          <div className="flex-1 max-w-xl">
+            <InputEventCandidates control={form.control} />
+          </div>
+        </div>
+        
+        <Button className='max-w-md' type="submit">送信</Button>
       </form>
     </>
   );

@@ -12,13 +12,13 @@ import { Field, FieldGroup, FieldLabel, FieldError } from '../ui/field';
 import { Separator } from '../ui/separator';
 import { InputGroup, InputGroupAddon, InputGroupText, InputGroupTextarea } from '../ui/input-group';
 
-interface InputEventInfoProps {
+interface InputEventProps {
   control: Control<FormData>;
 }
 
-const InputEventInfo = ({ control }: InputEventInfoProps) => {
+const InputEventInfo = ({ control }: InputEventProps) => {
   return (
-    <div className="max-w-xl">
+    <div>
       <Card>
         <CardHeader>
           <CardTitle className="text-center text-xl font-bold">
