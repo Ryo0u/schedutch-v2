@@ -1,5 +1,5 @@
 import { FormData } from '@/app/new/page';
-import { Control, Controller, useFieldArray, useWatch } from 'react-hook-form';
+import { Control, Controller, useFieldArray, useFormState, useWatch } from 'react-hook-form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card"
 import { Separator } from "../ui/separator"
 import { Field, FieldError, FieldGroup, FieldLabel } from '../ui/field';
@@ -16,6 +16,7 @@ interface InputEventProps {
 
 function CandidatesList({ control }: InputEventProps) {
 	const { remove } = useFieldArray({ control, name: "candidates" });
+	const { errors } = useFormState({ control });
 	const watchedFields = useWatch({ control, name: "candidates" });
 	
 	// セレクトの時間オプション
@@ -42,74 +43,78 @@ function CandidatesList({ control }: InputEventProps) {
 				
 				<CardContent>
 					<ItemGroup className="grid grid-cols-4 justify-center gap-4">
-						{watchedFields.filter(item => item && item.date).map((item, index) => (
-							<Item 
-								key={index}
-								variant="outline"
-								className="items-center justify-between max-w-sm w-full mb-3"
-							>
-								<ItemTitle className="text-sm font-bold truncate">
-									{format(new Date(item.date), 'MM/dd (eee)', { locale: ja })}
-								</ItemTitle>
-								<ItemActions>
-									<Button
-										type="button"
-										variant="ghost"
-										size="icon"
-										className="h-7 w-7 text-destructive hover:bg-destructive/10"
-										onClick={() => remove(index)}
-									>
-										<Trash2 className="h-4 w-4" />
-									</Button>
-								</ItemActions>
-								
-								<Separator/>
-								
-								<ItemContent>
-									<FieldGroup className='flex-row gap-3'>
-										<Controller
-											name={`candidates.${index}.startTime`}
-											control={control}
-											render={({ field }) => (
-												<Field>
-													<FieldLabel className='text-xs'>開始</FieldLabel>
-													<Select value={field.value} onValueChange={field.onChange}>
-														<SelectTrigger>
-															<SelectValue/>
-														</SelectTrigger>
-														<SelectContent>
-															{timeOptions.map((time) => (
-																<SelectItem key={`from-${time}`} value={time}>{time}</SelectItem>
-															))}
-														</SelectContent>
-													</Select>
-												</Field>
-											)}
-										/>
-										
-										<Controller
-											name={`candidates.${index}.endTime`}
-											control={control}
-											render={({ field }) => (
-												<Field>
-													<FieldLabel className='text-xs'>終了</FieldLabel>
-													<Select value={field.value} onValueChange={field.onChange}>
-														<SelectTrigger>
-															<SelectValue/>
-														</SelectTrigger>
-														<SelectContent>
-															{timeOptions.map((time) => (
-																<SelectItem key={`to-${time}`} value={time}>{time}</SelectItem>
-															))}
-														</SelectContent>
-													</Select>
-												</Field>
-											)}
-										/>
-									</FieldGroup>
-								</ItemContent>
-							</Item>
-						))}
+						{watchedFields.filter(item => item && item.date).map((item, index) => {
+							const hasError = !!errors.candidates?.[index];
+							
+							return (
+								<Item 
+									key={index}
+									variant="outline"
+									className="items-center justify-between max-w-sm w-full mb-3"
+								>
+									<ItemTitle className="text-sm font-bold truncate">
+										{format(new Date(item.date), 'MM/dd (eee)', { locale: ja })}
+									</ItemTitle>
+									<ItemActions>
+										<Button
+											type="button"
+											variant="ghost"
+											size="icon"
+											className="h-7 w-7 text-destructive hover:bg-destructive/10"
+											onClick={() => remove(index)}
+										>
+											<Trash2 className="h-4 w-4" />
+										</Button>
+									</ItemActions>
+									
+									<Separator/>
+									
+									<ItemContent>
+										<FieldGroup className='flex-row gap-3'>
+											<Controller
+												name={`candidates.${index}.startTime`}
+												control={control}
+												render={({ field }) => (
+													<Field data-invalid={hasError}>
+														<FieldLabel className='text-xs'>開始</FieldLabel>
+														<Select value={field.value} onValueChange={field.onChange}>
+															<SelectTrigger aria-invalid={hasError}>
+																<SelectValue/>
+															</SelectTrigger>
+															<SelectContent>
+																{timeOptions.map((time) => (
+																	<SelectItem key={`from-${time}`} value={time}>{time}</SelectItem>
+																))}
+															</SelectContent>
+														</Select>
+													</Field>
+												)}
+											/>
+											
+											<Controller
+												name={`candidates.${index}.endTime`}
+												control={control}
+												render={({ field }) => (
+													<Field data-invalid={hasError}>
+														<FieldLabel className='text-xs'>終了</FieldLabel>
+														<Select value={field.value} onValueChange={field.onChange}>
+															<SelectTrigger aria-invalid={hasError}>
+																<SelectValue/>
+															</SelectTrigger>
+															<SelectContent>
+																{timeOptions.map((time) => (
+																	<SelectItem key={`to-${time}`} value={time}>{time}</SelectItem>
+																))}
+															</SelectContent>
+														</Select>
+													</Field>
+												)}
+											/>
+										</FieldGroup>
+									</ItemContent>
+								</Item>
+							)
+						})}
 					</ItemGroup>
 				</CardContent>
 			</Card>
