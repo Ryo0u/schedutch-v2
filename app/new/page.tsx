@@ -70,8 +70,8 @@ export default function New() {
   return (
     <>
       <form>
-        <div className="flex justify-center items-end gap-8 w-full max-w-6xl mx-auto mt-5 mb-8">
-          <section className="flex-1 max-w-xl shrink-0">
+        <div className="flex flex-col sm:flex-row justify-center items-end gap-8 w-full max-w-6xl mx-auto mt-5 mb-8">
+          <section className="flex-1 max-w-xl shrink-0 px-3 sm:px-0">
             <div className="p-4 mb-3 space-y-4">
               <div className="flex items-center gap-3">
                 <img src="/logo.png" className="h-10 w-10" />
@@ -103,16 +103,16 @@ export default function New() {
             <InputEventInfo control={form.control} />
           </section>
           
-          <section className="flex-1 max-w-xl">
+          <section className="flex-1 max-w-xl px-3 sm:px-0">
             <InputEventCandidates control={form.control} />
           </section>
         </div>
         
-        <section className='flex-row justify-center w-full max-w-6xl mx-auto'>
+        <section className='flex-row justify-center w-full max-w-6xl mx-auto px-3 sm:px-0'>
           <CandidatesList control={form.control}/>
         </section>
         
-        <section className='max-w-6xl mx-auto'>
+        <section className='max-w-6xl mx-auto px-3 sm:px-0'>
           <CreateEvent form={form}/>
         </section>
       </form>
