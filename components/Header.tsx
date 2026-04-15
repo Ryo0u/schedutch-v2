@@ -11,7 +11,7 @@ function Header() {
 	const { theme, setTheme } = useTheme()
 	
   return (
-    <header className="sticky top-0 z-10 bg-background">
+    <header className="sticky top-0 z-50 bg-background border-b">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
 				<img src="/logo.png" className="h-8 w-8" />
 				
