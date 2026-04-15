@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import InputEventInfo from '@/components/new/InputEventInfo';
 import InputEventCandidates from '@/components/new/InputEventCandidates';
 import CandidatesList from '@/components/new/CandidatesList';
+import { Eraser, Plus } from 'lucide-react'; 
+import { Separator } from '@/components/ui/separator';
 
 export type FormData = {
   title: string;
@@ -73,26 +75,41 @@ export default function New() {
   return (
     <>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="flex justify-center items-end gap-8 w-full max-w-6xl mx-auto my-10">
-          <div className="flex-1 max-w-xl shrink-0">
+        <div className="flex justify-center items-end gap-8 w-full max-w-6xl mx-auto mt-5 mb-8">
+          <section className="flex-1 max-w-xl shrink-0">
             <div className="p-2">
               <h1 className="text-2xl font-bold text-primary">schedutch</h1>
               <p>ここにロゴとか説明を書く</p>
             </div>
             
             <InputEventInfo control={form.control} />
-          </div>
+          </section>
           
-          <div className="flex-1 max-w-xl">
+          <section className="flex-1 max-w-xl">
             <InputEventCandidates control={form.control} />
+          </section>
+        </div>
+        
+        <section className='flex-row justify-center w-full max-w-6xl mx-auto mb-8'>
+          <CandidatesList control={form.control}/>
+        </section>
+        
+        <div className='max-w-6xl mx-auto'>
+          <Separator className="my-8" />
+          <div className='flex justify-between items-center bg-muted/30 p-4 rounded-xl border border-border'>
+            <p className="text-sm text-muted-foreground ml-2">
+              入力内容を確認して送信してください
+            </p>
+            <div className='flex gap-3'>
+              <Button className="hover:bg-destructive/10 hover:text-destructive " variant="ghost" type="button" onClick={() => form.reset()}>
+                <Eraser/>リセット
+              </Button>
+              <Button className='px-12 font-bold' size="lg" type="submit">
+                <Plus/>作成する
+              </Button>
+            </div>
           </div>
         </div>
-        
-        <div className='flex-row justify-center w-full max-w-6xl mx-auto'>
-          <CandidatesList control={form.control}/>
-        </div>
-        
-        <Button className='max-w-md' type="submit">送信</Button>
       </form>
     </>
   );
