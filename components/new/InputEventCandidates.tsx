@@ -10,7 +10,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from '../ui/field';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../ui/select';
 import { Button } from '../ui/button';
 import { Plus } from 'lucide-react';
-import { useIsMobile } from '../UseMobile';
+import { useDeviceType } from '../UseDeviceType';
 
 
 interface InputEventProps {
@@ -18,8 +18,6 @@ interface InputEventProps {
 }
 
 const InputEventCandidates = ({ control }: InputEventProps) => {
-	const isMobile = useIsMobile()
-	
 	const { append } = useFieldArray({ control, name: "candidates" });
 	
 	// ローカルに選択している日時を一時保存
@@ -31,6 +29,12 @@ const InputEventCandidates = ({ control }: InputEventProps) => {
   })
 	
 	const watchedFields = useWatch({ control, name: "candidates" });
+	
+	const device = useDeviceType()
+	const calendarColum = (device: "mobile" | "tablet" | "desktop") => {
+		if (device === 'desktop') return 2
+		else return 1
+	}
 	
 	// セレクトの時間オプション
 	const timeOptions = Array.from({ length: 48 }).map((_, i) => {
@@ -101,8 +105,8 @@ const InputEventCandidates = ({ control }: InputEventProps) => {
 												selected={selectedDates}
 												onSelect={setSelectedDates}
 												disabled={disabledDates}
-												numberOfMonths={isMobile? 1 : 2}
-												className="h-full sm:h-80"
+												numberOfMonths={calendarColum(device)}
+												className="h-full lg:h-80"
 											/>
 										</Field>
 										
