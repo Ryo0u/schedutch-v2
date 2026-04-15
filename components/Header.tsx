@@ -1,6 +1,5 @@
 "use client"
 
-import { Calendar } from "lucide-react"
 import { Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
@@ -14,10 +13,7 @@ function Header() {
   return (
     <header className="sticky top-0 z-10 bg-background">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-				<div className="text-primary flex items-center gap-2 font-bold text-xl">
-          <Calendar/>
-          <span>schedutch</span>
-        </div>
+				<img src="/logo.png" className="h-8 w-8" />
 				
 				<div className="flex gap-2 justify-center items-center">
 					<Button
