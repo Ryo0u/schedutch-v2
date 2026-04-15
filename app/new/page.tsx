@@ -3,12 +3,10 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Button } from '@/components/ui/button';
 import InputEventInfo from '@/components/new/InputEventInfo';
 import InputEventCandidates from '@/components/new/InputEventCandidates';
 import CandidatesList from '@/components/new/CandidatesList';
-import { Eraser, Plus } from 'lucide-react'; 
-import { Separator } from '@/components/ui/separator';
+import CreateEvent from '@/components/new/CreateEvent';
 
 export type FormData = {
   title: string;
@@ -68,13 +66,9 @@ export default function New() {
     },
   });
 
-  const onSubmit = (data: FormData) => {
-    console.log(data);
-  };
-
   return (
     <>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
+      <form>
         <div className="flex justify-center items-end gap-8 w-full max-w-6xl mx-auto mt-5 mb-8">
           <section className="flex-1 max-w-xl shrink-0">
             <div className="p-2">
@@ -90,26 +84,13 @@ export default function New() {
           </section>
         </div>
         
-        <section className='flex-row justify-center w-full max-w-6xl mx-auto mb-8'>
+        <section className='flex-row justify-center w-full max-w-6xl mx-auto'>
           <CandidatesList control={form.control}/>
         </section>
         
-        <div className='max-w-6xl mx-auto'>
-          <Separator className="my-8" />
-          <div className='flex justify-between items-center bg-muted/30 p-4 rounded-xl border border-border'>
-            <p className="text-sm text-muted-foreground ml-2">
-              入力内容を確認して送信してください
-            </p>
-            <div className='flex gap-3'>
-              <Button className="hover:bg-destructive/10 hover:text-destructive " variant="ghost" type="button" onClick={() => form.reset()}>
-                <Eraser/>リセット
-              </Button>
-              <Button className='px-12 font-bold' size="lg" type="submit">
-                <Plus/>作成する
-              </Button>
-            </div>
-          </div>
-        </div>
+        <section className='max-w-6xl mx-auto'>
+          <CreateEvent form={form}/>
+        </section>
       </form>
     </>
   );
