@@ -80,70 +80,75 @@ const InputEventCandidates = ({ control }: InputEventProps) => {
 						<Controller
 							name='candidates'
 							control={control}	
-							render={({ fieldState }) => (
-								<>
-									<Field>
-										<FieldLabel className={fieldState.invalid ? "text-destructive" : ""}>
-											日付と時間<span className="text-destructive">*</span>
-										</FieldLabel>
-										<Calendar 
-											mode="range"
-											defaultMonth={selectedDates?.from}
-											selected={selectedDates}
-											onSelect={setSelectedDates}
-											disabled={disabledDates}
-											numberOfMonths={2}
-											className="h-80"
-										/>
-									</Field>
-									
-									<div className='flex gap-4'>
+							render={({ fieldState }) => {
+								// 候補日が追加されているかをエラーメッセージの有無で判定
+								const hasArrayError = !!fieldState.error?.message;
+								
+								return (
+									<>
 										<Field>
-											<FieldLabel htmlFor="time-from">開始</FieldLabel>
-											<Select value={startTime} onValueChange={(val) => setStartTime(val ?? "")}>
-												<SelectTrigger>
-													<SelectValue />
-												</SelectTrigger>
-												
-												<SelectContent>
-													<SelectGroup>
-														<SelectLabel>開始時間</SelectLabel>
-														{timeOptions.map((time) => (
-															<SelectItem key={`from-${time}`} value={time}>
-																{time}
-															</SelectItem>
-														))}
-													</SelectGroup>
-												</SelectContent>
-											</Select>
+											<FieldLabel className={hasArrayError ? "text-destructive" : ""}>
+												日付と時間<span className="text-destructive">*</span>
+											</FieldLabel>
+											<Calendar 
+												mode="range"
+												defaultMonth={selectedDates?.from}
+												selected={selectedDates}
+												onSelect={setSelectedDates}
+												disabled={disabledDates}
+												numberOfMonths={2}
+												className="h-80"
+											/>
 										</Field>
+										
+										<div className='flex gap-4'>
+											<Field>
+												<FieldLabel htmlFor="time-from">開始</FieldLabel>
+												<Select value={startTime} onValueChange={(val) => setStartTime(val ?? "")}>
+													<SelectTrigger>
+														<SelectValue />
+													</SelectTrigger>
+													
+													<SelectContent>
+														<SelectGroup>
+															<SelectLabel>開始時間</SelectLabel>
+															{timeOptions.map((time) => (
+																<SelectItem key={`from-${time}`} value={time}>
+																	{time}
+																</SelectItem>
+															))}
+														</SelectGroup>
+													</SelectContent>
+												</Select>
+											</Field>
 
-										<Field>
-											<FieldLabel htmlFor="time-from">終了</FieldLabel>
-											<Select value={endTime} onValueChange={(val) => setEndTime(val ?? "")}>
-												<SelectTrigger>
-													<SelectValue />
-												</SelectTrigger>
-												
-												<SelectContent>
-													<SelectGroup>
-														<SelectLabel>終了時間</SelectLabel>
-														{timeOptions.map((time) => (
-															<SelectItem key={`to-${time}`} value={time}>
-																{time}
-															</SelectItem>
-														))}
-													</SelectGroup>
-												</SelectContent>
-											</Select>
-										</Field>
-									</div>
-									
-									{fieldState.invalid && (
-										<FieldError errors={[fieldState.error]} />
-									)}
-								</>
-							)}
+											<Field>
+												<FieldLabel htmlFor="time-from">終了</FieldLabel>
+												<Select value={endTime} onValueChange={(val) => setEndTime(val ?? "")}>
+													<SelectTrigger>
+														<SelectValue />
+													</SelectTrigger>
+													
+													<SelectContent>
+														<SelectGroup>
+															<SelectLabel>終了時間</SelectLabel>
+															{timeOptions.map((time) => (
+																<SelectItem key={`to-${time}`} value={time}>
+																	{time}
+																</SelectItem>
+															))}
+														</SelectGroup>
+													</SelectContent>
+												</Select>
+											</Field>
+										</div>
+										
+										{hasArrayError && (
+											<FieldError errors={[fieldState.error]} />
+										)}
+									</>
+								)
+							}}
 						/>
 					</FieldGroup>
 				</CardContent>

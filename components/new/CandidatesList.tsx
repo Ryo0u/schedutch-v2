@@ -1,8 +1,8 @@
 import { FormData } from '@/app/new/page';
 import { Control, Controller, useFieldArray, useFormState, useWatch } from 'react-hook-form';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card"
 import { Separator } from "../ui/separator"
-import { Field, FieldGroup, FieldLabel } from '../ui/field';
+import { Field, FieldContent, FieldGroup, FieldLabel } from '../ui/field';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Button } from '../ui/button';
 import { Trash2 } from 'lucide-react'; 
@@ -50,83 +50,96 @@ function CandidatesList({ control }: InputEventProps) {
 					{watchedFields.length === 0 ? (
 						<EmptyList/>
 					): (
-						<ItemGroup className="grid grid-cols-4 justify-center gap-4">
-							{sortedFields.map((item) => {
-								const actualIndex = item.originalIndex
-								const hasError = !!errors.candidates?.[actualIndex];
-								
-								return (
-									<Item 
-										key={actualIndex}
-										variant="outline"
-										className="items-center justify-between max-w-sm w-full mb-3"
-									>
-										<ItemTitle className="text-sm font-bold truncate">
-											{format(new Date(item.date), 'MM/dd (eee)', { locale: ja })}
-										</ItemTitle>
-										<ItemActions>
-											<Button
-												type="button"
-												variant="ghost"
-												size="icon"
-												className="h-7 w-7 text-destructive hover:bg-destructive/10"
-												onClick={() => remove(actualIndex)}
+						<Field>
+							<FieldLabel className={errors.candidates?"text-destructive":""}>候補日一覧</FieldLabel>
+							<FieldContent>
+								<ItemGroup className="grid grid-cols-4 justify-center gap-4">
+									{sortedFields.map((item) => {
+										const actualIndex = item.originalIndex
+										const hasError = !!errors.candidates?.[actualIndex];
+										
+										return (
+											<Item 
+												key={actualIndex}
+												variant="outline"
+												className="items-center justify-between max-w-sm w-full mb-3"
 											>
-												<Trash2 className="h-4 w-4" />
-											</Button>
-										</ItemActions>
-										
-										<Separator/>
-										
-										<ItemContent>
-											<FieldGroup className='flex-row gap-3'>
-												<Controller
-													name={`candidates.${actualIndex}.startTime`}
-													control={control}
-													render={({ field }) => (
-														<Field data-invalid={hasError}>
-															<FieldLabel className='text-xs'>開始</FieldLabel>
-															<Select value={field.value} onValueChange={field.onChange}>
-																<SelectTrigger aria-invalid={hasError}>
-																	<SelectValue/>
-																</SelectTrigger>
-																<SelectContent>
-																	{timeOptions.map((time) => (
-																		<SelectItem key={`from-${time}`} value={time}>{time}</SelectItem>
-																	))}
-																</SelectContent>
-															</Select>
-														</Field>
-													)}
-												/>
+												<ItemTitle className="text-sm font-bold truncate">
+													{format(new Date(item.date), 'MM/dd (eee)', { locale: ja })}
+												</ItemTitle>
+												<ItemActions>
+													<Button
+														type="button"
+														variant="ghost"
+														size="icon"
+														className="h-7 w-7 text-destructive hover:bg-destructive/10"
+														onClick={() => remove(actualIndex)}
+													>
+														<Trash2 className="h-4 w-4" />
+													</Button>
+												</ItemActions>
 												
-												<Controller
-													name={`candidates.${actualIndex}.endTime`}
-													control={control}
-													render={({ field }) => (
-														<Field data-invalid={hasError}>
-															<FieldLabel className='text-xs'>終了</FieldLabel>
-															<Select value={field.value} onValueChange={field.onChange}>
-																<SelectTrigger aria-invalid={hasError}>
-																	<SelectValue/>
-																</SelectTrigger>
-																<SelectContent>
-																	{timeOptions.map((time) => (
-																		<SelectItem key={`to-${time}`} value={time}>{time}</SelectItem>
-																	))}
-																</SelectContent>
-															</Select>
-														</Field>
-													)}
-												/>
-											</FieldGroup>
-										</ItemContent>
-									</Item>
-								)
-							})}
-						</ItemGroup>
+												<Separator/>
+												
+												<ItemContent>
+													<FieldGroup className='flex-row gap-3'>
+														<Controller
+															name={`candidates.${actualIndex}.startTime`}
+															control={control}
+															render={({ field }) => (
+																<Field data-invalid={hasError}>
+																	<FieldLabel className='text-xs'>開始</FieldLabel>
+																	<Select value={field.value} onValueChange={field.onChange}>
+																		<SelectTrigger aria-invalid={hasError}>
+																			<SelectValue/>
+																		</SelectTrigger>
+																		<SelectContent>
+																			{timeOptions.map((time) => (
+																				<SelectItem key={`from-${time}`} value={time}>{time}</SelectItem>
+																			))}
+																		</SelectContent>
+																	</Select>
+																</Field>
+															)}
+														/>
+														
+														<Controller
+															name={`candidates.${actualIndex}.endTime`}
+															control={control}
+															render={({ field }) => (
+																<Field data-invalid={hasError}>
+																	<FieldLabel className='text-xs'>終了</FieldLabel>
+																	<Select value={field.value} onValueChange={field.onChange}>
+																		<SelectTrigger aria-invalid={hasError}>
+																			<SelectValue/>
+																		</SelectTrigger>
+																		<SelectContent>
+																			{timeOptions.map((time) => (
+																				<SelectItem key={`to-${time}`} value={time}>{time}</SelectItem>
+																			))}
+																		</SelectContent>
+																	</Select>
+																</Field>
+															)}
+														/>
+													</FieldGroup>
+												</ItemContent>
+											</Item>
+										)
+									})}
+								</ItemGroup>
+							</FieldContent>
+						</Field>
 					)}
-				</CardContent>
+				</CardContent >
+				
+				{errors.candidates && (
+					<CardFooter>
+						<p className="text-sm text-destructive font-medium">
+							時間に不備がある候補日があります
+						</p>
+					</CardFooter>
+				)}
 			</Card>
     </div>
   )

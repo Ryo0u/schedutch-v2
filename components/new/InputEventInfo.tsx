@@ -80,8 +80,8 @@ const InputEventInfo = ({ control }: InputEventProps) => {
             <Controller
               name='comment'
               control={control}
-              render={({ field }) => (
-                <Field>
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor='comment'>コメント</FieldLabel>
                   <InputGroup>
                     <InputGroupTextarea
@@ -90,6 +90,7 @@ const InputEventInfo = ({ control }: InputEventProps) => {
                       rows={10}
                       className="min-h-18 resize-none"
                       placeholder="頑張ります！！"
+                      aria-invalid={fieldState.invalid}
                     />
                     <InputGroupAddon align="block-end">
                       <InputGroupText className="tabular-nums">
@@ -97,6 +98,9 @@ const InputEventInfo = ({ control }: InputEventProps) => {
                       </InputGroupText>
                     </InputGroupAddon>
                   </InputGroup>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
                 </Field>
               )}
             />
