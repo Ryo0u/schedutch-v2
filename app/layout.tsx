@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'schedutch',
-  description: '予定調整ツール',
+  description: '予定調整アプリ',
 };
 
 export default function RootLayout({
