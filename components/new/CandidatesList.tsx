@@ -133,7 +133,7 @@ function CandidatesList({ control }: InputEventProps) {
 					)}
 				</CardContent >
 				
-				{errors.candidates && (
+				{errors.candidates && Array.isArray(errors.candidates) && errors.candidates.some((err) => err?.message) && (
 					<CardFooter>
 						<p className="text-sm text-destructive font-medium">
 							時間に不備がある候補日があります
