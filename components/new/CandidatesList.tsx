@@ -15,7 +15,7 @@ interface InputEventProps {
 	control: Control<FormData>;
 }
 
-function CandidatesList({ control }: InputEventProps) {
+function CandidatesList({ control }: InputEventProps) {	
 	const { remove } = useFieldArray({ control, name: "candidates" });
 	const { errors } = useFormState({ control });
 	const watchedFields = useWatch({ control, name: "candidates" });
@@ -53,7 +53,7 @@ function CandidatesList({ control }: InputEventProps) {
 						<Field>
 							<FieldLabel className={errors.candidates?"text-destructive":""}>候補日一覧</FieldLabel>
 							<FieldContent>
-								<ItemGroup className="grid grid-cols-4 justify-center gap-4">
+								<ItemGroup className="grid grid-cols-2 sm:grid-cols-4 justify-center gap-4">
 									{sortedFields.map((item) => {
 										const actualIndex = item.originalIndex
 										const hasError = !!errors.candidates?.[actualIndex];
@@ -82,12 +82,12 @@ function CandidatesList({ control }: InputEventProps) {
 												<Separator/>
 												
 												<ItemContent>
-													<FieldGroup className='flex-row gap-3'>
+													<FieldGroup className='sm:flex-row gap-3'>
 														<Controller
 															name={`candidates.${actualIndex}.startTime`}
 															control={control}
 															render={({ field }) => (
-																<Field data-invalid={hasError}>
+																<Field className='flex flex-row sm:flex-col' data-invalid={hasError}>
 																	<FieldLabel className='text-xs'>開始</FieldLabel>
 																	<Select value={field.value} onValueChange={field.onChange}>
 																		<SelectTrigger aria-invalid={hasError}>
@@ -107,7 +107,7 @@ function CandidatesList({ control }: InputEventProps) {
 															name={`candidates.${actualIndex}.endTime`}
 															control={control}
 															render={({ field }) => (
-																<Field data-invalid={hasError}>
+																<Field className='flex flex-row sm:flex-col' data-invalid={hasError}>
 																	<FieldLabel className='text-xs'>終了</FieldLabel>
 																	<Select value={field.value} onValueChange={field.onChange}>
 																		<SelectTrigger aria-invalid={hasError}>
