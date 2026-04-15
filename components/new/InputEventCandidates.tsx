@@ -10,14 +10,19 @@ import { Field, FieldError, FieldGroup, FieldLabel } from '../ui/field';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../ui/select';
 import { Button } from '../ui/button';
 import { Plus } from 'lucide-react';
+import { useIsMobile } from '../UseMobile';
+
 
 interface InputEventProps {
 	control: Control<FormData>;
 }
 
 const InputEventCandidates = ({ control }: InputEventProps) => {
+	const isMobile = useIsMobile()
+	
 	const { append } = useFieldArray({ control, name: "candidates" });
 	
+	// ローカルに選択している日時を一時保存
 	const [startTime, setStartTime] = useState<string>("06:00")
 	const [endTime, setEndTime] = useState<string>("21:00")
 	const [selectedDates, setSelectedDates] = useState<DateRange | undefined>({
@@ -96,8 +101,8 @@ const InputEventCandidates = ({ control }: InputEventProps) => {
 												selected={selectedDates}
 												onSelect={setSelectedDates}
 												disabled={disabledDates}
-												numberOfMonths={2}
-												className="h-80"
+												numberOfMonths={isMobile? 1 : 2}
+												className="h-full sm:h-80"
 											/>
 										</Field>
 										
