@@ -6,7 +6,7 @@ import { UseFormReturn } from 'react-hook-form';
 import { FormData } from '@/app/new/page';
 import { toast } from "sonner"
 import { useState } from 'react';
-import CreatedDialog from './CreateDiaolg';
+import CreatedDialog from './CreatedDiaolg';
 
 interface CreateEventActionProps {
   form: UseFormReturn<FormData>;
