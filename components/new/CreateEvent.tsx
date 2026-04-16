@@ -7,12 +7,14 @@ import { FormData } from '@/app/new/page';
 import { toast } from "sonner"
 import { useState } from 'react';
 import CreatedDialog from './CreatedDiaolg';
+import { Spinner } from '../ui/spinner';
 
 interface CreateEventActionProps {
   form: UseFormReturn<FormData>;
 }
 
 function CreateEvent({ form }: CreateEventActionProps) {
+  const { isSubmitting } = form.formState;
   const [showDialog, setShowDialog] = useState(false);
   const [createdEventId, setCreatedEventId] = useState<string | null>(null);
 	
@@ -74,7 +76,14 @@ function CreateEvent({ form }: CreateEventActionProps) {
             <Eraser/>リセット
           </Button>
           <Button className='px-12 font-bold' size="lg" onClick={form.handleSubmit(onSubmit)}>
-            <Plus/>作成する
+            {isSubmitting ?  
+              <>
+                <Spinner/>作成中...
+              </> : 
+              <>
+                <Plus/>作成する
+              </>
+            }
           </Button>
         </div>
       </div>
