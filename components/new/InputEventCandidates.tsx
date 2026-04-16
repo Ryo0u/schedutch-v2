@@ -10,7 +10,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from '../ui/field';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../ui/select';
 import { Button } from '../ui/button';
 import { Plus } from 'lucide-react';
-import { useDeviceType } from '../UseDeviceType';
+import { useDeviceType } from '../hooks/UseDeviceType';
 
 
 interface InputEventProps {
