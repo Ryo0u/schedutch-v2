@@ -5,6 +5,7 @@ import { Button } from '../ui/button';
 import { Eraser, Plus } from 'lucide-react';
 import { UseFormReturn } from 'react-hook-form';
 import { FormData } from '@/app/new/page';
+import { toast } from "sonner"
 
 interface CreateEventActionProps {
   form: UseFormReturn<FormData>;
@@ -52,7 +53,7 @@ function CreateEvent({ form }: CreateEventActionProps) {
         router.push(`/event/${event.id}`);
       } catch (error) {
         console.error('保存に失敗しました:', error);
-        alert('エラーが発生しました。もう一度お試しください。');
+        toast.error('イベント作成に失敗しました', {position: 'top-center'})
       }
     };
 	
