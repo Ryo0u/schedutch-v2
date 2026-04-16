@@ -10,7 +10,8 @@ import { Field, FieldError, FieldGroup, FieldLabel } from '../ui/field';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../ui/select';
 import { Button } from '../ui/button';
 import { Plus } from 'lucide-react';
-import { useDeviceType } from '../UseDeviceType';
+import { useDeviceType } from '../hooks/UseDeviceType';
+import { TIME_OPTIONS } from '@/lib/constants';
 
 
 interface InputEventProps {
@@ -35,13 +36,6 @@ const InputEventCandidates = ({ control }: InputEventProps) => {
 		if (device === 'desktop') return 2
 		else return 1
 	}
-	
-	// セレクトの時間オプション
-	const timeOptions = Array.from({ length: 48 }).map((_, i) => {
-		const hours = Math.floor(i / 2).toString().padStart(2, '0');
-		const minutes = (i % 2 === 0 ? '00' : '30');
-		return `${hours}:${minutes}`;
-	});
 	
 	// 追加された候補日はカレンダーから除外する
 	const disabledDates = watchedFields
@@ -121,7 +115,7 @@ const InputEventCandidates = ({ control }: InputEventProps) => {
 													<SelectContent>
 														<SelectGroup>
 															<SelectLabel>開始時間</SelectLabel>
-															{timeOptions.map((time) => (
+															{TIME_OPTIONS.map((time) => (
 																<SelectItem key={`from-${time}`} value={time}>
 																	{time}
 																</SelectItem>
@@ -141,7 +135,7 @@ const InputEventCandidates = ({ control }: InputEventProps) => {
 													<SelectContent>
 														<SelectGroup>
 															<SelectLabel>終了時間</SelectLabel>
-															{timeOptions.map((time) => (
+															{TIME_OPTIONS.map((time) => (
 																<SelectItem key={`to-${time}`} value={time}>
 																	{time}
 																</SelectItem>

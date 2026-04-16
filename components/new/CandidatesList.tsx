@@ -10,6 +10,7 @@ import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { Item, ItemActions, ItemContent, ItemGroup, ItemTitle } from '../ui/item';
 import EmptyList from './EmptyList';
+import { TIME_OPTIONS } from "@/lib/constants";
 
 interface InputEventProps {
 	control: Control<FormData>;
@@ -19,13 +20,6 @@ function CandidatesList({ control }: InputEventProps) {
 	const { remove } = useFieldArray({ control, name: "candidates" });
 	const { errors } = useFormState({ control });
 	const watchedFields = useWatch({ control, name: "candidates" });
-	
-	// セレクトの時間オプション
-	const timeOptions = Array.from({ length: 48 }).map((_, i) => {
-		const hours = Math.floor(i / 2).toString().padStart(2, '0');
-		const minutes = (i % 2 === 0 ? '00' : '30');
-		return `${hours}:${minutes}`;
-	});
 	
 	const sortedFields = [...watchedFields]
 		.filter(item => item && item.date)
@@ -94,7 +88,7 @@ function CandidatesList({ control }: InputEventProps) {
 																			<SelectValue/>
 																		</SelectTrigger>
 																		<SelectContent>
-																			{timeOptions.map((time) => (
+																			{TIME_OPTIONS.map((time) => (
 																				<SelectItem key={`from-${time}`} value={time}>{time}</SelectItem>
 																			))}
 																		</SelectContent>
@@ -114,7 +108,7 @@ function CandidatesList({ control }: InputEventProps) {
 																			<SelectValue/>
 																		</SelectTrigger>
 																		<SelectContent>
-																			{timeOptions.map((time) => (
+																			{TIME_OPTIONS.map((time) => (
 																				<SelectItem key={`to-${time}`} value={time}>{time}</SelectItem>
 																			))}
 																		</SelectContent>
