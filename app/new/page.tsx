@@ -112,7 +112,7 @@ export default function New() {
           <CandidatesList control={form.control}/>
         </section>
         
-        <section className='max-w-6xl mx-auto px-3'>
+        <section className='max-w-6xl mx-auto px-3 mb-5'>
           <CreateEvent form={form}/>
         </section>
       </form>

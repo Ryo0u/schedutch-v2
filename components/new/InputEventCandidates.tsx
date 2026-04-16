@@ -25,7 +25,7 @@ const InputEventCandidates = ({ control }: InputEventProps) => {
 	const [endTime, setEndTime] = useState<string>("21:00")
 	const [selectedDates, setSelectedDates] = useState<DateRange | undefined>({
     from: new Date(),
-    to: addDays(new Date(), 30),
+    to: addDays(new Date(), 5),
   })
 	
 	const watchedFields = useWatch({ control, name: "candidates" });
