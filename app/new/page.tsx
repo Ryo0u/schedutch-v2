@@ -66,10 +66,12 @@ export default function New() {
       candidates: [],
     },
   });
+  
+  const { isSubmitting } = form.formState;
 
   return (
-    <>
-      <form>
+    <form>
+      <fieldset disabled={isSubmitting}>
         <div className="flex flex-col sm:flex-row justify-center items-end gap-8 w-full max-w-6xl mx-auto mt-5 mb-8">
           <section className="flex-1 max-w-xl shrink-0 px-3">
             <div className="p-4 mb-3 space-y-4">
@@ -115,7 +117,7 @@ export default function New() {
         <section className='max-w-6xl mx-auto px-3 mb-5'>
           <CreateEvent form={form}/>
         </section>
-      </form>
-    </>
+      </fieldset>
+    </form>
   );
 }
