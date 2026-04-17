@@ -1,6 +1,6 @@
 'use client';
 
-import { Moon, Sun } from 'lucide-react';
+import { Menu, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import {
@@ -66,7 +66,10 @@ function Header() {
             <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger>Pages</NavigationMenuTrigger>
+                  <NavigationMenuTrigger className="[&>svg]:hidden">
+                    <Menu className="h-5 w-5 block!" />
+                  </NavigationMenuTrigger>
+                  
                   <NavigationMenuContent>
                     <ul className="p-2">
                       <li>
