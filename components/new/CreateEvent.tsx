@@ -8,6 +8,7 @@ import { toast } from "sonner"
 import { useState } from 'react';
 import CreatedDialog from './CreatedDiaolg';
 import { Spinner } from '../ui/spinner';
+import bcrypt from 'bcryptjs';
 
 interface CreateEventActionProps {
   form: UseFormReturn<FormData>;
@@ -20,11 +21,14 @@ function CreateEvent({ form }: CreateEventActionProps) {
 	
   const onSubmit = async (values: FormData) => {
       try {
+         const salt = await bcrypt.genSalt(10);
+         const hashedPassward = await bcrypt.hash(values.password, salt);
+         
         const { data: event, error: eventError } = await supabase
           .from('events')
           .insert({
             title: values.title,
-            password_digest: values.password,
+            password_digest: hashedPassward,
             comment: values.comment,
           })
           .select()
@@ -33,19 +37,19 @@ function CreateEvent({ form }: CreateEventActionProps) {
         if (eventError) throw eventError;
         
         const candidatesToInsert = values.candidates.map((c, index) => {
-        const dateStr = c.date.toISOString().split('T')[0];
-        
-        // TIMESTAMP形式にフォーマット
-        const startTimestamp = `${dateStr}T${c.startTime}:00`;
-        const endTimestamp = `${dateStr}T${c.endTime}:00`;
-  
-        return {
-          event_id: event.id,
-          start_time: startTimestamp,
-          end_time: endTimestamp,
-          index_number: index,
-        };
-      });
+          const dateStr = c.date.toISOString().split('T')[0];
+          
+          // TIMESTAMP形式にフォーマット
+          const startTimestamp = `${dateStr}T${c.startTime}:00`;
+          const endTimestamp = `${dateStr}T${c.endTime}:00`;
+    
+          return {
+            event_id: event.id,
+            start_time: startTimestamp,
+            end_time: endTimestamp,
+            index_number: index,
+          };
+        });
         
         const { error: candidateError } = await supabase
           .from('candidates')

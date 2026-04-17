@@ -6,6 +6,7 @@ import { Calendar } from '../ui/calendar';
 import { useState } from 'react';
 import { type DateRange } from "react-day-picker"
 import { addDays } from "date-fns"
+import { ja } from "date-fns/locale"
 import { Field, FieldError, FieldGroup, FieldLabel } from '../ui/field';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../ui/select';
 import { Button } from '../ui/button';
@@ -95,6 +96,7 @@ const InputEventCandidates = ({ control }: InputEventProps) => {
 											</FieldLabel>
 											<Calendar 
 												mode="range"
+												locale={ja}
 												defaultMonth={selectedDates?.from}
 												selected={selectedDates}
 												onSelect={setSelectedDates}
