@@ -8,6 +8,7 @@ import { toast } from "sonner"
 import { useState } from 'react';
 import CreatedDialog from './CreatedDiaolg';
 import { Spinner } from '../ui/spinner';
+import bcrypt from 'bcryptjs';
 
 interface CreateEventActionProps {
   form: UseFormReturn<FormData>;
@@ -20,45 +21,36 @@ function CreateEvent({ form }: CreateEventActionProps) {
 	
   const onSubmit = async (values: FormData) => {
       try {
-        const { data: event, error: eventError } = await supabase
-          .from('events')
-          .insert({
-            title: values.title,
-            password_digest: values.password,
-            comment: values.comment,
-          })
-          .select()
-          .single();
-  
-        if (eventError) throw eventError;
+        // パスワードのハッシュ化
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassward = await bcrypt.hash(values.password, salt);
         
+        // 候補日データをTIMESTAMP形式に整形
         const candidatesToInsert = values.candidates.map((c, index) => {
-        const dateStr = c.date.toISOString().split('T')[0];
+          const dateStr = c.date.toISOString().split('T')[0];
+          return {
+            start_time: `${dateStr}T${c.startTime}:00`,
+            end_time: `${dateStr}T${c.endTime}:00`,
+            index_number: index,
+          };
+        });
         
-        // TIMESTAMP形式にフォーマット
-        const startTimestamp = `${dateStr}T${c.startTime}:00`;
-        const endTimestamp = `${dateStr}T${c.endTime}:00`;
-  
-        return {
-          event_id: event.id,
-          start_time: startTimestamp,
-          end_time: endTimestamp,
-          index_number: index,
-        };
-      });
+        // supabase内でトランザクションを実装している
+        const { data: eventId, error } = await supabase.rpc('create_event_with_candidates', {
+          p_title: values.title,
+          p_password_digest: hashedPassward,
+          p_comment: values.comment,
+          p_candidates: candidatesToInsert,
+        });
         
-        const { error: candidateError } = await supabase
-          .from('candidates')
-          .insert(candidatesToInsert);
-          
-        if (candidateError) throw candidateError;
+        if (error) throw error;
         
         // ダイアログを表示
+        setCreatedEventId(eventId);
         setShowDialog(true);
-        setCreatedEventId(event.id);
         
       } catch (error) {
-        console.error('保存に失敗しました:', error);
+        console.error('Failed to create event:', error);
         toast.error('イベント作成に失敗しました', {position: 'top-center'})
       }
     };
