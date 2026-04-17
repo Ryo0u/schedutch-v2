@@ -5,7 +5,7 @@ import { Separator } from "../ui/separator"
 import { Calendar } from '../ui/calendar';
 import { useState } from 'react';
 import { type DateRange } from "react-day-picker"
-import { addDays } from "date-fns"
+import { addDays, getDate } from "date-fns"
 import { ja } from "date-fns/locale"
 import { Field, FieldError, FieldGroup, FieldLabel } from '../ui/field';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../ui/select';
@@ -43,26 +43,36 @@ const InputEventCandidates = ({ control }: InputEventProps) => {
 		.filter(item => item && item.date)
 		.map(item => new Date(item.date));
 	
-	
 	const handleAddCandidates = () => {
 		if (!selectedDates?.from || !selectedDates?.to) return;
 		
+		// 選択した候補日リスト
+		const datesList: Date[] = [];
 		let current = new Date(selectedDates.from);
-    const end = new Date(selectedDates.to);
-		
+		const end = new Date(selectedDates.to);
+
 		while (current <= end) {
-			append({
-				date: new Date(current),
-				startTime: startTime,
-				endTime: endTime,
-			})
-			
+			datesList.push(new Date(current));
 			current.setDate(current.getDate() + 1)
 		}
 		
+		// 既存の候補日リスト
+		const existingDateStrings = new Set(
+			watchedFields.map(item => new Date(item.date).toDateString())
+		)
+		
+		datesList
+			.filter(date => !existingDateStrings.has(date.toDateString()))
+			.forEach(date => {
+				append({
+					date: date,
+					startTime: startTime,
+					endTime: endTime,
+				});
+			});
+		
 		// 日付選択リセット
 		setSelectedDates(undefined)
-		
 	}
 	
   return (
