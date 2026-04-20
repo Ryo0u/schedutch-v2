@@ -1,13 +1,13 @@
 import EventInfo from "@/components/event/EventInfo";
+import JoinButton from "@/components/event/JoinButton";
 import MenuButton from "@/components/event/MenuBotton";
 import UsersInfo from "@/components/event/UsersInfo";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/utils/supabase/client";
 
 const EventFetch = async (id: string) => {
   try {
-    const { data, error } = await supabase.from('events').select('*').eq('id', id).single()
+    const { data, error } = await supabase.from('events').select(`*, users (*)`).eq('id', id).single()
     
     if (error) throw error
     
@@ -32,9 +32,7 @@ export default async function Event({ params }: { params: Promise<{ id: string }
         <EventInfo data={data}/> 
         <div className="flex items-center gap-3">
           <MenuButton/>
-          <Button size="lg" className="rounded-full px-8 font-bold">
-            予定を回答する {/* 回答フォームを開く処理を追記 */}
-          </Button>
+          <JoinButton eventId={eventId}/>
         </div>
       </section>
       
