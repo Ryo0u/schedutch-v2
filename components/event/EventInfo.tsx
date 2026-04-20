@@ -1,6 +1,4 @@
 import { Calendar, MessageSquare } from "lucide-react";
-import { Card, CardDescription, CardHeader, CardTitle } from "../ui/card"
-import { Separator } from "../ui/separator";
 
 interface EventInfoProps {
   data: {

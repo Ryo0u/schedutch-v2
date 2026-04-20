@@ -21,7 +21,7 @@ function MenuButton() {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger
-          render={<Button size="lg"><ChevronDown/>幹事用メニュー</Button>}
+          render={<Button size="sm" variant="ghost"><ChevronDown/>幹事用メニュー</Button>}
         />
         <DropdownMenuContent>
           <DropdownMenuGroup>
