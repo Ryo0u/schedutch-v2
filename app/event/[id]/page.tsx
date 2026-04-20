@@ -1,5 +1,5 @@
-import EventEdit from "@/components/event/EventEdit";
 import EventInfo from "@/components/event/EventInfo";
+import MenuButton from "@/components/event/MenuBotton";
 import { supabase } from "@/utils/supabase/client";
 
 const EventFetch = async (id: string) => {
@@ -30,7 +30,7 @@ export default async function Event({ params }: { params: Promise<{ id: string }
           <EventInfo data={data}/> 
         </section>
         <section className="flex-1">
-          <EventEdit/>
+          <MenuButton/>
         </section>
       </div>
     </div>

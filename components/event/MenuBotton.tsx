@@ -4,10 +4,11 @@ import { ChevronDown, Edit, Trash2 } from "lucide-react"
 import { Button } from "../ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu"
 import { useState } from "react"
-import EventAuthPass from "./EventAuthPass"
+import EventEditDialog from "./EventEditDialog"
+import EventDeleteDialog from "./EventDeleteDialog"
 
 
-function EventEdit() {
+function MenuButton() {
   const [ isOpen, setIsOpen ] = useState(false); // パスワード承認画面
   const [ actionType, setActionType ] = useState<"eventEdit" | "eventDelete" | "usersDelete" | null>(null)
   
@@ -44,14 +45,15 @@ function EventEdit() {
         </DropdownMenuContent>
       </DropdownMenu>
     
-      <EventAuthPass
-        open={isOpen}
-        onOpenChange={setIsOpen}
-        action={actionType}
-      />
+      {actionType === "eventEdit" && (
+        <EventEditDialog open={isOpen} onOpenChange={setIsOpen} />
+      )}
+      {actionType === "eventDelete" && (
+        <EventDeleteDialog open={isOpen} onOpenChange={setIsOpen} />
+      )}
     
     </>
   )
 }
 
-export default EventEdit
+export default MenuButton
