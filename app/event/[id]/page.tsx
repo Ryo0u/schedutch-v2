@@ -7,7 +7,7 @@ import { supabase } from "@/utils/supabase/client";
 
 const EventFetch = async (id: string) => {
   try {
-    const { data, error } = await supabase.from('events').select(`*, users (*)`).eq('id', id).single()
+    const { data, error } = await supabase.from('events').select(`*, candidates (*), users (*)`).eq('id', id).single()
     
     if (error) throw error
     
@@ -32,7 +32,7 @@ export default async function Event({ params }: { params: Promise<{ id: string }
         <EventInfo data={data}/> 
         <div className="flex items-center gap-3">
           <MenuButton/>
-          <JoinButton eventId={eventId}/>
+          <JoinButton data={data}/>
         </div>
       </section>
       
