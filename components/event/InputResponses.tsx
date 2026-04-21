@@ -4,6 +4,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui/dialog';
+import InputUserInfo from './InputUserInfo';
+import { Separator } from '../ui/separator';
 
 interface ResposesFromProps {
   data: {
@@ -62,7 +64,12 @@ function InputResponses({ data, open, onOpenChange }: ResposesFromProps) {
           <DialogDescription>
             回答者の名前とパスワード、日時毎の予定を入力してください
           </DialogDescription>
+          <Separator/>
         </DialogHeader>
+        
+        <form>
+          <InputUserInfo control={form.control}/>
+        </form>
       </DialogContent>
     </Dialog>
   )
