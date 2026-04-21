@@ -1,17 +1,22 @@
 import { Control, Controller } from 'react-hook-form';
-import { UserFormData } from './InputResponses';
+import { UserFormData } from './ResponsesForm';
 import { Field, FieldError, FieldGroup, FieldLabel } from '../ui/field';
 import { Input } from '../ui/input';
-import { InputGroup, InputGroupAddon, InputGroupText, InputGroupTextarea } from '../ui/input-group';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
+  InputGroupTextarea,
+} from '../ui/input-group';
 
 interface InputUserProps {
   control: Control<UserFormData>;
 }
 
-function InputUserInfo({ control } :InputUserProps) {
+function InputUserInfo({ control }: InputUserProps) {
   return (
     <FieldGroup>
-      <div className='flex flex-col sm:flex-row gap-3'>
+      <div className="flex flex-col gap-3 sm:flex-row">
         <Controller
           name="name"
           control={control}
@@ -20,18 +25,12 @@ function InputUserInfo({ control } :InputUserProps) {
               <FieldLabel htmlFor="title">
                 名前<span className="text-destructive">*</span>
               </FieldLabel>
-              <Input
-                id='name'
-                {...field}
-                aria-invalid={fieldState.invalid}
-              />
-              {fieldState.invalid && (
-                <FieldError errors={[fieldState.error]} />
-              )}
-            </Field>  
+              <Input id="name" {...field} aria-invalid={fieldState.invalid} />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
           )}
         />
-      
+
         <Controller
           name="password"
           control={control}
@@ -41,27 +40,25 @@ function InputUserInfo({ control } :InputUserProps) {
                 パスワード<span className="text-destructive">*</span>
               </FieldLabel>
               <Input
-                id='password'
+                id="password"
                 {...field}
                 aria-invalid={fieldState.invalid}
               />
-              {fieldState.invalid && (
-                <FieldError errors={[fieldState.error]} />
-              )}
-            </Field>  
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
           )}
         />
       </div>
-      
+
       <Controller
-        name='comment'
+        name="comment"
         control={control}
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor='comment'>コメント</FieldLabel>
+            <FieldLabel htmlFor="comment">コメント</FieldLabel>
             <InputGroup>
               <InputGroupTextarea
-                id='comment'
+                id="comment"
                 {...field}
                 rows={10}
                 className="min-h-15 resize-none"
@@ -73,14 +70,12 @@ function InputUserInfo({ control } :InputUserProps) {
                 </InputGroupText>
               </InputGroupAddon>
             </InputGroup>
-            {fieldState.invalid && (
-              <FieldError errors={[fieldState.error]} />
-            )}
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
       />
     </FieldGroup>
-  )
+  );
 }
 
-export default InputUserInfo
+export default InputUserInfo;
