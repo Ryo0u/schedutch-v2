@@ -88,7 +88,6 @@ function ResponsesForm({ data, open, onOpenChange }: ResposesFromProps) {
           current = new Date(current.getTime() + 30 * 60000); //30分進める
         }
       })
-      console.log("生成された回答データ:", initResponses);
       
       form.reset({
       ...form.getValues(),
@@ -99,7 +98,7 @@ function ResponsesForm({ data, open, onOpenChange }: ResposesFromProps) {
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[90vw] md:max-w-175 lg:max-w-250">
+      <DialogContent className="max-w-[90vw] md:max-w-175 lg:max-w-300">
         <DialogHeader className='text-center'>
           <DialogTitle className="text-xl font-black">予定を回答する</DialogTitle>
           <DialogDescription>
@@ -110,7 +109,8 @@ function ResponsesForm({ data, open, onOpenChange }: ResposesFromProps) {
         
         <form>
           <InputUserInfo control={form.control}/>
-          <InputResponses control={form.control}/>
+          <Separator className="my-8"/>
+          <InputResponses control={form.control} data={data}/>
         </form>
       </DialogContent>
     </Dialog>
