@@ -3,12 +3,16 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
 import InputUserInfo from './InputUserInfo';
 import { Separator } from '../ui/separator';
 import InputResponses from './InputResponses';
 import { useEffect } from 'react';
 import { Timestamp } from 'next/dist/server/lib/cache-handlers/types';
+import { Button } from '../ui/button';
+import bcrypt from 'bcryptjs';
+import { supabase } from '@/utils/supabase/client';
+import { useParams } from 'next/navigation';
 
 interface ResposesFromProps {
   data: {
@@ -65,6 +69,10 @@ function ResponsesForm({ data, open, onOpenChange }: ResposesFromProps) {
     }
   })
   
+  const params = useParams();
+  const eventId = params.id as string;
+  
+  // responsesの初期化
   useEffect(() => {
     if (open && data.candidates) {
       const initResponses: UserFormData["responses"] = [];
@@ -96,6 +104,36 @@ function ResponsesForm({ data, open, onOpenChange }: ResposesFromProps) {
     }
   }, [open, data.candidates])
   
+  const onSubmit = async (values: UserFormData) => {
+    try {
+      // パスワードのハッシュ化
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(values.password, salt);
+      
+      const formattedResponses = values.responses.map(res => ({
+        candidate_id: res.candidate_id,
+        time: res.time.toISOString(),
+        status: res.status
+      }));
+      
+      const { data, error } = await supabase.rpc("save_user_responses", {
+        p_event_id: eventId,
+        p_name: values.name,
+        p_comment: values.comment,
+        p_password: hashedPassword,
+        p_response_data: formattedResponses
+      })
+      
+      if (error) throw error;
+      
+      onOpenChange(false);
+      form.reset();
+    } catch (error) {
+      console.error('Failed to creat user:', error);
+      alert("保存に失敗しました。")
+    }
+  }
+  
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[90vw] md:max-w-175 lg:max-w-300">
@@ -111,7 +149,15 @@ function ResponsesForm({ data, open, onOpenChange }: ResposesFromProps) {
           <InputUserInfo control={form.control}/>
           <Separator className="my-8"/>
           <InputResponses control={form.control} data={data}/>
+          
+          <DialogFooter>
+            <DialogClose render={
+              <Button size="lg" variant="ghost" type='button' onClick={() => form.reset()}>キャンセル</Button>
+            }/>
+            <Button size="lg" variant="default" type='submit' onClick={form.handleSubmit(onSubmit)}>登録する</Button>
+          </DialogFooter>
         </form>
+        
       </DialogContent>
     </Dialog>
   )
