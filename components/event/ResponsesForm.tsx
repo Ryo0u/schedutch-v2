@@ -107,7 +107,7 @@ function ResponsesForm({ data, open, onOpenChange }: ResposesFromProps) {
           <Separator/>
         </DialogHeader>
         
-        <form>
+        <form className='overflow-auto'>
           <InputUserInfo control={form.control}/>
           <Separator className="my-8"/>
           <InputResponses control={form.control} data={data}/>
