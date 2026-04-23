@@ -2,6 +2,9 @@ import { Control, useFieldArray } from "react-hook-form";
 import { UserFormData } from "./ResponsesForm";
 import { TIME_OPTIONS } from "@/lib/constants";
 import { Timestamp } from "next/dist/server/lib/cache-handlers/types";
+import { useState } from "react";
+import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
+import { cn } from "@/lib/utils";
 
 interface InputResponsesProps {
   control: Control<UserFormData>;
@@ -20,6 +23,9 @@ function InputResponses({ control, data } :InputResponsesProps) {
     name: "responses"
   });
   
+  const [ currentState, setCurrentState ] = useState<"ok" | "maybe" | "ng">("ok")
+  const isSelected = (value: string) => currentState === value;
+  
   const responseMap = fields.reduce((acc, field, index) => {
     const d = new Date(field.time);
     const hhmm = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
@@ -29,7 +35,35 @@ function InputResponses({ control, data } :InputResponsesProps) {
   
   return (
     <div className="w-full overflow-x-auto select-none">
-      <table className="border-separate border-spacing-0 mx-auto">
+      <div className="sticky left-0 top-0 m-2 z-40">
+        <ToggleGroup size="lg" spacing={2} variant="outline">
+          <ToggleGroupItem
+            value="ok"
+            onClick={() => setCurrentState("ok")}
+            className={cn(isSelected("ok") && "border-blue-400! text-blue-400!")}
+          >
+            参加（⚫︎）
+          </ToggleGroupItem>
+
+          <ToggleGroupItem
+            value="maybe"
+            onClick={() => setCurrentState("maybe")}
+            className={cn(isSelected("maybe") && "border-yellow-300! text-yellow-400")}
+          >
+            未定（▲）
+          </ToggleGroupItem>
+
+          <ToggleGroupItem
+            value="ng"
+            onClick={() => setCurrentState("ng")}
+            className={cn(isSelected("ng") && "border-gray-400! text-gray-400")}
+          >
+            不参加（✖︎）
+          </ToggleGroupItem>
+        </ToggleGroup>
+      </div>
+      
+      <table className="mx-auto overflow-auto">
         <thead>
           {/* 時間のメモリ */}
           <tr>
@@ -79,7 +113,7 @@ function InputResponses({ control, data } :InputResponsesProps) {
                       onClick={() => {
                         update(slotInfo.index, {
                           ...fields[slotInfo.index],
-                          status: "ng",
+                          status: currentState,
                           candidate_id: slotInfo.candidate_id as string,
                           time: slotInfo.time as Date,
                         });
@@ -92,7 +126,7 @@ function InputResponses({ control, data } :InputResponsesProps) {
                       `}
                     >
                       <span className="text-[10px] pointer-events-none">
-                        {slotInfo?.status === "ok" ? "⚫︎" : slotInfo?.status === "maybe" ? "▲" : slotInfo?.status === "ng" ? "×" : ""}
+                        {slotInfo?.status === "ok" ? "⚫︎" : slotInfo?.status === "maybe" ? "▲" : slotInfo?.status === "ng" ? "✖︎" : ""}
                       </span>
                     </td>
                   );
