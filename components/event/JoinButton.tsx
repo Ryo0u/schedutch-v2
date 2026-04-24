@@ -8,9 +8,10 @@ interface EventCandidatesProps {
   data: {
     candidates: [];
   };
+  onSuccess: () => void;
 }
 
-export default function JoinButton({ data }: EventCandidatesProps) {
+export default function JoinButton({ data, onSuccess }: EventCandidatesProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -23,7 +24,7 @@ export default function JoinButton({ data }: EventCandidatesProps) {
         予定を回答する
       </Button>
 
-      <ResponsesForm data={data} open={isOpen} onOpenChange={setIsOpen} />
+      <ResponsesForm data={data} open={isOpen} onOpenChange={setIsOpen} onSuccess={onSuccess} />
     </>
   );
 }

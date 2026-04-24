@@ -2,7 +2,6 @@
 
 import { MessageCircle, UserCircle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "../ui/separator";
 import { useDeviceType } from "../hooks/UseDeviceType";
 import { Popover, PopoverContent, PopoverDescription, PopoverHeader, PopoverTitle, PopoverTrigger } from "../ui/popover";
 import { Button } from "../ui/button";

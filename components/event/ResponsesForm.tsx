@@ -24,6 +24,7 @@ interface ResposesFromProps {
   };
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess: () => void;
 }
 
 export type UserFormData = {
@@ -58,7 +59,7 @@ const UserFormSchema = z.object({
     ),
 })
 
-function ResponsesForm({ data, open, onOpenChange }: ResposesFromProps) {
+function ResponsesForm({ data, open, onOpenChange, onSuccess }: ResposesFromProps) {
   const form = useForm<z.infer<typeof UserFormSchema>>({
     resolver: zodResolver(UserFormSchema),
     defaultValues: {
@@ -126,6 +127,7 @@ function ResponsesForm({ data, open, onOpenChange }: ResposesFromProps) {
       
       if (error) throw error;
       
+      onSuccess?.();
       onOpenChange(false);
       form.reset();
     } catch (error) {
