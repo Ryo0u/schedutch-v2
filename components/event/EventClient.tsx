@@ -7,11 +7,12 @@ import MenuButton from "@/components/event/MenuBotton";
 import UsersInfo from "@/components/event/UsersInfo";
 import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/utils/supabase/client";
+import ResponsesInfo from "./ResponsesInfo";
 
 export default function EventClient({ eventId }: { eventId: string }) {
   const [data, setData] = useState<any>(null);
   const refresh = useCallback(async () => {
-    const { data } = await supabase.from('events').select(`*, candidates (*), users (*)`).eq('id', eventId).single();
+    const { data } = await supabase.from('events').select(`*, candidates (*), users (*, responses (*))`).eq('id', eventId).single();
     setData(data);
   }, [eventId]);
 
@@ -20,6 +21,7 @@ export default function EventClient({ eventId }: { eventId: string }) {
   if (!data) {
     return <div>イベント情報を読み込めませんでした。</div>;
   }
+  console.log(data)
   
   return (
     <div className="w-full max-w-6xl mx-auto px-3">
@@ -35,6 +37,10 @@ export default function EventClient({ eventId }: { eventId: string }) {
       
       <section className="mt-5 mb-8">
         <UsersInfo data={data}/>
+      </section>
+      
+      <section className="mb-8">
+        <ResponsesInfo data={data}/>
       </section>
     </div>
   );

@@ -86,33 +86,33 @@ function UsersInfo({ data }: UsersInfoProps) {
         </div>
       </CardHeader>
   
-  <CardContent className="px-0">
-    <div className="divide-y divide-border border-y border-border"> 
-      {data.users.map((user, index) => (
-        <div 
-          key={index} 
-          className="group flex justify-between items-center p-2 transition-all hover:bg-muted/40"
-        >
-          <div className="flex gap-4 items-center min-w-0">
-            <div className={cn(
-              "p-2 rounded-full transition-colors shadow-sm", 
-              getUserColor(user.name)
-            )}>
-              <UserCircle className="h-5 w-5" />
-            </div>
+      <CardContent className="px-0">
+        <div className="divide-y divide-border border-y border-border"> 
+          {data.users.map((user, index) => (
+            <div 
+              key={index} 
+              className="group flex justify-between items-center p-2 transition-all hover:bg-muted/40"
+            >
+              <div className="flex gap-4 items-center min-w-0">
+                <div className={cn(
+                  "p-2 rounded-full transition-colors shadow-sm", 
+                  getUserColor(user.name)
+                )}>
+                  <UserCircle className="h-5 w-5" />
+                </div>
 
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-bold text-foreground tracking-tight">
-                {user.name}
-              </span>
-              <UserComment comment={user.comment} />
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-bold text-foreground tracking-tight">
+                    {user.name}
+                  </span>
+                  <UserComment comment={user.comment} />
+                </div>
+              </div>
             </div>
-          </div>
+          ))}
         </div>
-      ))}
-    </div>
-  </CardContent>
-</Card>
+      </CardContent>
+    </Card>
   );
 }
 
