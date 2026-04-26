@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "../ui/dialog";
 import { Input } from "../ui/input";
-import { Field } from "../ui/field";
+import { Field, FieldError } from "../ui/field";
 import { Trash2 } from "lucide-react";
 import bcrypt from "bcryptjs";
 import { supabase } from "@/utils/supabase/client";
@@ -19,9 +19,19 @@ interface DialogProps {
 }
 
 function EventDeleteDialog({ open, onOpenChange, data }: DialogProps) {
-  const [ password, setPassword ] = useState<string>("")
+  const [ password, setPassword ] = useState<string>("");
   const [ isDeleting, setIsDeleting ] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const router = useRouter();
+  
+  useEffect(() => {
+    if (!open) {
+      // ダイアログが閉じられたら、ステートを初期値に戻す
+      setPassword("");
+      setErrorMsg(null);
+      setIsDeleting(false);
+    }
+  }, [open]);
   
   const handleDelete = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -39,10 +49,13 @@ function EventDeleteDialog({ open, onOpenChange, data }: DialogProps) {
       } catch (error) {
         toast.error("イベントの削除に失敗しました", {position: 'top-center'})
         console.log("failed to delete event", error)
+        
+        onOpenChange(false);
       }
+    } else {
+      setErrorMsg("パスワードが正しくありません");
     }
     
-    onOpenChange(false);
     setIsDeleting(false);
   }
   
@@ -65,7 +78,9 @@ function EventDeleteDialog({ open, onOpenChange, data }: DialogProps) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="......."
-              />
+              aria-invalid={!!errorMsg}
+            />
+            {errorMsg && <FieldError errors={[{ message: errorMsg }]}/>}
           </Field>
           <DialogFooter>
             <DialogClose render={<Button type="button" variant="outline">キャンセル</Button>}></DialogClose>
