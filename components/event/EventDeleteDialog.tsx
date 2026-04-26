@@ -4,24 +4,52 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { Input } from "../ui/input";
 import { Field } from "../ui/field";
 import { Trash2 } from "lucide-react";
+import bcrypt from "bcryptjs";
+import { supabase } from "@/utils/supabase/client";
+import { toast } from "sonner";
+import { useRouter } from 'next/navigation';
 
 interface DialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  data: {
+    id: string;
+    password_digest: string;
+  }
 }
 
-function EventDeleteDialog({ open, onOpenChange }: DialogProps) {
-  const [password, setPassword ] = useState<string>("")
+function EventDeleteDialog({ open, onOpenChange, data }: DialogProps) {
+  const [ password, setPassword ] = useState<string>("")
+  const [ isDeleting, setIsDeleting ] = useState(false);
+  const router = useRouter();
   
-  const handleSubmit = () => {
-    console.log(password)
+  const handleDelete = async (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsDeleting(true);
+    const isMatch = await bcrypt.compare(password, data.password_digest)
+    
+    if (isMatch) {
+      try {
+        const { error} =  await supabase.from("events").delete().eq("id", data.id);
+        if (error) throw error;
+        
+        toast.success("イベントを削除しました", {position: 'top-center'})
+        router.push("/")
+        
+      } catch (error) {
+        toast.error("イベントの削除に失敗しました", {position: 'top-center'})
+        console.log("failed to delete event", error)
+      }
+    }
+    
     onOpenChange(false);
+    setIsDeleting(false);
   }
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleDelete}>
           <DialogHeader className="mb-5">
             <DialogTitle className="flex flex-col justify-center items-center gap-3 text-destructive">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-destructive/10">
@@ -41,7 +69,7 @@ function EventDeleteDialog({ open, onOpenChange }: DialogProps) {
           </Field>
           <DialogFooter>
             <DialogClose render={<Button type="button" variant="outline">キャンセル</Button>}></DialogClose>
-            <Button type="submit" variant="destructive">削除する</Button>
+            <Button type="submit" variant="destructive" disabled={isDeleting}>{isDeleting ? "削除中..." : "削除する"}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

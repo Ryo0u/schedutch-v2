@@ -8,7 +8,7 @@ import EventEditDialog from "./EventEditDialog"
 import EventDeleteDialog from "./EventDeleteDialog"
 
 
-function MenuButton() {
+function MenuButton({ data }: any) {
   const [ isOpen, setIsOpen ] = useState(false); // パスワード承認画面
   const [ actionType, setActionType ] = useState<"eventEdit" | "eventDelete" | "usersDelete" | null>(null)
   
@@ -49,7 +49,7 @@ function MenuButton() {
         <EventEditDialog open={isOpen} onOpenChange={setIsOpen} />
       )}
       {actionType === "eventDelete" && (
-        <EventDeleteDialog open={isOpen} onOpenChange={setIsOpen} />
+        <EventDeleteDialog data={data} open={isOpen} onOpenChange={setIsOpen} />
       )}
     
     </>
