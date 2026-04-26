@@ -28,7 +28,7 @@ export default function EventClient({ eventId }: { eventId: string }) {
       <section className="flex flex-col sm:flex-row justify-between sm:items-end gap-8 mt-5 mb-8">
         <EventInfo data={data}/> 
         <div className="flex items-center gap-3">
-          <MenuButton/>
+          <MenuButton data={data}/>
           <JoinButton data={data} onSuccess={refresh}/>
         </div>
       </section>
