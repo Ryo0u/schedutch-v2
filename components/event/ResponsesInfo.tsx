@@ -12,6 +12,7 @@ interface ResponsesInfoProps {
       end_time: Timestamp;
     }[];
     users: {
+      id: string;
       name: string;
       responses: {
         user_id: string;
@@ -50,7 +51,7 @@ function ResponsesInfo({ data }: ResponsesInfoProps) {
               return (
                 <tbody key={candidate.id} className="">
                   <tr>
-                    <th rowSpan={2} className="sticky left-0 z-30 border bg-foreground/50 p-2 text-xs text-background min-w-24">
+                    <th rowSpan={2} className="sticky left-0 z-30 border bg-foreground p-2 text-xs text-background min-w-24">
                       {dateKey}
                     </th>
                     
@@ -95,7 +96,46 @@ function ResponsesInfo({ data }: ResponsesInfoProps) {
                     <td className=" border-r border-border"></td>
                   </tr>
                   
-                  {/* --- 3行目：候補日同士の間隔 -- */}
+                  {/* 3行目〜：ユーザー毎の予定一覧 */}
+                  {data.users.map((user) => {
+                    const userResponseMap = user.responses.reduce((acc, res) => {
+                      const d = new Date(res.time);
+                      const hhmm = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+                      acc[`${res.candidate_id}-${hhmm}`] = res.status;
+                      return acc;
+                    }, {} as Record<string, string>);
+                    
+                    return (
+                      <tr key={user.id}className="hover:bg-muted/40">
+                        <td className="sticky left-0 z-30 border bg-background p-2 text-center font-bold min-w-24">
+                          {user.name}
+                        </td>
+                        
+                        {/* 各時間の回答セル */}
+                        {TIME_OPTIONS.map((time) => {
+                          const status = userResponseMap[`${candidate.id}-${time}`];
+
+                          return (
+                            <td
+                              key={time}
+                              className={cn(
+                                "border-b bg-muted text-center text-[10px] transition-all",
+                                status === "ok" && "bg-blue-400 text-white",
+                                status === "maybe" && "bg-yellow-300 text-yellow-800",
+                                status === "ng" && "bg-gray-400 text-gray-600"
+                              )}
+                            >
+                              {status === "ok" ? "⚫︎" : status === "maybe" ? "▲" : status === "ng" ? "✖︎" : ""}
+                            </td>
+                          );
+                        })}
+                        {/* 右端の調整用セル */}
+                        <td className="border-r border-border"></td>
+                      </tr>
+                    )
+                  })}
+                  
+                  {/* --- 最終行目：候補日同士の間隔 -- */}
                   <tr className="h-4 pointer-events-none">
                     <td colSpan={TIME_OPTIONS.length + 1} className="h-4 border-none bg-transparent" />
                   </tr>
