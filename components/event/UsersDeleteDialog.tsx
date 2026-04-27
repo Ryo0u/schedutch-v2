@@ -18,10 +18,12 @@ interface DialogProps {
 }
 
 function UsersDeleteDialog({ data, open, onOpenChange }: DialogProps) {
-  const [password, setPassword ] = useState<string>("")
+  const [ password, setPassword ] = useState<string>("")
+  const [ userId, setUserId ] = useState("")
   
-  const handleSubmit = () => {
-    console.log(password)
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log(password,userId)
     onOpenChange(false);
   }
   
@@ -51,10 +53,10 @@ function UsersDeleteDialog({ data, open, onOpenChange }: DialogProps) {
             </Field>
             
             <FieldLabel>参加者一覧</FieldLabel>
-              <RadioGroup>
+              <RadioGroup value={userId} onValueChange={setUserId}>
                 {data.users.map((user) => (
                   <Field orientation="horizontal" key={user.id}>
-                    <RadioGroupItem value={user.name} id={user.id}/>
+                    <RadioGroupItem value={user.id} id={user.id}/>
                     <FieldLabel htmlFor={user.id}>{user.name}</FieldLabel>
                   </Field>
                 ))}
