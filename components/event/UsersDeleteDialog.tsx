@@ -1,13 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "../ui/dialog";
 import { Input } from "../ui/input";
-import { Field, FieldLabel, FieldSet } from "../ui/field";
+import { Field, FieldError, FieldLabel, FieldSet } from "../ui/field";
 import { Trash2 } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import bcrypt from "bcryptjs";
+import { supabase } from "@/utils/supabase/client";
+import { toast } from "sonner";
 
 interface DialogProps {
   data: {
+    password_digest: string;
     users: {
       id: string;
       name: string;
@@ -18,13 +22,41 @@ interface DialogProps {
 }
 
 function UsersDeleteDialog({ data, open, onOpenChange }: DialogProps) {
-  const [ password, setPassword ] = useState<string>("")
-  const [ userId, setUserId ] = useState("")
+  const [ password, setPassword ] = useState("");
+  const [ userId, setUserId ] = useState("");
+  const [ isDeleting, setIsDeleting ] = useState(false);
+  const [ errorMsg, setErrorMsg ] = useState<string | null>(null);
   
-  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+  useEffect(() => {
+    if (!open) {
+      setPassword("");
+      setUserId("");
+    }
+  }, [open])
+  
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(password,userId)
-    onOpenChange(false);
+    setIsDeleting(true);
+    
+    const isMatch = await bcrypt.compare(password, data.password_digest)
+    
+    if (isMatch && userId) {
+      try {
+        const { error} =  await supabase.from("users").delete().eq("id", userId);
+        if (error) throw error;
+        
+        toast.success("参加者を削除しました", {position: 'top-center'})
+        
+        
+      } catch (error) {
+        console.log("failed to delete user", error)
+        toast.error("参加者の削除に失敗しました", {position: 'top-center'})
+      }
+      
+      onOpenChange(false);
+    } else {
+      setErrorMsg("パスワードが間違っているか未入力があります")
+    }
   }
   
   return (
@@ -42,25 +74,31 @@ function UsersDeleteDialog({ data, open, onOpenChange }: DialogProps) {
           </DialogHeader>
           
           <FieldSet className="w-full mb-5">
-            <Field>
+            <Field data-invalid={!!errorMsg}>
               <FieldLabel>編集用パスワード</FieldLabel>
               <Input
                 autoFocus
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="......."
+                aria-invalid={!!errorMsg}
                 />
             </Field>
             
-            <FieldLabel>参加者一覧</FieldLabel>
-              <RadioGroup value={userId} onValueChange={setUserId}>
-                {data.users.map((user) => (
-                  <Field orientation="horizontal" key={user.id}>
-                    <RadioGroupItem value={user.id} id={user.id}/>
-                    <FieldLabel htmlFor={user.id}>{user.name}</FieldLabel>
-                  </Field>
-                ))}
-              </RadioGroup>
+            <Field data-invalid={!!errorMsg}>
+              <FieldLabel >参加者一覧</FieldLabel>
+            </Field>
+            
+            <RadioGroup value={userId} onValueChange={setUserId}>
+              {data.users.map((user) => (
+                <Field data-invalid={!!errorMsg} orientation="horizontal" key={user.id}>
+                  <RadioGroupItem value={user.id} id={user.id} aria-invalid={!!errorMsg}/>
+                  <FieldLabel htmlFor={user.id}>{user.name}</FieldLabel>
+                </Field>
+              ))}
+            </RadioGroup>
+            
+            {errorMsg && <FieldError errors={[{ message: errorMsg }]}/>}
           </FieldSet>
           
           <DialogFooter>
