@@ -91,12 +91,20 @@ function UsersDeleteDialog({ data, open, onOpenChange, onSuccess }: DialogProps)
             </Field>
             
             <RadioGroup value={userId} onValueChange={setUserId}>
-              {data.users.map((user) => (
-                <Field data-invalid={!!errorMsg} orientation="horizontal" key={user.id}>
-                  <RadioGroupItem value={user.id} id={user.id} aria-invalid={!!errorMsg}/>
-                  <FieldLabel htmlFor={user.id}>{user.name}</FieldLabel>
-                </Field>
-              ))}
+              {data.users.length > 0 ? (
+                data.users.map((user) => (
+                  <Field data-invalid={!!errorMsg} orientation="horizontal" key={user.id}>
+                    <RadioGroupItem value={user.id} id={user.id} aria-invalid={!!errorMsg}/>
+                    <FieldLabel htmlFor={user.id}>{user.name}</FieldLabel>
+                  </Field>
+                ))
+              ): (
+                <div className="py-3 text-center border-2 border-dashed rounded-lg bg-muted/20">
+                  <p className="text-sm text-muted-foreground">
+                    参加者がまだいません
+                  </p>
+                </div>
+              )}
             </RadioGroup>
             
             {errorMsg && <FieldError errors={[{ message: errorMsg }]}/>}
