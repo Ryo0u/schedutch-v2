@@ -58,6 +58,8 @@ function UsersDeleteDialog({ data, open, onOpenChange, onSuccess }: DialogProps)
     } else {
       setErrorMsg("パスワードが間違っています")
     }
+    
+    setIsDeleting(false);
   }
   
   return (
@@ -112,7 +114,13 @@ function UsersDeleteDialog({ data, open, onOpenChange, onSuccess }: DialogProps)
           
           <DialogFooter>
             <DialogClose render={<Button type="button" variant="outline">キャンセル</Button>}></DialogClose>
-            <Button type="submit" variant="destructive" disabled={isDeleting || !password || !userId}>削除する</Button>
+            <Button 
+              type="submit" 
+              variant="destructive" 
+              disabled={isDeleting || !password || !userId}
+            >
+              {isDeleting ? "削除中..." : "削除する"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
