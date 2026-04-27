@@ -6,9 +6,14 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
 import { useState } from "react"
 import EventEditDialog from "./EventEditDialog"
 import EventDeleteDialog from "./EventDeleteDialog"
+import UsersDeleteDialog from "./UsersDeleteDialog"
 
+interface MenuProps {
+  data: any;
+  onSuccess: () => void;
+}
 
-function MenuButton({ data }: any) {
+function MenuButton({ data, onSuccess }: MenuProps) {
   const [ isOpen, setIsOpen ] = useState(false); // パスワード承認画面
   const [ actionType, setActionType ] = useState<"eventEdit" | "eventDelete" | "usersDelete" | null>(null)
   
@@ -50,6 +55,9 @@ function MenuButton({ data }: any) {
       )}
       {actionType === "eventDelete" && (
         <EventDeleteDialog data={data} open={isOpen} onOpenChange={setIsOpen} />
+      )}
+      {actionType === "usersDelete" && (
+        <UsersDeleteDialog data={data} open={isOpen} onOpenChange={setIsOpen} onSuccess={onSuccess} />
       )}
     
     </>
