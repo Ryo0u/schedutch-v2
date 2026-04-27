@@ -2,15 +2,22 @@ import { useState } from "react";
 import { Button } from "../ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "../ui/dialog";
 import { Input } from "../ui/input";
-import { Field } from "../ui/field";
+import { Field, FieldLabel, FieldSet } from "../ui/field";
 import { Trash2 } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 
 interface DialogProps {
+  data: {
+    users: {
+      id: string;
+      name: string;
+    }[];
+  };
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-function UsersDeleteDialog({ open, onOpenChange }: DialogProps) {
+function UsersDeleteDialog({ data, open, onOpenChange }: DialogProps) {
   const [password, setPassword ] = useState<string>("")
   
   const handleSubmit = () => {
@@ -29,18 +36,30 @@ function UsersDeleteDialog({ open, onOpenChange }: DialogProps) {
               </div>
               <span className="text-xl font-bold">参加者を削除する</span>
             </DialogTitle>
-            <DialogDescription className="text-center">編集用パスワードを入力してください</DialogDescription>
+            <DialogDescription className="text-center">編集用パスワードを入力し<br/>削除する参加者を選択してください</DialogDescription>
           </DialogHeader>
-          <Field className="mb-5">
-            <Input
-              autoFocus
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="......."
-              />
-          </Field>
           
-          {/* ここに参加者を選ぶUIを追加する */}
+          <FieldSet className="w-full mb-5">
+            <Field>
+              <FieldLabel>編集用パスワード</FieldLabel>
+              <Input
+                autoFocus
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="......."
+                />
+            </Field>
+            
+            <FieldLabel>参加者一覧</FieldLabel>
+              <RadioGroup>
+                {data.users.map((user) => (
+                  <Field orientation="horizontal" key={user.id}>
+                    <RadioGroupItem value={user.name} id={user.id}/>
+                    <FieldLabel htmlFor={user.id}>{user.name}</FieldLabel>
+                  </Field>
+                ))}
+              </RadioGroup>
+          </FieldSet>
           
           <DialogFooter>
             <DialogClose render={<Button type="button" variant="outline">キャンセル</Button>}></DialogClose>
