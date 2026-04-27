@@ -19,9 +19,10 @@ interface DialogProps {
   };
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
 }
 
-function UsersDeleteDialog({ data, open, onOpenChange }: DialogProps) {
+function UsersDeleteDialog({ data, open, onOpenChange, onSuccess }: DialogProps) {
   const [ password, setPassword ] = useState("");
   const [ userId, setUserId ] = useState("");
   const [ isDeleting, setIsDeleting ] = useState(false);
@@ -46,7 +47,7 @@ function UsersDeleteDialog({ data, open, onOpenChange }: DialogProps) {
         if (error) throw error;
         
         toast.success("参加者を削除しました", {position: 'top-center'})
-        
+        onSuccess?.();
         
       } catch (error) {
         console.log("failed to delete user", error)
@@ -55,7 +56,7 @@ function UsersDeleteDialog({ data, open, onOpenChange }: DialogProps) {
       
       onOpenChange(false);
     } else {
-      setErrorMsg("パスワードが間違っているか未入力があります")
+      setErrorMsg("パスワードが間違っています")
     }
   }
   
@@ -103,7 +104,7 @@ function UsersDeleteDialog({ data, open, onOpenChange }: DialogProps) {
           
           <DialogFooter>
             <DialogClose render={<Button type="button" variant="outline">キャンセル</Button>}></DialogClose>
-            <Button type="submit" variant="destructive">削除する</Button>
+            <Button type="submit" variant="destructive" disabled={isDeleting || !password || !userId}>削除する</Button>
           </DialogFooter>
         </form>
       </DialogContent>
