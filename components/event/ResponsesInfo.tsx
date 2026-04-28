@@ -107,7 +107,7 @@ function ResponsesInfo({ data }: ResponsesInfoProps) {
                     
                     return (
                       <tr key={user.id}className="hover:bg-muted/40">
-                        <td className="sticky left-0 z-30 border bg-background p-2 text-center font-bold min-w-24">
+                        <td className="sticky left-0 z-30 border bg-foreground/90 p-2 text-center text-background font-bold min-w-24">
                           {user.name}
                         </td>
                         
@@ -119,7 +119,7 @@ function ResponsesInfo({ data }: ResponsesInfoProps) {
                             <td
                               key={time}
                               className={cn(
-                                "border-b bg-muted text-center text-[10px] transition-all",
+                                "border-b border-x border-muted bg-muted text-center text-[10px] transition-all",
                                 status === "ok" && "bg-blue-400 text-white",
                                 status === "maybe" && "bg-yellow-300 text-yellow-800",
                                 status === "ng" && "bg-gray-400 text-gray-600"
@@ -136,7 +136,7 @@ function ResponsesInfo({ data }: ResponsesInfoProps) {
                   })}
                   
                   {/* --- 最終行目：候補日同士の間隔 -- */}
-                  <tr className="h-4 pointer-events-none">
+                  <tr className="h-6 pointer-events-none">
                     <td colSpan={TIME_OPTIONS.length + 1} className="h-4 border-none bg-transparent" />
                   </tr>
                 </tbody>

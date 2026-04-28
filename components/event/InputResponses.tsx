@@ -37,11 +37,11 @@ function InputResponses({ control, data } :InputResponsesProps) {
   return (
     <div className="w-full select-none">
       <div className="sticky left-0 top-0 m-2 z-40">
-        <ToggleGroup size="lg" spacing={2} variant="outline">
+        <ToggleGroup size="sm" spacing={2} variant="outline">
           <ToggleGroupItem
             value="ok"
             onClick={() => setCurrentState("ok")}
-            className={cn(isSelected("ok") && "border-blue-400! text-blue-400!")}
+            className={cn("bg-background", isSelected("ok") && "border-blue-400! text-blue-400!")}
           >
             参加（⚫︎）
           </ToggleGroupItem>
@@ -49,7 +49,7 @@ function InputResponses({ control, data } :InputResponsesProps) {
           <ToggleGroupItem
             value="maybe"
             onClick={() => setCurrentState("maybe")}
-            className={cn(isSelected("maybe") && "border-yellow-300! text-yellow-400")}
+            className={cn("bg-background", isSelected("maybe") && "border-yellow-300! text-yellow-400")}
           >
             未定（▲）
           </ToggleGroupItem>
@@ -57,7 +57,7 @@ function InputResponses({ control, data } :InputResponsesProps) {
           <ToggleGroupItem
             value="ng"
             onClick={() => setCurrentState("ng")}
-            className={cn(isSelected("ng") && "border-gray-400! text-gray-400")}
+            className={cn("bg-background", isSelected("ng") && "border-gray-400! text-gray-400")}
           >
             不参加（✖︎）
           </ToggleGroupItem>
@@ -65,80 +65,84 @@ function InputResponses({ control, data } :InputResponsesProps) {
       </div>
       
       <div className="w-full overflow-x-auto pb-5">
-        <table className="min-w-max">
-          <thead>
-            {/* 時間のメモリ */}
-            <tr>
-              <th className="sticky left-0 z-30 border border-border w-25"></th>
-              {TIME_OPTIONS.map((time) => {
-                const isWholeHour = time.endsWith(":00");
-                return (
-                  <th key={time} className="relative h-8 w-6 sm:w-6 border-y border-border">
-                    {isWholeHour && (
-                      <span className="absolute top-0 left-2 -translate-x-1/2 text-[10px] font-bold text-muted-foreground">
-                        {time.split(":")[0]}
-                      </span>
-                    )}
-                    {/* 目盛りの線 */}
-                    <div className={`absolute bottom-0 left-0 border-l border-border ${isWholeHour ? 'h-4' : 'h-3'}`} />
-                  </th>
-                );
-              })}
-              <th className=" border-r border-border"></th>
-            </tr>
-          </thead>
-          
           {data.candidates.map((candidate) => {
             const dateKey = new Date(candidate.start_time).toLocaleDateString('ja-JP', { 
               month: 'short', day: 'numeric', weekday: 'short' 
             });
 
             return (
-              <tbody key={candidate.id}>
-                <tr className="h-8">
-                  {/* 日付ラベル */}
-                  <td className="sticky left-0 z-20 border px-2 bg-muted">
-                    {dateKey}
-                  </td>
+              <table className="min-w-max" key={candidate.id}>
+                <thead>
+                  {/* 時間のメモリ */}
+                  <tr>
+                    <th className="sticky left-0 z-30 border border-border w-25"></th>
+                    {TIME_OPTIONS.map((time) => {
+                      const isWholeHour = time.endsWith(":00");
+                      return (
+                        <th key={time} className="relative h-8 w-6 sm:w-6 border-y border-border">
+                          {isWholeHour && (
+                            <span className="absolute top-0 left-2 -translate-x-1/2 text-[10px] font-bold text-muted-foreground">
+                              {time.split(":")[0]}
+                            </span>
+                          )}
+                          {/* 目盛りの線 */}
+                          <div className={`absolute bottom-0 left-0 border-l border-border ${isWholeHour ? 'h-4' : 'h-3'}`} />
+                        </th>
+                      );
+                    })}
+                    <th className=" border-r border-border"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="h-8">
+                    {/* 日付ラベル */}
+                    <td className="sticky left-0 z-20 border h-10 text-center  bg-foreground text-background">
+                      {dateKey}
+                    </td>
 
-                  {TIME_OPTIONS.map((timeOption) => {
-                    const slotInfo = responseMap[`${candidate.id}-${timeOption}`];
+                    {TIME_OPTIONS.map((timeOption) => {
+                      const slotInfo = responseMap[`${candidate.id}-${timeOption}`];
 
-                    // 候補日の時間範囲外
-                    if (!slotInfo) {
-                      return <td key={timeOption} className="bg-muted/30 border-b border-border" />;
-                    }
+                      // 候補日の時間範囲外
+                      if (!slotInfo) {
+                        return <td key={timeOption} className="bg-muted/30 border-b border-border" />;
+                      }
 
-                    return (
-                      <td
-                        key={timeOption}
-                        onClick={() => {
-                          update(slotInfo.index, {
-                            ...fields[slotInfo.index],
-                            status: currentState,
-                            candidate_id: slotInfo.candidate_id as string,
-                            time: slotInfo.time as Date,
-                          });
-                        }}
-                        className={`
-                          border-b border-l border-border text-center transition-all
-                          ${slotInfo?.status === "ok" ? "bg-blue-400 text-white" : ""}
-                          ${slotInfo?.status === "maybe" ? "bg-yellow-300 text-yellow-800" : ""}
-                          ${slotInfo?.status === "ng" ? "bg-gray-400 text-gray-600" : ""}
-                        `}
-                      >
-                        <span className="text-[10px] pointer-events-none">
-                          {slotInfo?.status === "ok" ? "⚫︎" : slotInfo?.status === "maybe" ? "▲" : slotInfo?.status === "ng" ? "✖︎" : ""}
-                        </span>
-                      </td>
-                    );
-                  })}
-                  <td className=" border-r border-border"></td>
-                </tr>
-              </tbody>
+                      return (
+                        <td
+                          key={timeOption}
+                          onClick={() => {
+                            update(slotInfo.index, {
+                              ...fields[slotInfo.index],
+                              status: currentState,
+                              candidate_id: slotInfo.candidate_id as string,
+                              time: slotInfo.time as Date,
+                            });
+                          }}
+                          className={`
+                            border-b border-l border text-center transition-all
+                            ${slotInfo?.status === "ok" ? "bg-blue-400 text-white" : ""}
+                            ${slotInfo?.status === "maybe" ? "bg-yellow-300 text-yellow-800" : ""}
+                            ${slotInfo?.status === "ng" ? "bg-gray-400 text-gray-600" : ""}
+                          `}
+                        >
+                          <span className="text-[10px] pointer-events-none">
+                            {slotInfo?.status === "ok" ? "⚫︎" : slotInfo?.status === "maybe" ? "▲" : slotInfo?.status === "ng" ? "✖︎" : ""}
+                          </span>
+                        </td>
+                      );
+                    })}
+                    <td className=" border-r border-border"></td>
+                  </tr>
+                  
+                  {/* --- 候補日同士の間隔 -- */}
+                  <tr className="h-6 pointer-events-none">
+                    <td colSpan={TIME_OPTIONS.length + 1} className="h-4 border-none bg-transparent" />
+                  </tr>
+                </tbody>
+              </table>
             );
           })}
-        </table>
       </div>      
     </div>
   )
