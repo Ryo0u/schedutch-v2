@@ -138,27 +138,31 @@ function ResponsesForm({ data, open, onOpenChange, onSuccess }: ResposesFromProp
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[90vw] md:max-w-175 lg:max-w-300">
-        <DialogHeader className='text-center'>
+      <DialogContent className="max-w-[95vw] md:max-w-2xl lg:max-w-6xl max-h-[90vh] flex flex-col p-0 overflow-hidden">
+        <DialogHeader className="p-6 pb-2 text-center shrink-0">
           <DialogTitle className="text-xl font-black">予定を回答する</DialogTitle>
           <DialogDescription>
             回答者の名前とパスワード、日時毎の予定を入力してください
           </DialogDescription>
-          <Separator/>
         </DialogHeader>
-        
-        <form className='overflow-auto'>
-          <InputUserInfo control={form.control}/>
-          <Separator className="my-8"/>
-          <InputResponses control={form.control} data={data}/>
-          
-          <DialogFooter>
-            <DialogClose render={
-              <Button size="lg" variant="ghost" type='button' onClick={() => form.reset()}>キャンセル</Button>
-            }/>
-            <Button size="lg" variant="default" type='submit' onClick={form.handleSubmit(onSubmit)}>登録する</Button>
-          </DialogFooter>
+
+        <Separator className="shrink-0" />
+
+        <form 
+          onSubmit={form.handleSubmit(onSubmit)} 
+          className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-6"
+        >
+          <InputUserInfo control={form.control} />
+          <Separator/>
+          <InputResponses control={form.control} data={data} />
         </form>
+        
+        <DialogFooter className='m-3'>
+          <DialogClose render={
+            <Button size="lg" variant="ghost" type='button' onClick={() => form.reset()}>キャンセル</Button>
+          }/>
+          <Button size="lg" variant="default" type='submit' onClick={form.handleSubmit(onSubmit)}>登録する</Button>
+        </DialogFooter>
         
       </DialogContent>
     </Dialog>
