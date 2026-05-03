@@ -23,15 +23,26 @@ interface ExtractProps {
 // 抽出条件を管理
 type FilterCondition = 
   | { type: 'PARTICIPANTS'; userIds: string[] }
-  | { type: 'EXACT_COUNT'; count: number };
+  | { type: 'HEADCOUNTS'; counts: number[] };
 
 function ExtractResponses({ data }: ExtractProps) {
   const SLOT_INTERVAL = 30 * 60 * 1000;
   
   const [ selectedUserIds, setSelectedUserIds ] = useState<Set<string>>(new Set());
   const [ activeTab, setActiveTab ] = useState("pepole");
-  const [ targetCount, setTargetCount ] = useState(2);
+  const [ selectedHeadcounts, setSelectedHeadcounts ] = useState<Set<number>>(new Set());
   const [ availableSlots, setAvailableSlots ] = useState<string[]>([]);
+  
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    setAvailableSlots([]);
+
+    if (value === "pepole") {
+      setSelectedHeadcounts(new Set());
+    } else {
+      setSelectedUserIds(new Set());
+    }
+  };
   
   const evaluateConditions = (time: number, conditions: FilterCondition[]): boolean => {
     return conditions.every(condition => {
@@ -40,11 +51,11 @@ function ExtractResponses({ data }: ExtractProps) {
           return condition.userIds.every(uid => 
             data.users.find(u => u.id === uid)?.responses.some(r => new Date(r.time).getTime() === time && r.status === 'ok')
           );
-        case 'EXACT_COUNT':
+        case 'HEADCOUNTS':
           const okCount = data.users.filter(u => 
             u.responses.some(r => new Date(r.time).getTime() === time && r.status === 'ok')
           ).length;
-          return okCount === condition.count;
+          return condition.counts.includes(okCount);
         default:
           return true;
       }
@@ -60,7 +71,7 @@ function ExtractResponses({ data }: ExtractProps) {
     // 2. 条件（参加者選択 or 人数）を決定
     const activeCondition: FilterCondition[] = activeTab === "pepole" 
       ? [{ type: 'PARTICIPANTS', userIds: Array.from(selectedUserIds) }]
-      : [{ type: 'EXACT_COUNT', count: targetCount }];
+      : [{ type: 'HEADCOUNTS', counts: Array.from(selectedHeadcounts) }];
 
     // 3. 条件に合う時刻を絞り込む
     const filteredTimes = allTimes.filter(time => evaluateConditions(time, activeCondition));
@@ -68,18 +79,31 @@ function ExtractResponses({ data }: ExtractProps) {
     // 4. 時刻を結合してブロック化する
     type TimeBlock = { start: number; end: number; participants: string[] };
     
+    // 参加者が一致しているか比較する関数
+    const areParticipantsEqual = (p1: string[], p2: string[]) => {
+      if (p1.length !== p2.length) return false;
+      const sorted1 = [...p1].sort();
+      const sorted2 = [...p2].sort();
+      return sorted1.every((val, index) => val === sorted2[index]);
+    };
+
     const mergedBlocks = filteredTimes.reduce((acc: TimeBlock[], time) => {
-      // 選択したユーザー全員がOKしているか再度確認し、名前リストを作成
-      const selectedUsers = data.users.filter(u => 
-        selectedUserIds.has(u.id) && 
-        u.responses.some(r => new Date(r.time).getTime() === time && r.status === 'ok')
-      );
+      const selectedUsers = data.users.filter(u => {
+        const isOk = u.responses.some(r => new Date(r.time).getTime() === time && r.status === 'ok');
+        return isOk && (activeTab === "pepole" ? selectedUserIds.has(u.id) : true);
+      });
       
       const participants = selectedUsers.map(u => u.name);
       const lastBlock = acc[acc.length - 1];
 
-      // 前のブロックと時間が連続しているか (30分間隔)
-      if (lastBlock && time === lastBlock.end + 30 * 60 * 1000) {
+      // 結合条件：
+      // 1. 時間が連続している
+      // 2. 参加者が全く同じメンバーである
+      if (
+        lastBlock && 
+        time === lastBlock.end + SLOT_INTERVAL && 
+        areParticipantsEqual(lastBlock.participants, participants)
+      ) {
         lastBlock.end = time;
       } else {
         acc.push({ start: time, end: time, participants });
@@ -90,7 +114,7 @@ function ExtractResponses({ data }: ExtractProps) {
     // 5. 文字列にフォーマットしてセット
     const result = mergedBlocks.map(block => {
       const start = new Date(block.start).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-      const end = new Date(block.end + 30 * 60 * 1000).toLocaleString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+      const end = new Date(block.end + SLOT_INTERVAL).toLocaleString('ja-JP', { hour: '2-digit', minute: '2-digit' });
       return `${start} - ${end} : ${block.participants.join(', ')}`;
     });
       
@@ -100,7 +124,7 @@ function ExtractResponses({ data }: ExtractProps) {
   
   const handleReset = () => {
     setSelectedUserIds(new Set());
-    setTargetCount(2);
+    setSelectedHeadcounts(new Set());
     setAvailableSlots([]);
   };
   
@@ -115,7 +139,7 @@ function ExtractResponses({ data }: ExtractProps) {
       <Separator/>
       <CardContent className="flex flex-col sm:flex-row">
         <div className="flex-1">
-          <Tabs defaultValue="pepole" onValueChange={setActiveTab} className="mb-2">
+          <Tabs defaultValue="pepole" onValueChange={handleTabChange} className="mb-2">
             <TabsList variant="line" className="mb-2">
               <TabsTrigger value="pepole">参加者を選択</TabsTrigger>
               <TabsTrigger value="number">人数を選択</TabsTrigger>
@@ -143,7 +167,24 @@ function ExtractResponses({ data }: ExtractProps) {
             </TabsContent>
             
             <TabsContent value="number">
-              
+              <FieldGroup className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                {[...Array(data.users.length).keys()].map(i => i + 1).map((num) => (
+                  <Field key={num} orientation="horizontal" className="items-center">
+                    <Checkbox
+                      id={`count-${num}`}
+                      checked={selectedHeadcounts.has(num)} 
+                      onCheckedChange={() => {
+                        setSelectedHeadcounts(prev => {
+                          const next = new Set(prev);
+                          next.has(num) ? next.delete(num) : next.add(num);
+                          return next;
+                        });
+                      }}                   
+                    />
+                    <FieldLabel htmlFor={`count-${num}`}>{num}人</FieldLabel>  
+                  </Field>
+                ))}
+              </FieldGroup>
             </TabsContent>
           </Tabs>
           
