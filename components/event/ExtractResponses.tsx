@@ -26,9 +26,12 @@ type FilterCondition =
   | { type: 'EXACT_COUNT'; count: number };
 
 function ExtractResponses({ data }: ExtractProps) {
+  const SLOT_INTERVAL = 30 * 60 * 1000;
+  
   const [ selectedUserIds, setSelectedUserIds ] = useState<Set<string>>(new Set());
   const [ activeTab, setActiveTab ] = useState("pepole");
   const [ targetCount, setTargetCount ] = useState(2);
+  const [ availableSlots, setAvailableSlots ] = useState<string[]>([]);
   
   const evaluateConditions = (time: number, conditions: FilterCondition[]): boolean => {
     return conditions.every(condition => {
@@ -48,37 +51,57 @@ function ExtractResponses({ data }: ExtractProps) {
     });
   };
   
-  const formatToReadableDate = (timestamp: number): string => {
-    return new Date(timestamp).toLocaleString('ja-JP', {
-      year: 'numeric',
-      month: 'numeric',
-      day: 'numeric',
-      weekday: 'short',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-  
   const handleExtractSlots = () => {
+    // 1. すべての回答時間を抽出
     const allTimes = Array.from(new Set(
       data.users.flatMap(u => u.responses.map(r => new Date(r.time).getTime()))
-    ));
+    )).sort((a, b) => a - b);
 
+    // 2. 条件（参加者選択 or 人数）を決定
     const activeCondition: FilterCondition[] = activeTab === "pepole" 
       ? [{ type: 'PARTICIPANTS', userIds: Array.from(selectedUserIds) }]
       : [{ type: 'EXACT_COUNT', count: targetCount }];
 
-    const result = allTimes
-      .filter(time => evaluateConditions(time, activeCondition))
-      .sort((a, b) => a - b)
-      .map(t => formatToReadableDate(t));
+    // 3. 条件に合う時刻を絞り込む
+    const filteredTimes = allTimes.filter(time => evaluateConditions(time, activeCondition));
+
+    // 4. 時刻を結合してブロック化する
+    type TimeBlock = { start: number; end: number; participants: string[] };
+    
+    const mergedBlocks = filteredTimes.reduce((acc: TimeBlock[], time) => {
+      // 選択したユーザー全員がOKしているか再度確認し、名前リストを作成
+      const selectedUsers = data.users.filter(u => 
+        selectedUserIds.has(u.id) && 
+        u.responses.some(r => new Date(r.time).getTime() === time && r.status === 'ok')
+      );
       
+      const participants = selectedUsers.map(u => u.name);
+      const lastBlock = acc[acc.length - 1];
+
+      // 前のブロックと時間が連続しているか (30分間隔)
+      if (lastBlock && time === lastBlock.end + 30 * 60 * 1000) {
+        lastBlock.end = time;
+      } else {
+        acc.push({ start: time, end: time, participants });
+      }
+      return acc;
+    }, []);
+
+    // 5. 文字列にフォーマットしてセット
+    const result = mergedBlocks.map(block => {
+      const start = new Date(block.start).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+      const end = new Date(block.end + 30 * 60 * 1000).toLocaleString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+      return `${start} - ${end} : ${block.participants.join(', ')}`;
+    });
+      
+    setAvailableSlots(result);
     console.log(result)
   };
   
   const handleReset = () => {
     setSelectedUserIds(new Set());
     setTargetCount(2);
+    setAvailableSlots([]);
   };
   
   return (
