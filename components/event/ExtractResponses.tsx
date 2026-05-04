@@ -5,6 +5,8 @@ import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { Checkbox } from "../ui/checkbox";
 import { useState } from "react";
 import { Button } from "../ui/button";
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupText, InputGroupTextarea } from "../ui/input-group";
+import { CopyIcon } from "lucide-react";
 
 interface ExtractProps {
   data: {
@@ -137,7 +139,7 @@ function ExtractResponses({ data }: ExtractProps) {
         </CardDescription>
       </CardHeader>
       <Separator/>
-      <CardContent className="flex flex-col sm:flex-row">
+      <CardContent className="flex flex-col sm:flex-row gap-5">
         <div className="flex-1">
           <Tabs defaultValue="pepole" onValueChange={handleTabChange} className="mb-2">
             <TabsList variant="line" className="mb-2">
@@ -194,7 +196,21 @@ function ExtractResponses({ data }: ExtractProps) {
           </div>
         </div>
         
-        <div className="flex-1">{/* ここにテキストエリア */}</div>
+        <div className="flex-1">
+          <InputGroup>
+            <InputGroupTextarea
+              className="min-h-50 overflow-y-auto resize-none"
+              readOnly
+              value={availableSlots.join('\n')}
+            />
+              <InputGroupAddon align="block-start" className="border-b flex justify-between">
+                <InputGroupText>抽出結果</InputGroupText>
+                <InputGroupButton variant="ghost" size="icon-xs" onClick={() => navigator.clipboard.writeText(availableSlots.join('\n'))}>
+                  <CopyIcon/>
+                </InputGroupButton>
+              </InputGroupAddon>
+          </InputGroup>
+        </div>
       </CardContent>
     </Card>
   )
