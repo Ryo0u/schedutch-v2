@@ -78,7 +78,7 @@ function ExtractResponses({ data }: ExtractProps) {
     // 3. 条件に合う時刻を絞り込む
     const filteredTimes = allTimes.filter(time => evaluateConditions(time, activeCondition));
 
-    // 4. 時刻を結合してブロック化する
+    // 4. 時刻をブロック化
     type TimeBlock = { start: number; end: number; participants: string[] };
     
     // 参加者が一致しているか比較する関数
@@ -99,8 +99,8 @@ function ExtractResponses({ data }: ExtractProps) {
       const lastBlock = acc[acc.length - 1];
 
       // 結合条件：
-      // 1. 時間が連続している
-      // 2. 参加者が全く同じメンバーである
+      // 時間が連続している
+      // 参加者が全く同じメンバーである
       if (
         lastBlock && 
         time === lastBlock.end + SLOT_INTERVAL && 
@@ -114,10 +114,25 @@ function ExtractResponses({ data }: ExtractProps) {
     }, []);
 
     // 5. 文字列にフォーマットしてセット
-    const result = mergedBlocks.map(block => {
-      const start = new Date(block.start).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-      const end = new Date(block.end + SLOT_INTERVAL).toLocaleString('ja-JP', { hour: '2-digit', minute: '2-digit' });
-      return `${start} - ${end} : ${block.participants.join(', ')}`;
+    const result: string[] = [];
+
+    // 日付ごとにグループ化
+    const grouped = mergedBlocks.reduce((acc, block) => {
+      const dateKey = new Date(block.start).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' });
+      if (!acc[dateKey]) acc[dateKey] = [];
+      acc[dateKey].push(block);
+      return acc;
+    }, {} as Record<string, TimeBlock[]>);
+
+      // グループ化したデータを文字列配列に変換
+    Object.entries(grouped).forEach(([date, blocks]) => {
+      result.push(date);
+      blocks.forEach(block => {
+        const start = new Date(block.start).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+        const end = new Date(block.end + SLOT_INTERVAL).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+        result.push(`${start} - ${end} : ${block.participants.join(', ')}`);
+      });
+      result.push("");
     });
       
     setAvailableSlots(result);
@@ -199,7 +214,7 @@ function ExtractResponses({ data }: ExtractProps) {
         <div className="flex-1">
           <InputGroup>
             <InputGroupTextarea
-              className="min-h-50 overflow-y-auto resize-none"
+              className="h-64 flex-none overflow-y-auto resize-none"
               readOnly
               value={availableSlots.join('\n')}
             />
