@@ -116,7 +116,7 @@ function ExtractResponses({ data }: ExtractProps) {
     // 5. 文字列にフォーマットしてセット
     const result: string[] = [];
 
-    // 日付ごとにグループ化
+      // 日付ごとにグループ化
     const grouped = mergedBlocks.reduce((acc, block) => {
       const dateKey = new Date(block.start).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' });
       if (!acc[dateKey]) acc[dateKey] = [];
@@ -132,7 +132,7 @@ function ExtractResponses({ data }: ExtractProps) {
         const end = new Date(block.end + SLOT_INTERVAL).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
         result.push(`${start} - ${end} : ${block.participants.join(', ')}`);
       });
-      result.push("");
+      result.push(""); //日付間の空行
     });
       
     setAvailableSlots(result);
@@ -155,8 +155,8 @@ function ExtractResponses({ data }: ExtractProps) {
       </CardHeader>
       <Separator/>
       <CardContent className="flex flex-col sm:flex-row gap-5">
-        <div className="flex-1">
-          <Tabs defaultValue="pepole" onValueChange={handleTabChange} className="mb-2">
+        <div className="flex-1 flex flex-col">
+          <Tabs defaultValue="pepole" onValueChange={handleTabChange} className="flex-1 mb-5">
             <TabsList variant="line" className="mb-2">
               <TabsTrigger value="pepole">参加者を選択</TabsTrigger>
               <TabsTrigger value="number">人数を選択</TabsTrigger>
@@ -207,7 +207,13 @@ function ExtractResponses({ data }: ExtractProps) {
           
           <div className="flex gap-2">
             <Button variant="outline" onClick={handleReset} className="flex-1">条件をリセット</Button>
-            <Button onClick={handleExtractSlots} className="flex-2">抽出する</Button>
+            <Button 
+              onClick={handleExtractSlots} 
+              disabled={activeTab === "pepole" ? selectedUserIds.size === 0 : selectedHeadcounts.size === 0} 
+              className="flex-2"
+            >
+              抽出する
+            </Button>
           </div>
         </div>
         
