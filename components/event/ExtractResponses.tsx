@@ -5,6 +5,8 @@ import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { Checkbox } from "../ui/checkbox";
 import { useState } from "react";
 import { Button } from "../ui/button";
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupText, InputGroupTextarea } from "../ui/input-group";
+import { CopyIcon } from "lucide-react";
 
 interface ExtractProps {
   data: {
@@ -76,7 +78,7 @@ function ExtractResponses({ data }: ExtractProps) {
     // 3. 条件に合う時刻を絞り込む
     const filteredTimes = allTimes.filter(time => evaluateConditions(time, activeCondition));
 
-    // 4. 時刻を結合してブロック化する
+    // 4. 時刻をブロック化
     type TimeBlock = { start: number; end: number; participants: string[] };
     
     // 参加者が一致しているか比較する関数
@@ -97,8 +99,8 @@ function ExtractResponses({ data }: ExtractProps) {
       const lastBlock = acc[acc.length - 1];
 
       // 結合条件：
-      // 1. 時間が連続している
-      // 2. 参加者が全く同じメンバーである
+      // 時間が連続している
+      // 参加者が全く同じメンバーである
       if (
         lastBlock && 
         time === lastBlock.end + SLOT_INTERVAL && 
@@ -112,10 +114,25 @@ function ExtractResponses({ data }: ExtractProps) {
     }, []);
 
     // 5. 文字列にフォーマットしてセット
-    const result = mergedBlocks.map(block => {
-      const start = new Date(block.start).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-      const end = new Date(block.end + SLOT_INTERVAL).toLocaleString('ja-JP', { hour: '2-digit', minute: '2-digit' });
-      return `${start} - ${end} : ${block.participants.join(', ')}`;
+    const result: string[] = [];
+
+      // 日付ごとにグループ化
+    const grouped = mergedBlocks.reduce((acc, block) => {
+      const dateKey = new Date(block.start).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' });
+      if (!acc[dateKey]) acc[dateKey] = [];
+      acc[dateKey].push(block);
+      return acc;
+    }, {} as Record<string, TimeBlock[]>);
+
+      // グループ化したデータを文字列配列に変換
+    Object.entries(grouped).forEach(([date, blocks]) => {
+      result.push(date);
+      blocks.forEach(block => {
+        const start = new Date(block.start).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+        const end = new Date(block.end + SLOT_INTERVAL).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+        result.push(`${start} - ${end} : ${block.participants.join(', ')}`);
+      });
+      result.push(""); //日付間の空行
     });
       
     setAvailableSlots(result);
@@ -137,9 +154,9 @@ function ExtractResponses({ data }: ExtractProps) {
         </CardDescription>
       </CardHeader>
       <Separator/>
-      <CardContent className="flex flex-col sm:flex-row">
-        <div className="flex-1">
-          <Tabs defaultValue="pepole" onValueChange={handleTabChange} className="mb-2">
+      <CardContent className="flex flex-col sm:flex-row gap-5">
+        <div className="flex-1 flex flex-col">
+          <Tabs defaultValue="pepole" onValueChange={handleTabChange} className="flex-1 mb-5">
             <TabsList variant="line" className="mb-2">
               <TabsTrigger value="pepole">参加者を選択</TabsTrigger>
               <TabsTrigger value="number">人数を選択</TabsTrigger>
@@ -190,11 +207,31 @@ function ExtractResponses({ data }: ExtractProps) {
           
           <div className="flex gap-2">
             <Button variant="outline" onClick={handleReset} className="flex-1">条件をリセット</Button>
-            <Button onClick={handleExtractSlots} className="flex-2">抽出する</Button>
+            <Button 
+              onClick={handleExtractSlots} 
+              disabled={activeTab === "pepole" ? selectedUserIds.size === 0 : selectedHeadcounts.size === 0} 
+              className="flex-2"
+            >
+              抽出する
+            </Button>
           </div>
         </div>
         
-        <div className="flex-1">{/* ここにテキストエリア */}</div>
+        <div className="flex-1">
+          <InputGroup>
+            <InputGroupTextarea
+              className="h-64 flex-none overflow-y-auto resize-none"
+              readOnly
+              value={availableSlots.join('\n')}
+            />
+              <InputGroupAddon align="block-start" className="border-b flex justify-between">
+                <InputGroupText>抽出結果</InputGroupText>
+                <InputGroupButton variant="ghost" size="icon-xs" onClick={() => navigator.clipboard.writeText(availableSlots.join('\n'))}>
+                  <CopyIcon/>
+                </InputGroupButton>
+              </InputGroupAddon>
+          </InputGroup>
+        </div>
       </CardContent>
     </Card>
   )
