@@ -289,7 +289,7 @@ function ExtractResponses({ data }: ExtractProps) {
                         onCheckedChange={(checked) => setIsDurationEnabled(!!checked)}
                       />                      
                       <FieldLabel htmlFor="select-min-duration" className="text-sm cursor-pointer">
-                        最小連続時間を指定する
+                        時間を指定する
                       </FieldLabel>
                       <Select 
                         disabled={!isDurationEnabled}
@@ -328,7 +328,7 @@ function ExtractResponses({ data }: ExtractProps) {
         <div className="flex-1">
           <InputGroup>
             <InputGroupTextarea
-              className="h-64 flex-none overflow-y-auto resize-none"
+              className="h-72 flex-none overflow-y-auto resize-none"
               readOnly
               value={availableSlots.join('\n')}
             />
