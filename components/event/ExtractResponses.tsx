@@ -6,7 +6,8 @@ import { Checkbox } from "../ui/checkbox";
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupText, InputGroupTextarea } from "../ui/input-group";
-import { CopyIcon } from "lucide-react";
+import { ChevronDownIcon, CopyIcon, Plus } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
 
 interface ExtractProps {
   data: {
@@ -128,8 +129,8 @@ function ExtractResponses({ data }: ExtractProps) {
       blocks.forEach(block => {
         const start = new Date(block.start).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
         const end = new Date(block.end + SLOT_INTERVAL).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
-        // 表示時に maybe の人には (△) を付ける
-        const names = block.participants.map(p => p.status === 'maybe' ? `${p.name}(△)` : p.name).join(', ');
+        // 表示時に maybe の人には (▲) を付ける
+        const names = block.participants.map(p => p.status === 'maybe' ? `${p.name}(▲)` : p.name).join(', ');
         result.push(`${start} - ${end} : ${names}`);
       });
       result.push("");
@@ -142,6 +143,7 @@ function ExtractResponses({ data }: ExtractProps) {
     setSelectedUserIds(new Set());
     setSelectedHeadcounts(new Set());
     setAvailableSlots([]);
+    setIncludeMaybe(false);
   };
   
   return (
@@ -204,17 +206,30 @@ function ExtractResponses({ data }: ExtractProps) {
             </TabsContent>
           </Tabs>
           
-          <div className="flex-1">
-            <Field orientation="horizontal" className="justify-start gap-2">
-              <Checkbox 
-                id="include-maybe" 
-                checked={includeMaybe} 
-                onCheckedChange={(checked) => setIncludeMaybe(!!checked)} 
+          <Separator className="mb-5"/>
+          
+          <div className="flex-2 mb-5">
+            <Collapsible className="rounded-md data-open:bg-muted">
+              <CollapsibleTrigger 
+                render={
+                  <Button variant="ghost" className="w-full">
+                    <Plus/>条件を追加<ChevronDownIcon className="ml-auto group-data-panel-open/button:rotate-180" />
+                  </Button>
+                }
               />
-              <FieldLabel htmlFor="include-maybe" className="text-sm cursor-pointer">
-                ▲（未定）も予定に含める
-              </FieldLabel>
-            </Field>
+              <CollapsibleContent className="p-2">
+                <Field orientation="horizontal" className="justify-start gap-2">
+                  <Checkbox 
+                    id="include-maybe" 
+                    checked={includeMaybe} 
+                    onCheckedChange={(checked) => setIncludeMaybe(!!checked)} 
+                  />
+                  <FieldLabel htmlFor="include-maybe" className="text-sm cursor-pointer">
+                    ▲（未定）も予定に含める
+                  </FieldLabel>
+                </Field>
+              </CollapsibleContent>
+            </Collapsible>
           </div>
           
           <div className="flex gap-2">
