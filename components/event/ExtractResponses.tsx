@@ -33,6 +33,7 @@ function ExtractResponses({ data }: ExtractProps) {
   const [ selectedUserIds, setSelectedUserIds ] = useState<Set<string>>(new Set());
   const [ activeTab, setActiveTab ] = useState("pepole");
   const [ selectedHeadcounts, setSelectedHeadcounts ] = useState<Set<number>>(new Set());
+  const [ includeMaybe, setIncludeMaybe ] = useState(false);
   const [ availableSlots, setAvailableSlots ] = useState<string[]>([]);
   
   const handleTabChange = (value: string) => {
@@ -46,18 +47,25 @@ function ExtractResponses({ data }: ExtractProps) {
     }
   };
   
+  const isUserAvailable = (user: ExtractProps['data']['users'][0], time: number) => {
+    const res = user.responses.find(r => new Date(r.time).getTime() === time);
+    if (!res) return false;
+    if (res.status === 'ok') return true;
+    if (includeMaybe && res.status === 'maybe') return true;
+    return false;
+  };
+  
   const evaluateConditions = (time: number, conditions: FilterCondition[]): boolean => {
     return conditions.every(condition => {
       switch (condition.type) {
         case 'PARTICIPANTS':
-          return condition.userIds.every(uid => 
-            data.users.find(u => u.id === uid)?.responses.some(r => new Date(r.time).getTime() === time && r.status === 'ok')
-          );
+          return condition.userIds.every(uid => {
+            const user = data.users.find(u => u.id === uid);
+            return user ? isUserAvailable(user, time) : false;
+          });
         case 'HEADCOUNTS':
-          const okCount = data.users.filter(u => 
-            u.responses.some(r => new Date(r.time).getTime() === time && r.status === 'ok')
-          ).length;
-          return condition.counts.includes(okCount);
+          const count = data.users.filter(u => isUserAvailable(u, time)).length;
+          return condition.counts.includes(count);
         default:
           return true;
       }
@@ -65,47 +73,41 @@ function ExtractResponses({ data }: ExtractProps) {
   };
   
   const handleExtractSlots = () => {
-    // 1. すべての回答時間を抽出
     const allTimes = Array.from(new Set(
       data.users.flatMap(u => u.responses.map(r => new Date(r.time).getTime()))
     )).sort((a, b) => a - b);
 
-    // 2. 条件（参加者選択 or 人数）を決定
     const activeCondition: FilterCondition[] = activeTab === "pepole" 
       ? [{ type: 'PARTICIPANTS', userIds: Array.from(selectedUserIds) }]
       : [{ type: 'HEADCOUNTS', counts: Array.from(selectedHeadcounts) }];
 
-    // 3. 条件に合う時刻を絞り込む
     const filteredTimes = allTimes.filter(time => evaluateConditions(time, activeCondition));
 
-    // 4. 時刻をブロック化
-    type TimeBlock = { start: number; end: number; participants: string[] };
+    // 参加者リストには名前だけでなくステータスも持たせる
+    type ParticipantInfo = { name: string; status: string };
+    type TimeBlock = { start: number; end: number; participants: ParticipantInfo[] };
     
-    // 参加者が一致しているか比較する関数
-    const areParticipantsEqual = (p1: string[], p2: string[]) => {
+    const areParticipantsEqual = (p1: ParticipantInfo[], p2: ParticipantInfo[]) => {
       if (p1.length !== p2.length) return false;
-      const sorted1 = [...p1].sort();
-      const sorted2 = [...p2].sort();
-      return sorted1.every((val, index) => val === sorted2[index]);
+      const s1 = [...p1].sort((a, b) => a.name.localeCompare(b.name));
+      const s2 = [...p2].sort((a, b) => a.name.localeCompare(b.name));
+      return s1.every((val, index) => val.name === s2[index]?.name && val.status === s2[index]?.status);
     };
 
     const mergedBlocks = filteredTimes.reduce((acc: TimeBlock[], time) => {
-      const selectedUsers = data.users.filter(u => {
-        const isOk = u.responses.some(r => new Date(r.time).getTime() === time && r.status === 'ok');
-        return isOk && (activeTab === "pepole" ? selectedUserIds.has(u.id) : true);
+      const availableUsers = data.users.filter(u => {
+        const available = isUserAvailable(u, time);
+        return available && (activeTab === "pepole" ? selectedUserIds.has(u.id) : true);
       });
       
-      const participants = selectedUsers.map(u => u.name);
+      const participants = availableUsers.map(u => ({
+        name: u.name,
+        status: u.responses.find(r => new Date(r.time).getTime() === time)?.status || 'ok'
+      }));
+
       const lastBlock = acc[acc.length - 1];
 
-      // 結合条件：
-      // 時間が連続している
-      // 参加者が全く同じメンバーである
-      if (
-        lastBlock && 
-        time === lastBlock.end + SLOT_INTERVAL && 
-        areParticipantsEqual(lastBlock.participants, participants)
-      ) {
+      if (lastBlock && time === lastBlock.end + SLOT_INTERVAL && areParticipantsEqual(lastBlock.participants, participants)) {
         lastBlock.end = time;
       } else {
         acc.push({ start: time, end: time, participants });
@@ -113,10 +115,7 @@ function ExtractResponses({ data }: ExtractProps) {
       return acc;
     }, []);
 
-    // 5. 文字列にフォーマットしてセット
     const result: string[] = [];
-
-      // 日付ごとにグループ化
     const grouped = mergedBlocks.reduce((acc, block) => {
       const dateKey = new Date(block.start).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' });
       if (!acc[dateKey]) acc[dateKey] = [];
@@ -124,19 +123,19 @@ function ExtractResponses({ data }: ExtractProps) {
       return acc;
     }, {} as Record<string, TimeBlock[]>);
 
-      // グループ化したデータを文字列配列に変換
     Object.entries(grouped).forEach(([date, blocks]) => {
       result.push(date);
       blocks.forEach(block => {
         const start = new Date(block.start).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
         const end = new Date(block.end + SLOT_INTERVAL).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
-        result.push(`${start} - ${end} : ${block.participants.join(', ')}`);
+        // 表示時に maybe の人には (△) を付ける
+        const names = block.participants.map(p => p.status === 'maybe' ? `${p.name}(△)` : p.name).join(', ');
+        result.push(`${start} - ${end} : ${names}`);
       });
-      result.push(""); //日付間の空行
+      result.push("");
     });
       
     setAvailableSlots(result);
-    console.log(result)
   };
   
   const handleReset = () => {
@@ -204,6 +203,19 @@ function ExtractResponses({ data }: ExtractProps) {
               </FieldGroup>
             </TabsContent>
           </Tabs>
+          
+          <div className="flex-1">
+            <Field orientation="horizontal" className="justify-start gap-2">
+              <Checkbox 
+                id="include-maybe" 
+                checked={includeMaybe} 
+                onCheckedChange={(checked) => setIncludeMaybe(!!checked)} 
+              />
+              <FieldLabel htmlFor="include-maybe" className="text-sm cursor-pointer">
+                ▲（未定）も予定に含める
+              </FieldLabel>
+            </Field>
+          </div>
           
           <div className="flex gap-2">
             <Button variant="outline" onClick={handleReset} className="flex-1">条件をリセット</Button>
