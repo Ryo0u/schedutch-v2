@@ -8,6 +8,8 @@ import { Button } from "../ui/button";
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupText, InputGroupTextarea } from "../ui/input-group";
 import { ChevronDownIcon, CopyIcon, Plus } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { cn } from "@/lib/utils";
 
 interface ExtractProps {
   data: {
@@ -32,14 +34,24 @@ type FilterCondition =
 type ParticipantInfo = { name: string; status: string };
 type TimeBlock = { start: number; end: number; participants: ParticipantInfo[] };
 
+const DurationOption = [
+  { label: "制限なし", value: "0" },
+  { label: "30分以上", value: "30" },
+  { label: "1時間以上", value: "60" },
+  { label: "1.5時間以上", value: "90" },
+  { label: "2時間以上", value: "120" },
+];
+
 function ExtractResponses({ data }: ExtractProps) {
   const SLOT_INTERVAL = 30 * 60 * 1000;
   
-  const [ selectedUserIds, setSelectedUserIds ] = useState<Set<string>>(new Set());
   const [ activeTab, setActiveTab ] = useState("pepole");
-  const [ selectedHeadcounts, setSelectedHeadcounts ] = useState<Set<number>>(new Set());
   const [ includeMaybe, setIncludeMaybe ] = useState(false);
-  const [ minDuration, setMinDuration ] = useState(60);
+  const [ isDurationEnabled, setIsDurationEnabled ] = useState(false);
+  
+  const [ selectedUserIds, setSelectedUserIds ] = useState<Set<string>>(new Set());
+  const [ selectedHeadcounts, setSelectedHeadcounts ] = useState<Set<number>>(new Set());
+  const [ minDuration, setMinDuration ] = useState(0);
   const [ availableSlots, setAvailableSlots ] = useState<string[]>([]);
   
   const handleTabChange = (value: string) => {
@@ -58,6 +70,8 @@ function ExtractResponses({ data }: ExtractProps) {
     setSelectedHeadcounts(new Set());
     setAvailableSlots([]);
     setIncludeMaybe(false);
+    setIsDurationEnabled(false);
+    setMinDuration(0);
   };
   
   // -------- ヘルパー関数 -----------
@@ -164,12 +178,16 @@ function ExtractResponses({ data }: ExtractProps) {
     )).sort((a, b) => a - b);
 
     // 条件リストの作成
-    const conditions: FilterCondition[] = [
-      activeTab === "pepole" 
-        ? { type: 'PARTICIPANTS', userIds: Array.from(selectedUserIds) }
-        : { type: 'HEADCOUNTS', counts: Array.from(selectedHeadcounts) },
-      { type: 'DURATION', minMinutes: minDuration }
-    ];
+    const conditions: FilterCondition[] = [];
+    if (activeTab === "pepole") {
+      conditions.push({ type: 'PARTICIPANTS', userIds: Array.from(selectedUserIds) });
+    } else {
+      conditions.push({ type: 'HEADCOUNTS', counts: Array.from(selectedHeadcounts) });
+    }
+
+    if (isDurationEnabled) {
+      conditions.push({ type: 'DURATION', minMinutes: minDuration });
+    }
 
     // 実行フロー
     const filteredTimes = allTimes.filter(t => checkSlotConditions(t, conditions));
@@ -252,16 +270,45 @@ function ExtractResponses({ data }: ExtractProps) {
                 }
               />
               <CollapsibleContent className="p-2">
-                <Field orientation="horizontal" className="justify-start gap-2">
-                  <Checkbox 
-                    id="include-maybe" 
-                    checked={includeMaybe} 
-                    onCheckedChange={(checked) => setIncludeMaybe(!!checked)} 
-                  />
-                  <FieldLabel htmlFor="include-maybe" className="text-sm cursor-pointer">
-                    ▲（未定）も予定に含める
-                  </FieldLabel>
-                </Field>
+                  <FieldGroup>
+                    <Field orientation="horizontal" className="justify-start gap-2">
+                      <Checkbox 
+                        id="include-maybe" 
+                        checked={includeMaybe} 
+                        onCheckedChange={(checked) => setIncludeMaybe(!!checked)} 
+                      />
+                      <FieldLabel htmlFor="include-maybe" className="text-sm cursor-pointer">
+                        ▲（未定）も予定に含める
+                      </FieldLabel>
+                    </Field>
+                    
+                    <Field orientation="horizontal">
+                      <Checkbox
+                        id="select-min-duration"
+                        checked={isDurationEnabled}
+                        onCheckedChange={(checked) => setIsDurationEnabled(!!checked)}
+                      />                      
+                      <FieldLabel htmlFor="select-min-duration" className="text-sm cursor-pointer">
+                        最小連続時間を指定する
+                      </FieldLabel>
+                      <Select 
+                        disabled={!isDurationEnabled}
+                        value={minDuration.toString()} 
+                        onValueChange={(val) => setMinDuration(Number(val))}
+                      >
+                        <SelectTrigger className={cn("w-32 h-9 text-sm transition-opacity", !isDurationEnabled && "opacity-50")}>
+                          <SelectValue placeholder="時間を選択" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {DurationOption.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                  </FieldGroup>
               </CollapsibleContent>
             </Collapsible>
           </div>
