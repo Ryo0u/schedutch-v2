@@ -26,7 +26,11 @@ interface ExtractProps {
 // 抽出条件を管理
 type FilterCondition = 
   | { type: 'PARTICIPANTS'; userIds: string[] }
-  | { type: 'HEADCOUNTS'; counts: number[] };
+  | { type: 'HEADCOUNTS'; counts: number[] }
+  | { type: 'DURATION'; minMinutes: number };
+  
+type ParticipantInfo = { name: string; status: string };
+type TimeBlock = { start: number; end: number; participants: ParticipantInfo[] };
 
 function ExtractResponses({ data }: ExtractProps) {
   const SLOT_INTERVAL = 30 * 60 * 1000;
@@ -35,6 +39,7 @@ function ExtractResponses({ data }: ExtractProps) {
   const [ activeTab, setActiveTab ] = useState("pepole");
   const [ selectedHeadcounts, setSelectedHeadcounts ] = useState<Set<number>>(new Set());
   const [ includeMaybe, setIncludeMaybe ] = useState(false);
+  const [ minDuration, setMinDuration ] = useState(60);
   const [ availableSlots, setAvailableSlots ] = useState<string[]>([]);
   
   const handleTabChange = (value: string) => {
@@ -48,6 +53,15 @@ function ExtractResponses({ data }: ExtractProps) {
     }
   };
   
+  const handleReset = () => {
+    setSelectedUserIds(new Set());
+    setSelectedHeadcounts(new Set());
+    setAvailableSlots([]);
+    setIncludeMaybe(false);
+  };
+  
+  // -------- ヘルパー関数 -----------
+  
   const isUserAvailable = (user: ExtractProps['data']['users'][0], time: number) => {
     const res = user.responses.find(r => new Date(r.time).getTime() === time);
     if (!res) return false;
@@ -56,7 +70,15 @@ function ExtractResponses({ data }: ExtractProps) {
     return false;
   };
   
-  const evaluateConditions = (time: number, conditions: FilterCondition[]): boolean => {
+  const areParticipantsEqual = (p1: ParticipantInfo[], p2: ParticipantInfo[]) => {
+    if (p1.length !== p2.length) return false;
+    const s1 = [...p1].sort((a, b) => a.name.localeCompare(b.name));
+    const s2 = [...p2].sort((a, b) => a.name.localeCompare(b.name));
+    return s1.every((val, index) => val.name === s2[index]?.name && val.status === s2[index]?.status);
+  };
+  
+  // 一コマ単位のルールを適応
+  const checkSlotConditions = (time: number, conditions: FilterCondition[]): boolean => {
     return conditions.every(condition => {
       switch (condition.type) {
         case 'PARTICIPANTS':
@@ -73,60 +95,54 @@ function ExtractResponses({ data }: ExtractProps) {
     });
   };
   
-  const handleExtractSlots = () => {
-    const allTimes = Array.from(new Set(
-      data.users.flatMap(u => u.responses.map(r => new Date(r.time).getTime()))
-    )).sort((a, b) => a - b);
-
-    const activeCondition: FilterCondition[] = activeTab === "pepole" 
-      ? [{ type: 'PARTICIPANTS', userIds: Array.from(selectedUserIds) }]
-      : [{ type: 'HEADCOUNTS', counts: Array.from(selectedHeadcounts) }];
-
-    const filteredTimes = allTimes.filter(time => evaluateConditions(time, activeCondition));
-
-    // 参加者リストには名前だけでなくステータスも持たせる
-    type ParticipantInfo = { name: string; status: string };
-    type TimeBlock = { start: number; end: number; participants: ParticipantInfo[] };
-    
-    const areParticipantsEqual = (p1: ParticipantInfo[], p2: ParticipantInfo[]) => {
-      if (p1.length !== p2.length) return false;
-      const s1 = [...p1].sort((a, b) => a.name.localeCompare(b.name));
-      const s2 = [...p2].sort((a, b) => a.name.localeCompare(b.name));
-      return s1.every((val, index) => val.name === s2[index]?.name && val.status === s2[index]?.status);
-    };
-
-    const mergedBlocks = filteredTimes.reduce((acc: TimeBlock[], time) => {
-      const availableUsers = data.users.filter(u => {
-        const available = isUserAvailable(u, time);
-        return available && (activeTab === "pepole" ? selectedUserIds.has(u.id) : true);
-      });
-      
-      const participants = availableUsers.map(u => ({
-        name: u.name,
-        status: u.responses.find(r => new Date(r.time).getTime() === time)?.status || 'ok'
-      }));
+  // 連続した時間の塊を作成
+  const createMergedBlocks = (times: number[]): TimeBlock[] => {
+    return times.reduce((acc: TimeBlock[], time) => {
+      // この時間の参加者リストを作成
+      const currentParticipants = data.users
+        .filter(u => isUserAvailable(u, time) && (activeTab === "pepole" ? selectedUserIds.has(u.id) : true))
+        .map(u => ({
+          name: u.name,
+          status: u.responses.find((r: any) => new Date(r.time).getTime() === time)?.status || 'ok'
+        }));
 
       const lastBlock = acc[acc.length - 1];
-
-      if (lastBlock && time === lastBlock.end + SLOT_INTERVAL && areParticipantsEqual(lastBlock.participants, participants)) {
+      // 「時間が連続」かつ「参加者と状態が一致」なら結合
+      if (lastBlock && time === lastBlock.end + SLOT_INTERVAL && areParticipantsEqual(lastBlock.participants, currentParticipants)) {
         lastBlock.end = time;
       } else {
-        acc.push({ start: time, end: time, participants });
+        acc.push({ start: time, end: time, participants: currentParticipants });
       }
       return acc;
     }, []);
-
+  };
+  
+  // 塊単位のルールを適応
+  const checkBlockConditions = (block: TimeBlock, conditions: FilterCondition[]) => {
+    return conditions.every(cond => {
+      switch (cond.type) {
+        case 'DURATION':
+          const durationMs = (block.end + SLOT_INTERVAL) - block.start;
+          return durationMs >= cond.minMinutes * 60 * 1000;
+        default:
+          return true;
+      }
+    });
+  };
+  
+  const formatExtractTimes = (blocks: TimeBlock[]): string[] => {
     const result: string[] = [];
-    const grouped = mergedBlocks.reduce((acc, block) => {
+    
+    const grouped = blocks.reduce((acc, block) => {
       const dateKey = new Date(block.start).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' });
       if (!acc[dateKey]) acc[dateKey] = [];
       acc[dateKey].push(block);
       return acc;
     }, {} as Record<string, TimeBlock[]>);
 
-    Object.entries(grouped).forEach(([date, blocks]) => {
+    Object.entries(grouped).forEach(([date, daysBlocks]) => {
       result.push(date);
-      blocks.forEach(block => {
+      daysBlocks.forEach(block => {
         const start = new Date(block.start).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
         const end = new Date(block.end + SLOT_INTERVAL).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
         // 表示時に maybe の人には (▲) を付ける
@@ -135,15 +151,33 @@ function ExtractResponses({ data }: ExtractProps) {
       });
       result.push("");
     });
-      
-    setAvailableSlots(result);
-  };
+    
+    return result;
+  }
   
-  const handleReset = () => {
-    setSelectedUserIds(new Set());
-    setSelectedHeadcounts(new Set());
-    setAvailableSlots([]);
-    setIncludeMaybe(false);
+  // -------- メインロジック ------------
+  
+  const handleExtractSlots = () => {
+    // 全タイムスタンプの取得
+    const allTimes = Array.from(new Set(
+      data.users.flatMap(u => u.responses.map(r => new Date(r.time).getTime()))
+    )).sort((a, b) => a - b);
+
+    // 条件リストの作成
+    const conditions: FilterCondition[] = [
+      activeTab === "pepole" 
+        ? { type: 'PARTICIPANTS', userIds: Array.from(selectedUserIds) }
+        : { type: 'HEADCOUNTS', counts: Array.from(selectedHeadcounts) },
+      { type: 'DURATION', minMinutes: minDuration }
+    ];
+
+    // 実行フロー
+    const filteredTimes = allTimes.filter(t => checkSlotConditions(t, conditions));
+    const mergedBlocks = createMergedBlocks(filteredTimes);
+    const finalBlocks = mergedBlocks.filter(b => checkBlockConditions(b, conditions));
+      
+    const displayResult = formatExtractTimes(finalBlocks);
+    setAvailableSlots(displayResult);
   };
   
   return (
