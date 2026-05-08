@@ -6,7 +6,10 @@ import { Checkbox } from "../ui/checkbox";
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupText, InputGroupTextarea } from "../ui/input-group";
-import { CopyIcon } from "lucide-react";
+import { ChevronDownIcon, CopyIcon, Plus } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { cn } from "@/lib/utils";
 
 interface ExtractProps {
   data: {
@@ -25,14 +28,30 @@ interface ExtractProps {
 // 抽出条件を管理
 type FilterCondition = 
   | { type: 'PARTICIPANTS'; userIds: string[] }
-  | { type: 'HEADCOUNTS'; counts: number[] };
+  | { type: 'HEADCOUNTS'; counts: number[] }
+  | { type: 'DURATION'; minMinutes: number };
+  
+type ParticipantInfo = { name: string; status: string };
+type TimeBlock = { start: number; end: number; participants: ParticipantInfo[] };
+
+const DurationOption = [
+  { label: "制限なし", value: "0" },
+  { label: "30分以上", value: "30" },
+  { label: "1時間以上", value: "60" },
+  { label: "1.5時間以上", value: "90" },
+  { label: "2時間以上", value: "120" },
+];
 
 function ExtractResponses({ data }: ExtractProps) {
   const SLOT_INTERVAL = 30 * 60 * 1000;
   
-  const [ selectedUserIds, setSelectedUserIds ] = useState<Set<string>>(new Set());
   const [ activeTab, setActiveTab ] = useState("pepole");
+  const [ includeMaybe, setIncludeMaybe ] = useState(false);
+  const [ isDurationEnabled, setIsDurationEnabled ] = useState(false);
+  
+  const [ selectedUserIds, setSelectedUserIds ] = useState<Set<string>>(new Set());
   const [ selectedHeadcounts, setSelectedHeadcounts ] = useState<Set<number>>(new Set());
+  const [ minDuration, setMinDuration ] = useState(0);
   const [ availableSlots, setAvailableSlots ] = useState<string[]>([]);
   
   const handleTabChange = (value: string) => {
@@ -46,103 +65,137 @@ function ExtractResponses({ data }: ExtractProps) {
     }
   };
   
-  const evaluateConditions = (time: number, conditions: FilterCondition[]): boolean => {
+  const handleReset = () => {
+    setSelectedUserIds(new Set());
+    setSelectedHeadcounts(new Set());
+    setAvailableSlots([]);
+    setIncludeMaybe(false);
+    setIsDurationEnabled(false);
+    setMinDuration(0);
+  };
+  
+  // -------- ヘルパー関数 -----------
+  
+  const isUserAvailable = (user: ExtractProps['data']['users'][0], time: number) => {
+    const res = user.responses.find(r => new Date(r.time).getTime() === time);
+    if (!res) return false;
+    if (res.status === 'ok') return true;
+    if (includeMaybe && res.status === 'maybe') return true;
+    return false;
+  };
+  
+  const areParticipantsEqual = (p1: ParticipantInfo[], p2: ParticipantInfo[]) => {
+    if (p1.length !== p2.length) return false;
+    const s1 = [...p1].sort((a, b) => a.name.localeCompare(b.name));
+    const s2 = [...p2].sort((a, b) => a.name.localeCompare(b.name));
+    return s1.every((val, index) => val.name === s2[index]?.name && val.status === s2[index]?.status);
+  };
+  
+  // 一コマ単位のルールを適応
+  const checkSlotConditions = (time: number, conditions: FilterCondition[]): boolean => {
     return conditions.every(condition => {
       switch (condition.type) {
         case 'PARTICIPANTS':
-          return condition.userIds.every(uid => 
-            data.users.find(u => u.id === uid)?.responses.some(r => new Date(r.time).getTime() === time && r.status === 'ok')
-          );
+          return condition.userIds.every(uid => {
+            const user = data.users.find(u => u.id === uid);
+            return user ? isUserAvailable(user, time) : false;
+          });
         case 'HEADCOUNTS':
-          const okCount = data.users.filter(u => 
-            u.responses.some(r => new Date(r.time).getTime() === time && r.status === 'ok')
-          ).length;
-          return condition.counts.includes(okCount);
+          const count = data.users.filter(u => isUserAvailable(u, time)).length;
+          return condition.counts.includes(count);
         default:
           return true;
       }
     });
   };
   
-  const handleExtractSlots = () => {
-    // 1. すべての回答時間を抽出
-    const allTimes = Array.from(new Set(
-      data.users.flatMap(u => u.responses.map(r => new Date(r.time).getTime()))
-    )).sort((a, b) => a - b);
+  // 連続した時間の塊を作成
+  const createMergedBlocks = (times: number[]): TimeBlock[] => {
+    return times.reduce((acc: TimeBlock[], time) => {
+      // この時間の参加者リストを作成
+      const currentParticipants = data.users
+        .filter(u => isUserAvailable(u, time) && (activeTab === "pepole" ? selectedUserIds.has(u.id) : true))
+        .map(u => ({
+          name: u.name,
+          status: u.responses.find((r: any) => new Date(r.time).getTime() === time)?.status || 'ok'
+        }));
 
-    // 2. 条件（参加者選択 or 人数）を決定
-    const activeCondition: FilterCondition[] = activeTab === "pepole" 
-      ? [{ type: 'PARTICIPANTS', userIds: Array.from(selectedUserIds) }]
-      : [{ type: 'HEADCOUNTS', counts: Array.from(selectedHeadcounts) }];
-
-    // 3. 条件に合う時刻を絞り込む
-    const filteredTimes = allTimes.filter(time => evaluateConditions(time, activeCondition));
-
-    // 4. 時刻をブロック化
-    type TimeBlock = { start: number; end: number; participants: string[] };
-    
-    // 参加者が一致しているか比較する関数
-    const areParticipantsEqual = (p1: string[], p2: string[]) => {
-      if (p1.length !== p2.length) return false;
-      const sorted1 = [...p1].sort();
-      const sorted2 = [...p2].sort();
-      return sorted1.every((val, index) => val === sorted2[index]);
-    };
-
-    const mergedBlocks = filteredTimes.reduce((acc: TimeBlock[], time) => {
-      const selectedUsers = data.users.filter(u => {
-        const isOk = u.responses.some(r => new Date(r.time).getTime() === time && r.status === 'ok');
-        return isOk && (activeTab === "pepole" ? selectedUserIds.has(u.id) : true);
-      });
-      
-      const participants = selectedUsers.map(u => u.name);
       const lastBlock = acc[acc.length - 1];
-
-      // 結合条件：
-      // 時間が連続している
-      // 参加者が全く同じメンバーである
-      if (
-        lastBlock && 
-        time === lastBlock.end + SLOT_INTERVAL && 
-        areParticipantsEqual(lastBlock.participants, participants)
-      ) {
+      // 「時間が連続」かつ「参加者と状態が一致」なら結合
+      if (lastBlock && time === lastBlock.end + SLOT_INTERVAL && areParticipantsEqual(lastBlock.participants, currentParticipants)) {
         lastBlock.end = time;
       } else {
-        acc.push({ start: time, end: time, participants });
+        acc.push({ start: time, end: time, participants: currentParticipants });
       }
       return acc;
     }, []);
-
-    // 5. 文字列にフォーマットしてセット
+  };
+  
+  // 塊単位のルールを適応
+  const checkBlockConditions = (block: TimeBlock, conditions: FilterCondition[]) => {
+    return conditions.every(cond => {
+      switch (cond.type) {
+        case 'DURATION':
+          const durationMs = (block.end + SLOT_INTERVAL) - block.start;
+          return durationMs >= cond.minMinutes * 60 * 1000;
+        default:
+          return true;
+      }
+    });
+  };
+  
+  const formatExtractTimes = (blocks: TimeBlock[]): string[] => {
     const result: string[] = [];
-
-      // 日付ごとにグループ化
-    const grouped = mergedBlocks.reduce((acc, block) => {
+    
+    const grouped = blocks.reduce((acc, block) => {
       const dateKey = new Date(block.start).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' });
       if (!acc[dateKey]) acc[dateKey] = [];
       acc[dateKey].push(block);
       return acc;
     }, {} as Record<string, TimeBlock[]>);
 
-      // グループ化したデータを文字列配列に変換
-    Object.entries(grouped).forEach(([date, blocks]) => {
+    Object.entries(grouped).forEach(([date, daysBlocks]) => {
       result.push(date);
-      blocks.forEach(block => {
+      daysBlocks.forEach(block => {
         const start = new Date(block.start).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
         const end = new Date(block.end + SLOT_INTERVAL).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
-        result.push(`${start} - ${end} : ${block.participants.join(', ')}`);
+        // 表示時に maybe の人には (▲) を付ける
+        const names = block.participants.map(p => p.status === 'maybe' ? `${p.name}(▲)` : p.name).join(', ');
+        result.push(`${start} - ${end} : ${names}`);
       });
-      result.push(""); //日付間の空行
+      result.push("");
     });
-      
-    setAvailableSlots(result);
-    console.log(result)
-  };
+    
+    return result;
+  }
   
-  const handleReset = () => {
-    setSelectedUserIds(new Set());
-    setSelectedHeadcounts(new Set());
-    setAvailableSlots([]);
+  // -------- メインロジック ------------
+  
+  const handleExtractSlots = () => {
+    // 全タイムスタンプの取得
+    const allTimes = Array.from(new Set(
+      data.users.flatMap(u => u.responses.map(r => new Date(r.time).getTime()))
+    )).sort((a, b) => a - b);
+
+    // 条件リストの作成
+    const conditions: FilterCondition[] = [];
+    if (activeTab === "pepole") {
+      conditions.push({ type: 'PARTICIPANTS', userIds: Array.from(selectedUserIds) });
+    } else {
+      conditions.push({ type: 'HEADCOUNTS', counts: Array.from(selectedHeadcounts) });
+    }
+
+    if (isDurationEnabled) {
+      conditions.push({ type: 'DURATION', minMinutes: minDuration });
+    }
+
+    // 実行フロー
+    const filteredTimes = allTimes.filter(t => checkSlotConditions(t, conditions));
+    const mergedBlocks = createMergedBlocks(filteredTimes);
+    const finalBlocks = mergedBlocks.filter(b => checkBlockConditions(b, conditions));
+      
+    const displayResult = formatExtractTimes(finalBlocks);
+    setAvailableSlots(displayResult);
   };
   
   return (
@@ -205,6 +258,61 @@ function ExtractResponses({ data }: ExtractProps) {
             </TabsContent>
           </Tabs>
           
+          <Separator className="mb-5"/>
+          
+          <div className="flex-2 mb-5">
+            <Collapsible className="rounded-md data-open:bg-muted">
+              <CollapsibleTrigger 
+                render={
+                  <Button variant="ghost" className="w-full">
+                    <Plus/>条件を追加<ChevronDownIcon className="ml-auto group-data-panel-open/button:rotate-180" />
+                  </Button>
+                }
+              />
+              <CollapsibleContent className="p-2">
+                  <FieldGroup>
+                    <Field orientation="horizontal" className="justify-start gap-2">
+                      <Checkbox 
+                        id="include-maybe" 
+                        checked={includeMaybe} 
+                        onCheckedChange={(checked) => setIncludeMaybe(!!checked)} 
+                      />
+                      <FieldLabel htmlFor="include-maybe" className="text-sm cursor-pointer">
+                        ▲（未定）も予定に含める
+                      </FieldLabel>
+                    </Field>
+                    
+                    <Field orientation="horizontal">
+                      <Checkbox
+                        id="select-min-duration"
+                        checked={isDurationEnabled}
+                        onCheckedChange={(checked) => setIsDurationEnabled(!!checked)}
+                      />                      
+                      <FieldLabel htmlFor="select-min-duration" className="text-sm cursor-pointer">
+                        時間を指定する
+                      </FieldLabel>
+                      <Select 
+                        disabled={!isDurationEnabled}
+                        value={minDuration.toString()} 
+                        onValueChange={(val) => setMinDuration(Number(val))}
+                      >
+                        <SelectTrigger className={cn("w-32 h-9 text-sm transition-opacity", !isDurationEnabled && "opacity-50")}>
+                          <SelectValue placeholder="時間を選択" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {DurationOption.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                  </FieldGroup>
+              </CollapsibleContent>
+            </Collapsible>
+          </div>
+          
           <div className="flex gap-2">
             <Button variant="outline" onClick={handleReset} className="flex-1">条件をリセット</Button>
             <Button 
@@ -220,7 +328,7 @@ function ExtractResponses({ data }: ExtractProps) {
         <div className="flex-1">
           <InputGroup>
             <InputGroupTextarea
-              className="h-64 flex-none overflow-y-auto resize-none"
+              className="h-72 flex-none overflow-y-auto resize-none"
               readOnly
               value={availableSlots.join('\n')}
             />
