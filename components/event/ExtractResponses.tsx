@@ -322,14 +322,14 @@ function ExtractResponses({ data }: ExtractProps) {
                         onCheckedChange={(checked) => setIsDurationEnabled(!!checked)}
                       />                      
                       <FieldLabel htmlFor="select-min-duration" className="text-sm cursor-pointer">
-                        時間を指定する
+                        時間を指定
                       </FieldLabel>
                       <Select 
                         disabled={!isDurationEnabled}
                         value={minDuration.toString()} 
                         onValueChange={(val) => setMinDuration(Number(val))}
                       >
-                        <SelectTrigger className={cn("w-32 h-9 text-sm transition-opacity", !isDurationEnabled && "opacity-50")}>
+                        <SelectTrigger className={cn("w-25.5 sm:w-32 h-8 text-[10px] sm:text-xs transition-opacity", !isDurationEnabled && "opacity-50")}>
                           <SelectValue placeholder="時間を選択" />
                         </SelectTrigger>
                         <SelectContent>
@@ -349,7 +349,7 @@ function ExtractResponses({ data }: ExtractProps) {
                         onCheckedChange={(checked) => setIsDateRangeEnabled(!!checked)}
                       />
                       <FieldLabel htmlFor="date-range" className="text-sm cursor-pointer">
-                        日付の範囲を指定する
+                        日付範囲を指定
                       </FieldLabel>
                       
                       <Select 
@@ -364,7 +364,7 @@ function ExtractResponses({ data }: ExtractProps) {
                           }
                         }}
                       >
-                        <SelectTrigger className="w-32 h-8 text-xs">
+                        <SelectTrigger className="w-25.5 sm:w-32 h-8 text-[10px] sm:text-xs">
                           <SelectValue placeholder="開始日" />
                         </SelectTrigger>
                         <SelectContent>
@@ -373,6 +373,8 @@ function ExtractResponses({ data }: ExtractProps) {
                           ))}
                         </SelectContent>
                       </Select>
+                      
+                      <span className="text-[10px] sm:text-xs text-muted-foreground shrink-0">〜</span>
 
                       <Select 
                         disabled={!isDateRangeEnabled}
@@ -386,7 +388,7 @@ function ExtractResponses({ data }: ExtractProps) {
                           }
                         }}
                       >
-                        <SelectTrigger className="w-32 h-8 text-xs">
+                        <SelectTrigger className="w-25.5 sm:w-32 h-8 text-[10px] sm:text-xs">
                           <SelectValue placeholder="終了日" />
                         </SelectTrigger>
                         <SelectContent>
