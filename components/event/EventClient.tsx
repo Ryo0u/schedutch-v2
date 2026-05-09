@@ -8,6 +8,7 @@ import UsersInfo from "@/components/event/UsersInfo";
 import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/utils/supabase/client";
 import ResponsesInfo from "./ResponsesInfo";
+import ExtractResponses from "./ExtractResponses";
 
 export default function EventClient({ eventId }: { eventId: string }) {
   const [data, setData] = useState<any>(null);
@@ -41,6 +42,10 @@ export default function EventClient({ eventId }: { eventId: string }) {
       
       <section className="mb-8">
         <ResponsesInfo data={data}/>
+      </section>
+      
+      <section className="mb-8">
+        <ExtractResponses data={data}/>
       </section>
     </div>
   );
