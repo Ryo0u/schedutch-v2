@@ -3,7 +3,7 @@ import { Separator } from "../ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { Checkbox } from "../ui/checkbox";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "../ui/button";
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupText, InputGroupTextarea } from "../ui/input-group";
 import { ChevronDownIcon, CopyIcon, Plus } from "lucide-react";
@@ -13,6 +13,10 @@ import { cn } from "@/lib/utils";
 
 interface ExtractProps {
   data: {
+    candidates: {
+      id: string;
+      start_time: Date;
+    }[];
     users: {
       id: string;
       name: string;
@@ -29,7 +33,8 @@ interface ExtractProps {
 type FilterCondition = 
   | { type: 'PARTICIPANTS'; userIds: string[] }
   | { type: 'HEADCOUNTS'; counts: number[] }
-  | { type: 'DURATION'; minMinutes: number };
+  | { type: 'DURATION'; minMinutes: number }
+  | { type: 'DATERANGE'; start: number, end: number };
   
 type ParticipantInfo = { name: string; status: string };
 type TimeBlock = { start: number; end: number; participants: ParticipantInfo[] };
@@ -45,13 +50,18 @@ const DurationOption = [
 function ExtractResponses({ data }: ExtractProps) {
   const SLOT_INTERVAL = 30 * 60 * 1000;
   
+  // 条件のフラグ管理
   const [ activeTab, setActiveTab ] = useState("pepole");
   const [ includeMaybe, setIncludeMaybe ] = useState(false);
   const [ isDurationEnabled, setIsDurationEnabled ] = useState(false);
+  const [ isDateRangeEnabled, setIsDateRangeEnabled ] = useState(false);
   
+  // 条件の値を管理
   const [ selectedUserIds, setSelectedUserIds ] = useState<Set<string>>(new Set());
   const [ selectedHeadcounts, setSelectedHeadcounts ] = useState<Set<number>>(new Set());
   const [ minDuration, setMinDuration ] = useState(0);
+  const [ dateRange, setDateRange ] = useState<[string, string]>(["", ""]);
+  
   const [ availableSlots, setAvailableSlots ] = useState<string[]>([]);
   
   const handleTabChange = (value: string) => {
@@ -72,7 +82,16 @@ function ExtractResponses({ data }: ExtractProps) {
     setIncludeMaybe(false);
     setIsDurationEnabled(false);
     setMinDuration(0);
+    setIsDateRangeEnabled(false);
+    setDateRange(["", ""]);
   };
+  
+  const availableDates = useMemo(() => {
+    const dates = data.candidates.map(c => 
+      new Date(c.start_time).toLocaleDateString('sv-SE')
+    );
+    return Array.from(new Set(dates)).sort();
+  }, [data.candidates]);
   
   // -------- ヘルパー関数 -----------
   
@@ -103,6 +122,8 @@ function ExtractResponses({ data }: ExtractProps) {
         case 'HEADCOUNTS':
           const count = data.users.filter(u => isUserAvailable(u, time)).length;
           return condition.counts.includes(count);
+        case 'DATERANGE':
+          return condition.start <= time && time <= condition.end 
         default:
           return true;
       }
@@ -187,6 +208,18 @@ function ExtractResponses({ data }: ExtractProps) {
 
     if (isDurationEnabled) {
       conditions.push({ type: 'DURATION', minMinutes: minDuration });
+    }
+    
+    if (isDateRangeEnabled) {
+      const fallbackStart = availableDates[0] || "1970-01-01";
+      const start = new Date(dateRange[0] || fallbackStart).setHours(0, 0, 0, 0);
+
+      const fallbackEnd = availableDates[availableDates.length - 1];
+      const end = dateRange[1] 
+        ? new Date(dateRange[1]).setHours(23, 59, 59, 999) 
+        : (fallbackEnd ? new Date(fallbackEnd).setHours(23, 59, 59, 999) : Infinity);
+      
+      conditions.push({ type: 'DATERANGE', start, end });
     }
 
     // 実行フロー
@@ -304,6 +337,61 @@ function ExtractResponses({ data }: ExtractProps) {
                             <SelectItem key={option.value} value={option.value}>
                               {option.label}
                             </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                    
+                    <Field orientation="horizontal">
+                      <Checkbox
+                        id="date-range"
+                        checked={isDateRangeEnabled}
+                        onCheckedChange={(checked) => setIsDateRangeEnabled(!!checked)}
+                      />
+                      <FieldLabel htmlFor="date-range" className="text-sm cursor-pointer">
+                        日付の範囲を指定する
+                      </FieldLabel>
+                      
+                      <Select 
+                        disabled={!isDateRangeEnabled}
+                        value={dateRange[0]}
+                        onValueChange={(val) => {
+                          if (!val) return;
+                          if (dateRange[1] && val > dateRange[1]) {
+                            setDateRange([val, val]);
+                          } else {
+                            setDateRange([val, dateRange[1]]);
+                          }
+                        }}
+                      >
+                        <SelectTrigger className="w-32 h-8 text-xs">
+                          <SelectValue placeholder="開始日" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableDates.map(date => (
+                            <SelectItem key={date} value={date}>{date.replace(/-/g, '/')}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+
+                      <Select 
+                        disabled={!isDateRangeEnabled}
+                        value={dateRange[1]}
+                        onValueChange={(val) => {
+                          if (!val) return;
+                          if (dateRange[0] && val < dateRange[0]) {
+                            setDateRange([val, val]);
+                          } else {
+                            setDateRange([dateRange[0], val]);
+                          }
+                        }}
+                      >
+                        <SelectTrigger className="w-32 h-8 text-xs">
+                          <SelectValue placeholder="終了日" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableDates.map(date => (
+                            <SelectItem key={date} value={date}>{date.replace(/-/g, '/')}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
