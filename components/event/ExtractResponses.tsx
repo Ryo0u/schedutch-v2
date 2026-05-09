@@ -41,10 +41,9 @@ type TimeBlock = { start: number; end: number; participants: ParticipantInfo[] }
 
 const DurationOption = [
   { label: "制限なし", value: "0" },
-  { label: "30分以上", value: "30" },
   { label: "1時間以上", value: "60" },
-  { label: "1.5時間以上", value: "90" },
   { label: "2時間以上", value: "120" },
+  { label: "3時間以上", value: "180" },
 ];
 
 function ExtractResponses({ data }: ExtractProps) {
