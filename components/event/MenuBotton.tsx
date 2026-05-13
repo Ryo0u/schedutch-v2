@@ -7,6 +7,7 @@ import { useState } from "react"
 import EventEditDialog from "./EventEditDialog"
 import EventDeleteDialog from "./EventDeleteDialog"
 import UsersDeleteDialog from "./UsersDeleteDialog"
+import EventShareDialog from "./EventShareDialog"
 
 interface MenuProps {
   data: any;
@@ -57,7 +58,7 @@ function MenuButton({ data, onSuccess }: MenuProps) {
         <EventEditDialog open={isOpen} onOpenChange={setIsOpen} />
       )}
       {actionType === "eventShare" && (
-        <></>
+        <EventShareDialog open={isOpen} onOpenChange={setIsOpen}/>
       )}
       {actionType === "eventDelete" && (
         <EventDeleteDialog data={data} open={isOpen} onOpenChange={setIsOpen} />
