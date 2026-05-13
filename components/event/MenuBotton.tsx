@@ -1,12 +1,13 @@
 "use client"
 
-import { ChevronDown, Edit, Trash2 } from "lucide-react"
+import { ChevronDown, Edit, Share2, Trash2 } from "lucide-react"
 import { Button } from "../ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu"
 import { useState } from "react"
 import EventEditDialog from "./EventEditDialog"
 import EventDeleteDialog from "./EventDeleteDialog"
 import UsersDeleteDialog from "./UsersDeleteDialog"
+import EventShareDialog from "./EventShareDialog"
 
 interface MenuProps {
   data: any;
@@ -15,9 +16,9 @@ interface MenuProps {
 
 function MenuButton({ data, onSuccess }: MenuProps) {
   const [ isOpen, setIsOpen ] = useState(false); // パスワード承認画面
-  const [ actionType, setActionType ] = useState<"eventEdit" | "eventDelete" | "usersDelete" | null>(null)
+  const [ actionType, setActionType ] = useState<"eventEdit" | "eventShare" | "eventDelete" | "usersDelete" | null>(null)
   
-  const handleMenuClick = (action: "eventEdit" | "eventDelete" | "usersDelete") => {
+  const handleMenuClick = (action: "eventEdit" | "eventShare" | "eventDelete" | "usersDelete") => {
     setActionType(action);
     setIsOpen(true);
   }
@@ -33,6 +34,9 @@ function MenuButton({ data, onSuccess }: MenuProps) {
             <DropdownMenuLabel>Event</DropdownMenuLabel>
             <DropdownMenuItem onClick={() => handleMenuClick("eventEdit")}>
               <Edit/>編集
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleMenuClick("eventShare")}>
+              <Share2/>共有
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleMenuClick("eventDelete")} variant="destructive">
               <Trash2/>削除
@@ -52,6 +56,9 @@ function MenuButton({ data, onSuccess }: MenuProps) {
     
       {actionType === "eventEdit" && (
         <EventEditDialog open={isOpen} onOpenChange={setIsOpen} />
+      )}
+      {actionType === "eventShare" && (
+        <EventShareDialog open={isOpen} onOpenChange={setIsOpen}/>
       )}
       {actionType === "eventDelete" && (
         <EventDeleteDialog data={data} open={isOpen} onOpenChange={setIsOpen} />
