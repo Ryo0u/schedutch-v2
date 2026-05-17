@@ -36,7 +36,7 @@ function InputResponses({ control, data } :InputResponsesProps) {
     return acc;
   }, {} as Record<string, any>);
   
-  // 回答更新ハンドラ
+  // PCでの回答更新ハンドラ
   const handleSlotUpdate = (slotInfo: any) => {
     if (!slotInfo) return;
     update(slotInfo.index, {
@@ -47,10 +47,37 @@ function InputResponses({ control, data } :InputResponsesProps) {
     });
   };
   
+  // スマホでの回答更新ハンドラ
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    
+    const touch = e.touches[0];
+    if (!touch) return;
+    const element = document.elementFromPoint(touch.clientX, touch.clientY);
+    if (!element) return;
+
+    const tdElement = element.closest("[data-index]");
+    if (tdElement) {
+      const index = Number(tdElement.getAttribute("data-index"));
+      const slotField = fields[index];
+      
+      if (slotField) {
+        update(index, {
+          ...slotField,
+          status: currentState,
+          candidate_id: slotField.candidate_id as string,
+          time: slotField.time as Date,
+        });
+      }
+    }
+  };
+  
   return (
     <div className="w-full select-none"
       onMouseUp={() => setIsDragging(false)}
       onMouseLeave={() => setIsDragging(false)}
+      onTouchEnd={() => setIsDragging(false)}
+      onTouchCancel={() => setIsDragging(false)}
     >
       <div className="sticky left-0 top-0 m-2 z-40">
         <ToggleGroup size="sm" spacing={2} variant="outline">
@@ -121,7 +148,7 @@ function InputResponses({ control, data } :InputResponsesProps) {
 
                       // 候補日の時間範囲外
                       if (!slotInfo) {
-                        return <td key={timeOption} className="bg-muted/30 border-b border-border" />;
+                        return <td key={timeOption} className="bg-muted border-b border-border" />;
                       }
 
                       return (
@@ -133,14 +160,19 @@ function InputResponses({ control, data } :InputResponsesProps) {
                             setIsDragging(true);
                             handleSlotUpdate(slotInfo);
                           }}
-                          // ドラッグ状態での更新
+                          // マウスでのドラッグ状態中の更新
                           onMouseEnter={() => {
                             if (isDragging) {
                               handleSlotUpdate(slotInfo)
                             }
                           }}
+                          // スマホ用のイベント
+                          onTouchStart={() => {
+                            setIsDragging(true);
+                            handleSlotUpdate(slotInfo);
+                          }}
                           className={`
-                            border-b border-l border text-center transition-all
+                            border-b border-l border text-center transition-all cursor-pointer select-none touch-none
                             ${slotInfo?.status === "ok" ? "bg-blue-400 text-white" : ""}
                             ${slotInfo?.status === "maybe" ? "bg-yellow-300 text-yellow-800" : ""}
                             ${slotInfo?.status === "ng" ? "bg-gray-400 text-gray-600" : ""}
