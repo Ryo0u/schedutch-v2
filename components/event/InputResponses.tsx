@@ -107,7 +107,7 @@ function InputResponses({ control, data } :InputResponsesProps) {
         </ToggleGroup>
       </div>
       
-      <div className="w-full overflow-x-auto pb-5">
+      <div className="w-full overflow-x-auto pb-5" onTouchMove={handleTouchMove}>
           {data.candidates.map((candidate) => {
             const dateKey = new Date(candidate.start_time).toLocaleDateString('ja-JP', { 
               month: 'short', day: 'numeric', weekday: 'short' 
@@ -154,6 +154,7 @@ function InputResponses({ control, data } :InputResponsesProps) {
                       return (
                         <td
                           key={timeOption}
+                          data-index={slotInfo.index}
                           // マウスでのスロット開始&更新
                           onMouseDown={(e) => {
                             e.preventDefault();
