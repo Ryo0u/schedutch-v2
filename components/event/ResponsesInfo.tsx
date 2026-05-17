@@ -51,7 +51,7 @@ function ResponsesInfo({ data }: ResponsesInfoProps) {
               return (
                 <tbody key={candidate.id} className="">
                   <tr>
-                    <th rowSpan={2} className="sticky left-0 z-30 border bg-foreground p-2 text-xs text-background min-w-24">
+                    <th rowSpan={2} className="sticky left-0 z-30 border bg-foreground p-1 sm:p-2 text-[10px] sm:text-xs text-center text-background min-w-10 sm:min-w-24">
                       {dateKey}
                     </th>
                     
@@ -60,13 +60,13 @@ function ResponsesInfo({ data }: ResponsesInfoProps) {
                       const isWholeHour = time.endsWith(":00");
                       
                       return (
-                        <th key={time} className="relative h-8 w-6 border-y border-border bg-muted/30">
+                        <th key={time} className="relative h-5 sm:h-8 w-5 sm:w-6 border-y border-border bg-muted/30">
                           {isWholeHour && (
-                            <span className="absolute top-0 left-2 -translate-x-1/2 text-[9px] font-bold text-muted-foreground">
+                            <span className="absolute top-0 left-2 -translate-x-1/2 text-[8px] sm:text-[9px] font-bold text-muted-foreground">
                               {time.split(":")[0]}
                             </span>
                           )}
-                          <div className={`absolute bottom-0 left-0 border-l border-border ${isWholeHour ? 'h-4' : 'h-3'}`} />
+                          <div className={`absolute bottom-0 left-0 border-l border-border ${isWholeHour ? 'h-3 sm:h-4' : 'h-2 sm:h-3'}`} />
                         </th>
                       );
                     })}
@@ -76,7 +76,7 @@ function ResponsesInfo({ data }: ResponsesInfoProps) {
                   </tr>
 
                   {/* --- 2行目：予定の範囲 --- */}
-                  <tr className="h-5 border-b">
+                  <tr className="h-3 sm:h-5 border-b">
                     {TIME_OPTIONS.map((time) => {
                       const [hours, minutes] = time.split(":").map(Number);
                       const cellTime = new Date(start);
@@ -107,7 +107,7 @@ function ResponsesInfo({ data }: ResponsesInfoProps) {
                     
                     return (
                       <tr key={user.id}className="hover:bg-muted/40">
-                        <td className="sticky left-0 z-30 border bg-foreground/90 p-2 text-center text-background font-bold min-w-24">
+                        <td className="sticky left-0 z-30 border bg-foreground/90 p-1 sm:p-2 text-[12px] sm:text-xs text-center text-background font-bold min-w-10 sm:min-w-24">
                           {user.name}
                         </td>
                         
@@ -119,7 +119,7 @@ function ResponsesInfo({ data }: ResponsesInfoProps) {
                             <td
                               key={time}
                               className={cn(
-                                "border-b border-x border-muted bg-muted text-center text-[10px] transition-all",
+                                "border-b border-x border-muted bg-muted text-center text-[8px] sm:text-[10px] transition-all",
                                 status === "ok" && "bg-blue-400 text-white",
                                 status === "maybe" && "bg-yellow-300 text-yellow-800",
                                 status === "ng" && "bg-gray-400 text-gray-600"
@@ -136,7 +136,7 @@ function ResponsesInfo({ data }: ResponsesInfoProps) {
                   })}
                   
                   {/* --- 最終行目：候補日同士の間隔 -- */}
-                  <tr className="h-6 pointer-events-none">
+                  <tr className="h-3 sm:h-6 pointer-events-none">
                     <td colSpan={TIME_OPTIONS.length + 1} className="h-4 border-none bg-transparent" />
                   </tr>
                 </tbody>
