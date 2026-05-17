@@ -24,8 +24,10 @@ function InputResponses({ control, data } :InputResponsesProps) {
     name: "responses"
   });
   
-  const [ currentState, setCurrentState ] = useState<"ok" | "maybe" | "ng">("ok")
+  const [ currentState, setCurrentState ] = useState<"ok" | "maybe" | "ng">("ok");
   const isSelected = (value: string) => currentState === value;
+  
+  const [ isDragging, setIsDragging ] = useState(false);
   
   const responseMap = fields.reduce((acc, field, index) => {
     const d = new Date(field.time);
@@ -34,8 +36,22 @@ function InputResponses({ control, data } :InputResponsesProps) {
     return acc;
   }, {} as Record<string, any>);
   
+  // 回答更新ハンドラ
+  const handleSlotUpdate = (slotInfo: any) => {
+    if (!slotInfo) return;
+    update(slotInfo.index, {
+      ...fields[slotInfo.index],
+      status: currentState,
+      candidate_id: slotInfo.candidate_id as string,
+      time: slotInfo.time as Date,
+    });
+  };
+  
   return (
-    <div className="w-full select-none">
+    <div className="w-full select-none"
+      onMouseUp={() => setIsDragging(false)}
+      onMouseLeave={() => setIsDragging(false)}
+    >
       <div className="sticky left-0 top-0 m-2 z-40">
         <ToggleGroup size="sm" spacing={2} variant="outline">
           <ToggleGroupItem
@@ -111,13 +127,17 @@ function InputResponses({ control, data } :InputResponsesProps) {
                       return (
                         <td
                           key={timeOption}
-                          onClick={() => {
-                            update(slotInfo.index, {
-                              ...fields[slotInfo.index],
-                              status: currentState,
-                              candidate_id: slotInfo.candidate_id as string,
-                              time: slotInfo.time as Date,
-                            });
+                          // マウスでのスロット開始&更新
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            setIsDragging(true);
+                            handleSlotUpdate(slotInfo);
+                          }}
+                          // ドラッグ状態での更新
+                          onMouseEnter={() => {
+                            if (isDragging) {
+                              handleSlotUpdate(slotInfo)
+                            }
                           }}
                           className={`
                             border-b border-l border text-center transition-all
@@ -136,7 +156,7 @@ function InputResponses({ control, data } :InputResponsesProps) {
                   </tr>
                   
                   {/* --- 候補日同士の間隔 -- */}
-                  <tr className="h-6 pointer-events-none">
+                  <tr className="h-3 pointer-events-none">
                     <td colSpan={TIME_OPTIONS.length + 1} className="h-4 border-none bg-transparent" />
                   </tr>
                 </tbody>
