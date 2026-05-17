@@ -79,14 +79,15 @@ function InputResponses({ control, data } :InputResponsesProps) {
       onTouchEnd={() => setIsDragging(false)}
       onTouchCancel={() => setIsDragging(false)}
     >
-      <div className="sticky left-0 top-0 m-2 z-40">
+      <div className="sticky right-0 top-0 z-40 mb-2 flex justify-end">
         <ToggleGroup size="sm" spacing={2} variant="outline">
           <ToggleGroupItem
             value="ok"
             onClick={() => setCurrentState("ok")}
             className={cn("bg-background", isSelected("ok") && "border-blue-400! text-blue-400!")}
           >
-            参加（⚫︎）
+            <span className="sm:hidden">⚫︎</span>
+            <span className="hidden sm:inline">参加（⚫︎）</span>
           </ToggleGroupItem>
 
           <ToggleGroupItem
@@ -94,7 +95,8 @@ function InputResponses({ control, data } :InputResponsesProps) {
             onClick={() => setCurrentState("maybe")}
             className={cn("bg-background", isSelected("maybe") && "border-yellow-300! text-yellow-400")}
           >
-            未定（▲）
+            <span className="sm:hidden">▲</span>
+            <span className="hidden sm:inline">未定（▲）</span>
           </ToggleGroupItem>
 
           <ToggleGroupItem
@@ -102,7 +104,8 @@ function InputResponses({ control, data } :InputResponsesProps) {
             onClick={() => setCurrentState("ng")}
             className={cn("bg-background", isSelected("ng") && "border-gray-400! text-gray-400")}
           >
-            不参加（✖︎）
+            <span className="sm:hidden">✖︎</span>
+            <span className="hidden sm:inline">不参加（✖︎）</span>
           </ToggleGroupItem>
         </ToggleGroup>
       </div>
@@ -118,13 +121,13 @@ function InputResponses({ control, data } :InputResponsesProps) {
                 <thead>
                   {/* 時間のメモリ */}
                   <tr>
-                    <th className="sticky left-0 z-30 border border-border w-25"></th>
+                    <th className="sticky left-0 z-30 border border-border w-18 sm:w-25"></th>
                     {TIME_OPTIONS.map((time) => {
                       const isWholeHour = time.endsWith(":00");
                       return (
-                        <th key={time} className="relative h-8 w-6 sm:w-6 border-y border-border">
+                        <th key={time} className="relative h-6 sm:h-8 w-5 sm:w-6 border-y border-border">
                           {isWholeHour && (
-                            <span className="absolute top-0 left-2 -translate-x-1/2 text-[10px] font-bold text-muted-foreground">
+                            <span className="absolute top-0 left-2 -translate-x-1/2 text-[8px] sm:text-[10px] font-bold text-muted-foreground">
                               {time.split(":")[0]}
                             </span>
                           )}
@@ -139,7 +142,7 @@ function InputResponses({ control, data } :InputResponsesProps) {
                 <tbody>
                   <tr className="h-8">
                     {/* 日付ラベル */}
-                    <td className="sticky left-0 z-20 border h-10 text-center  bg-foreground text-background">
+                    <td className="sticky left-0 z-20 border h-8 sm:h-10 text-[11px] sm:text-sm text-center bg-foreground text-background">
                       {dateKey}
                     </td>
 
