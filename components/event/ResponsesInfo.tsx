@@ -107,8 +107,10 @@ function ResponsesInfo({ data }: ResponsesInfoProps) {
                     
                     return (
                       <tr key={user.id}className="hover:bg-muted/40">
-                        <td className="sticky left-0 z-30 border bg-foreground/90 p-1 sm:p-2 text-[12px] sm:text-xs text-center text-background font-bold min-w-10 sm:min-w-24">
-                          {user.name}
+                        <td className="sticky left-0 z-30 border bg-foreground/90 p-1 sm:p-2 text-center text-background font-bold min-w-15 max-w-20 sm:max-w-30 sm:min-w-24 h-7 sm:h-9">
+                          <div className="text-[11px] sm:text-xs truncate" title={user.name}>
+                            {user.name}
+                          </div>
                         </td>
                         
                         {/* 各時間の回答セル */}
