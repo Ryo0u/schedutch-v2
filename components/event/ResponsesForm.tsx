@@ -8,20 +8,15 @@ import InputUserInfo from './InputUserInfo';
 import { Separator } from '../ui/separator';
 import InputResponses from './InputResponses';
 import { useEffect } from 'react';
-import { Timestamp } from 'next/dist/server/lib/cache-handlers/types';
 import { Button } from '../ui/button';
 import bcrypt from 'bcryptjs';
 import { supabase } from '@/utils/supabase/client';
 import { useParams } from 'next/navigation';
-import { toJST } from '@/lib/utils';
+import { Candidate } from '@/lib/types';
 
 interface ResposesFromProps {
   data: {
-    candidates: {
-      id: string
-      start_time: Timestamp
-      end_time: Timestamp
-    }[]
+    candidates: Pick<Candidate, "id" | "start_time" | "end_time">[];
   };
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -78,18 +73,19 @@ function ResponsesForm({ data, open, onOpenChange, onSuccess }: ResposesFromProp
   useEffect(() => {
     if (open && data.candidates) {
       const initResponses: UserFormData["responses"] = [];
-      
+
+      // UTC instant 上の30分刻みでループし、ブラウザTZに依存しない
       data.candidates.forEach((candidate) => {
-        let current = toJST(candidate.start_time);
-        const end = toJST(candidate.end_time);
-        
-        while (current < end) {
+        let currentMs = new Date(candidate.start_time).getTime();
+        const endMs = new Date(candidate.end_time).getTime();
+
+        while (currentMs < endMs) {
           initResponses.push({
             candidate_id: candidate.id,
-            time: new Date(current),
+            time: new Date(currentMs),
             status: "ok",
-          })
-          current = new Date(current.getTime() + 30 * 60000); //30分進める
+          });
+          currentMs += 30 * 60000; // 30分進める
         }
       })
       
