@@ -8,8 +8,7 @@ import { toast } from "sonner"
 import { useState } from 'react';
 import CreatedDialog from './CreatedDiaolg';
 import { Spinner } from '../ui/spinner';
-import bcrypt from 'bcryptjs';
-import { jstWallTimeToISO } from '@/lib/utils';
+import { hashPassword, jstWallTimeToISO } from '@/lib/utils';
 
 interface CreateEventActionProps {
   form: UseFormReturn<FormData>;
@@ -22,9 +21,7 @@ function CreateEvent({ form }: CreateEventActionProps) {
 	
   const onSubmit = async (values: FormData) => {
       try {
-        // パスワードのハッシュ化
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(values.password, salt);
+        const hashedPassword = await hashPassword(values.password);
 
         // 候補日データをUTC instant（ISO文字列）に整形
         // jstWallTimeToISO でカレンダー日付+時刻をJST壁時計として扱い正しいUTCに変換する

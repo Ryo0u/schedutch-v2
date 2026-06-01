@@ -9,7 +9,7 @@ import { Separator } from '../ui/separator';
 import InputResponses from './InputResponses';
 import { useEffect } from 'react';
 import { Button } from '../ui/button';
-import bcrypt from 'bcryptjs';
+import { hashPassword } from '@/lib/utils';
 import { supabase } from '@/utils/supabase/client';
 import { useParams } from 'next/navigation';
 import { Candidate } from '@/lib/types';
@@ -98,9 +98,7 @@ function ResponsesForm({ data, open, onOpenChange, onSuccess }: ResposesFromProp
   
   const onSubmit = async (values: UserFormData) => {
     try {
-      // パスワードのハッシュ化
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(values.password, salt);
+      const hashedPassword = await hashPassword(values.password);
       
       const formattedResponses = values.responses.map(res => ({
         candidate_id: res.candidate_id,
