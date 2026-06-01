@@ -6,14 +6,11 @@ import { useDeviceType } from "../hooks/UseDeviceType";
 import { Popover, PopoverContent, PopoverDescription, PopoverHeader, PopoverTitle, PopoverTrigger } from "../ui/popover";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
+import type { User } from "@/lib/types";
 
 interface UsersInfoProps {
   data: {
-    users: {
-      name: string
-      comment: string
-      password_digest: string
-    }[]
+    users: Pick<User, "id" | "name" | "comment">[];
   };
 }
 
@@ -88,9 +85,9 @@ function UsersInfo({ data }: UsersInfoProps) {
   
       <CardContent className="px-0">
         <div className="divide-y divide-border border-y border-border"> 
-          {data.users.map((user, index) => (
-            <div 
-              key={index} 
+          {data.users.map((user) => (
+            <div
+              key={user.id}
               className="group flex justify-between items-center p-2 transition-all hover:bg-muted/40"
             >
               <div className="flex gap-4 items-center min-w-0">
