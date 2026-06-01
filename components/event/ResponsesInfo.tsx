@@ -2,7 +2,7 @@ import { Timestamp } from "next/dist/server/lib/cache-handlers/types"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Separator } from "../ui/separator";
 import { TIME_OPTIONS } from "@/lib/constants";
-import { cn } from "@/lib/utils";
+import { cn, toJST } from "@/lib/utils";
 
 interface ResponsesInfoProps {
   data: {
@@ -39,10 +39,8 @@ function ResponsesInfo({ data }: ResponsesInfoProps) {
         <div className="w-full overflow-x-auto">
           <table className="min-w-max">
             {data.candidates.map((candidate) => {
-              // 日本の時差分（9時間 = 540分）をミリ秒で引いて日本時間に戻す
-              const JST_OFFSET = 9 * 60 * 60 * 1000;
-              const start = new Date(new Date(candidate.start_time).getTime() - JST_OFFSET);
-              const end = new Date(new Date(candidate.end_time).getTime() - JST_OFFSET);
+              const start = toJST(candidate.start_time);
+              const end = toJST(candidate.end_time);
 
               const dateKey = start.toLocaleDateString('ja-JP', { 
                 month: 'short', day: 'numeric', weekday: 'short' 

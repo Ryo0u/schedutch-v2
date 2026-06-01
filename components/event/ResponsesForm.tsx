@@ -13,6 +13,7 @@ import { Button } from '../ui/button';
 import bcrypt from 'bcryptjs';
 import { supabase } from '@/utils/supabase/client';
 import { useParams } from 'next/navigation';
+import { toJST } from '@/lib/utils';
 
 interface ResposesFromProps {
   data: {
@@ -79,14 +80,8 @@ function ResponsesForm({ data, open, onOpenChange, onSuccess }: ResposesFromProp
       const initResponses: UserFormData["responses"] = [];
       
       data.candidates.forEach((candidate) => {
-        // 世界標準時で取得
-        const startDate = new Date(candidate.start_time);
-        const endDate = new Date(candidate.end_time);
-
-        // 日本の時差分（9時間 = 540分）をミリ秒で引いて日本時間に戻す
-        const JST_OFFSET = 9 * 60 * 60 * 1000;
-        let current = new Date(startDate.getTime() - JST_OFFSET);
-        const end = new Date(endDate.getTime() - JST_OFFSET);
+        let current = toJST(candidate.start_time);
+        const end = toJST(candidate.end_time);
         
         while (current < end) {
           initResponses.push({
