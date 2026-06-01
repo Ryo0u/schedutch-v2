@@ -1,27 +1,14 @@
-import { Timestamp } from "next/dist/server/lib/cache-handlers/types"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Separator } from "../ui/separator";
 import { TIME_OPTIONS } from "@/lib/constants";
-import { cn } from "@/lib/utils";
+import { cn, jstHHMM, formatJSTDate } from "@/lib/utils";
+import type { Candidate, User } from "@/lib/types";
 
 interface ResponsesInfoProps {
   data: {
-    candidates: {
-      id: string;
-      start_time: Timestamp;
-      end_time: Timestamp;
-    }[];
-    users: {
-      id: string;
-      name: string;
-      responses: {
-        user_id: string;
-        candidate_id: string;
-        time: Date;
-        status: string; 
-      }[];
-    }[];
-  }
+    candidates: Pick<Candidate, "id" | "start_time" | "end_time">[];
+    users: Pick<User, "id" | "name" | "responses">[];
+  };
 }
 
 function ResponsesInfo({ data }: ResponsesInfoProps) {
@@ -39,13 +26,12 @@ function ResponsesInfo({ data }: ResponsesInfoProps) {
         <div className="w-full overflow-x-auto">
           <table className="min-w-max">
             {data.candidates.map((candidate) => {
-              // 日本の時差分（9時間 = 540分）をミリ秒で引いて日本時間に戻す
-              const JST_OFFSET = 9 * 60 * 60 * 1000;
-              const start = new Date(new Date(candidate.start_time).getTime() - JST_OFFSET);
-              const end = new Date(new Date(candidate.end_time).getTime() - JST_OFFSET);
-
-              const dateKey = start.toLocaleDateString('ja-JP', { 
-                month: 'short', day: 'numeric', weekday: 'short' 
+              const startHHMM = jstHHMM(candidate.start_time);
+              const endHHMM = jstHHMM(candidate.end_time);
+              const dateKey = formatJSTDate(candidate.start_time, {
+                month: "short",
+                day: "numeric",
+                weekday: "short",
               });
 
               return (
@@ -54,11 +40,11 @@ function ResponsesInfo({ data }: ResponsesInfoProps) {
                     <th rowSpan={2} className="sticky left-0 z-30 border bg-foreground p-1 sm:p-2 text-[10px] sm:text-xs text-center text-background min-w-10 sm:min-w-24">
                       {dateKey}
                     </th>
-                    
+
                     {/* --- 1行目：時間のラベル --- */}
                     {TIME_OPTIONS.map((time) => {
                       const isWholeHour = time.endsWith(":00");
-                      
+
                       return (
                         <th key={time} className="relative h-5 sm:h-8 w-5 sm:w-6 border-y border-border bg-muted/30">
                           {isWholeHour && (
@@ -70,7 +56,7 @@ function ResponsesInfo({ data }: ResponsesInfoProps) {
                         </th>
                       );
                     })}
-                    
+
                     {/* 一番右の枠線 */}
                     <th className=" border-r border-border"></th>
                   </tr>
@@ -78,11 +64,8 @@ function ResponsesInfo({ data }: ResponsesInfoProps) {
                   {/* --- 2行目：予定の範囲 --- */}
                   <tr className="h-3 sm:h-5 border-b">
                     {TIME_OPTIONS.map((time) => {
-                      const [hours, minutes] = time.split(":").map(Number);
-                      const cellTime = new Date(start);
-                      cellTime.setHours(hours!, minutes, 0, 0);
-
-                      const isInRange = cellTime >= start && cellTime < end;
+                      // JST の "HH:MM" 文字列比較で範囲判定（ブラウザTZ非依存）
+                      const isInRange = time >= startHHMM && time < endHHMM;
 
                       return (
                         <td
@@ -91,7 +74,7 @@ function ResponsesInfo({ data }: ResponsesInfoProps) {
                         />
                       );
                     })}
-                    
+
                      {/* 一番右の枠線 */}
                     <td className=" border-r border-border"></td>
                   </tr>
@@ -99,9 +82,7 @@ function ResponsesInfo({ data }: ResponsesInfoProps) {
                   {/* 3行目〜：ユーザー毎の予定一覧 */}
                   {data.users.map((user) => {
                     const userResponseMap = user.responses.reduce((acc, res) => {
-                      const d = new Date(res.time);
-                      const hhmm = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-                      acc[`${res.candidate_id}-${hhmm}`] = res.status;
+                      acc[`${res.candidate_id}-${jstHHMM(res.time)}`] = res.status;
                       return acc;
                     }, {} as Record<string, string>);
                     

@@ -8,19 +8,15 @@ import InputUserInfo from './InputUserInfo';
 import { Separator } from '../ui/separator';
 import InputResponses from './InputResponses';
 import { useEffect } from 'react';
-import { Timestamp } from 'next/dist/server/lib/cache-handlers/types';
 import { Button } from '../ui/button';
-import bcrypt from 'bcryptjs';
+import { hashPassword } from '@/lib/utils';
 import { supabase } from '@/utils/supabase/client';
 import { useParams } from 'next/navigation';
+import { Candidate } from '@/lib/types';
 
 interface ResposesFromProps {
   data: {
-    candidates: {
-      id: string
-      start_time: Timestamp
-      end_time: Timestamp
-    }[]
+    candidates: Pick<Candidate, "id" | "start_time" | "end_time">[];
   };
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -77,24 +73,19 @@ function ResponsesForm({ data, open, onOpenChange, onSuccess }: ResposesFromProp
   useEffect(() => {
     if (open && data.candidates) {
       const initResponses: UserFormData["responses"] = [];
-      
-      data.candidates.forEach((candidate) => {
-        // 世界標準時で取得
-        const startDate = new Date(candidate.start_time);
-        const endDate = new Date(candidate.end_time);
 
-        // 日本の時差分（9時間 = 540分）をミリ秒で引いて日本時間に戻す
-        const JST_OFFSET = 9 * 60 * 60 * 1000;
-        let current = new Date(startDate.getTime() - JST_OFFSET);
-        const end = new Date(endDate.getTime() - JST_OFFSET);
-        
-        while (current < end) {
+      // UTC instant 上の30分刻みでループし、ブラウザTZに依存しない
+      data.candidates.forEach((candidate) => {
+        let currentMs = new Date(candidate.start_time).getTime();
+        const endMs = new Date(candidate.end_time).getTime();
+
+        while (currentMs < endMs) {
           initResponses.push({
             candidate_id: candidate.id,
-            time: new Date(current),
+            time: new Date(currentMs),
             status: "ok",
-          })
-          current = new Date(current.getTime() + 30 * 60000); //30分進める
+          });
+          currentMs += 30 * 60000; // 30分進める
         }
       })
       
@@ -107,9 +98,7 @@ function ResponsesForm({ data, open, onOpenChange, onSuccess }: ResposesFromProp
   
   const onSubmit = async (values: UserFormData) => {
     try {
-      // パスワードのハッシュ化
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(values.password, salt);
+      const hashedPassword = await hashPassword(values.password);
       
       const formattedResponses = values.responses.map(res => ({
         candidate_id: res.candidate_id,

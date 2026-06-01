@@ -3,27 +3,27 @@
 import { useState, useEffect, useCallback } from "react";
 import EventInfo from "@/components/event/EventInfo";
 import JoinButton from "@/components/event/JoinButton";
-import MenuButton from "@/components/event/MenuBotton";
+import MenuButton from "@/components/event/MenuButton";
 import UsersInfo from "@/components/event/UsersInfo";
 import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/utils/supabase/client";
 import ResponsesInfo from "./ResponsesInfo";
 import ExtractResponses from "./ExtractResponses";
+import type { EventData } from "@/lib/types";
 
 export default function EventClient({ eventId }: { eventId: string }) {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<EventData | null>(null);
   const refresh = useCallback(async () => {
     const { data } = await supabase.from('events').select(`*, candidates (*), users (*, responses (*))`).eq('id', eventId).single();
     setData(data);
   }, [eventId]);
 
   useEffect(() => { refresh(); }, [refresh]);
-  
+
   if (!data) {
     return <div>イベント情報を読み込めませんでした。</div>;
   }
-  console.log(data)
-  
+
   return (
     <div className="w-full max-w-6xl mx-auto px-3">
       <section className="flex flex-col sm:flex-row justify-between sm:items-end gap-8 mt-5 mb-8">

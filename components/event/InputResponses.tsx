@@ -1,20 +1,23 @@
 import { Control, useFieldArray } from "react-hook-form";
 import { UserFormData } from "./ResponsesForm";
 import { TIME_OPTIONS } from "@/lib/constants";
-import { Timestamp } from "next/dist/server/lib/cache-handlers/types";
 import { useState } from "react";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
-import { cn } from "@/lib/utils";
-import { ScrollArea, ScrollBar } from "../ui/scroll-area";
+import { cn, jstHHMM, formatJSTDate } from "@/lib/utils";
+import type { Candidate } from "@/lib/types";
+
+type SlotInfo = {
+  id: string;
+  candidate_id: string;
+  time: Date;
+  status: string;
+  index: number;
+};
 
 interface InputResponsesProps {
   control: Control<UserFormData>;
   data: {
-    candidates: {
-    id: string
-    start_time: Timestamp
-    end_time: Timestamp
-  }[]
+    candidates: Pick<Candidate, "id" | "start_time" | "end_time">[];
   };
 }
 
@@ -30,27 +33,25 @@ function InputResponses({ control, data } :InputResponsesProps) {
   const [ isDragging, setIsDragging ] = useState(false);
   
   const responseMap = fields.reduce((acc, field, index) => {
-    const d = new Date(field.time);
-    const hhmm = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+    const hhmm = jstHHMM(field.time);
     acc[`${field.candidate_id}-${hhmm}`] = { ...field, index };
     return acc;
-  }, {} as Record<string, any>);
-  
+  }, {} as Record<string, SlotInfo>);
+
   // PCでの回答更新ハンドラ
-  const handleSlotUpdate = (slotInfo: any) => {
-    if (!slotInfo) return;
+  const handleSlotUpdate = (slotInfo: SlotInfo) => {
     update(slotInfo.index, {
       ...fields[slotInfo.index],
       status: currentState,
-      candidate_id: slotInfo.candidate_id as string,
-      time: slotInfo.time as Date,
+      candidate_id: slotInfo.candidate_id,
+      time: slotInfo.time,
     });
   };
   
   // スマホでの回答更新ハンドラ
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!isDragging) return;
-    
+
     const touch = e.touches[0];
     if (!touch) return;
     const element = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -60,13 +61,13 @@ function InputResponses({ control, data } :InputResponsesProps) {
     if (tdElement) {
       const index = Number(tdElement.getAttribute("data-index"));
       const slotField = fields[index];
-      
+
       if (slotField) {
         update(index, {
           ...slotField,
           status: currentState,
-          candidate_id: slotField.candidate_id as string,
-          time: slotField.time as Date,
+          candidate_id: slotField.candidate_id,
+          time: slotField.time,
         });
       }
     }
@@ -112,8 +113,10 @@ function InputResponses({ control, data } :InputResponsesProps) {
       
       <div className="w-full overflow-x-auto pb-5" onTouchMove={handleTouchMove}>
           {data.candidates.map((candidate) => {
-            const dateKey = new Date(candidate.start_time).toLocaleDateString('ja-JP', { 
-              month: 'short', day: 'numeric', weekday: 'short' 
+            const dateKey = formatJSTDate(candidate.start_time, {
+              month: "short",
+              day: "numeric",
+              weekday: "short",
             });
 
             return (

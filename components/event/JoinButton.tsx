@@ -3,10 +3,11 @@
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import ResponsesForm from './ResponsesForm';
+import type { Candidate } from '@/lib/types';
 
 interface EventCandidatesProps {
   data: {
-    candidates: [];
+    candidates: Pick<Candidate, "id" | "start_time" | "end_time">[];
   };
   onSuccess: () => void;
 }

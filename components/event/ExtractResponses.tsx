@@ -9,24 +9,14 @@ import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupText, InputGro
 import { ChevronDownIcon, CopyIcon, Plus } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { cn } from "@/lib/utils";
+import { cn, jstHHMM, formatJSTDate } from "@/lib/utils";
+import type { Candidate, User } from "@/lib/types";
 
 interface ExtractProps {
   data: {
-    candidates: {
-      id: string;
-      start_time: Date;
-    }[];
-    users: {
-      id: string;
-      name: string;
-      responses: {
-        id: string;
-        status: string;
-        time:  Date;
-      }[];
-    }[];
-  }
+    candidates: Pick<Candidate, "id" | "start_time">[];
+    users: Pick<User, "id" | "name" | "responses">[];
+  };
 }
 
 // 抽出条件を管理
@@ -86,8 +76,11 @@ function ExtractResponses({ data }: ExtractProps) {
   };
   
   const availableDates = useMemo(() => {
-    const dates = data.candidates.map(c => 
-      new Date(c.start_time).toLocaleDateString('sv-SE')
+    // JST の "YYYY-MM-DD" で一意な日付リストを作成（ブラウザTZ非依存）
+    const dates = data.candidates.map(c =>
+      new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Tokyo" }).format(
+        new Date(c.start_time)
+      )
     );
     return Array.from(new Set(dates)).sort();
   }, [data.candidates]);
@@ -137,7 +130,7 @@ function ExtractResponses({ data }: ExtractProps) {
         .filter(u => isUserAvailable(u, time) && (activeTab === "pepole" ? selectedUserIds.has(u.id) : true))
         .map(u => ({
           name: u.name,
-          status: u.responses.find((r: any) => new Date(r.time).getTime() === time)?.status || 'ok'
+          status: u.responses.find(r => new Date(r.time).getTime() === time)?.status ?? "ok"
         }));
 
       const lastBlock = acc[acc.length - 1];
@@ -168,7 +161,7 @@ function ExtractResponses({ data }: ExtractProps) {
     const result: string[] = [];
     
     const grouped = blocks.reduce((acc, block) => {
-      const dateKey = new Date(block.start).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' });
+      const dateKey = formatJSTDate(block.start, { month: "numeric", day: "numeric" });
       if (!acc[dateKey]) acc[dateKey] = [];
       acc[dateKey].push(block);
       return acc;
@@ -177,8 +170,8 @@ function ExtractResponses({ data }: ExtractProps) {
     Object.entries(grouped).forEach(([date, daysBlocks]) => {
       result.push(date);
       daysBlocks.forEach(block => {
-        const start = new Date(block.start).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
-        const end = new Date(block.end + SLOT_INTERVAL).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+        const start = jstHHMM(block.start);
+        const end = jstHHMM(block.end + SLOT_INTERVAL);
         // 表示時に maybe の人には (▲) を付ける
         const names = block.participants.map(p => p.status === 'maybe' ? `${p.name}(▲)` : p.name).join(', ');
         result.push(`${start} - ${end} : ${names}`);
@@ -210,14 +203,16 @@ function ExtractResponses({ data }: ExtractProps) {
     }
     
     if (isDateRangeEnabled) {
-      const fallbackStart = availableDates[0] || "1970-01-01";
-      const start = new Date(dateRange[0] || fallbackStart).setHours(0, 0, 0, 0);
+      const fallbackStart = availableDates[0] ?? "1970-01-01";
+      const startDate = dateRange[0] || fallbackStart;
+      // JST 0時 → UTC = "YYYY-MM-DDT00:00:00+09:00"
+      const start = new Date(`${startDate}T00:00:00+09:00`).getTime();
 
-      const fallbackEnd = availableDates[availableDates.length - 1];
-      const end = dateRange[1] 
-        ? new Date(dateRange[1]).setHours(23, 59, 59, 999) 
-        : (fallbackEnd ? new Date(fallbackEnd).setHours(23, 59, 59, 999) : Infinity);
-      
+      const fallbackEnd = availableDates[availableDates.length - 1] ?? "9999-12-31";
+      const endDate = dateRange[1] || fallbackEnd;
+      // JST 23:59:59.999 → UTC
+      const end = new Date(`${endDate}T23:59:59.999+09:00`).getTime();
+
       conditions.push({ type: 'DATERANGE', start, end });
     }
 

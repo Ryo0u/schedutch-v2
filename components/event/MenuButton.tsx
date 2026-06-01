@@ -8,9 +8,10 @@ import EventEditDialog from "./EventEditDialog"
 import EventDeleteDialog from "./EventDeleteDialog"
 import UsersDeleteDialog from "./UsersDeleteDialog"
 import EventShareDialog from "./EventShareDialog"
+import type { EventData } from "@/lib/types";
 
 interface MenuProps {
-  data: any;
+  data: EventData;
   onSuccess: () => void;
 }
 
