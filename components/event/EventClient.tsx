@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import EventInfo from "@/components/event/EventInfo";
 import JoinButton from "@/components/event/JoinButton";
-import MenuButton from "@/components/event/MenuBotton";
+import MenuButton from "@/components/event/MenuButton";
 import UsersInfo from "@/components/event/UsersInfo";
 import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/utils/supabase/client";
