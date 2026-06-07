@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Separator } from '../ui/separator';
 import { Button } from '../ui/button';
@@ -10,15 +11,13 @@ import { Field, FieldError, FieldGroup, FieldLabel } from '../ui/field';
 import { Input } from '../ui/input';
 import { InputGroup, InputGroupAddon, InputGroupText, InputGroupTextarea } from '../ui/input-group';
 import InputResponses from './InputResponses';
-import { UserFormSchema, type UserFormData } from './ResponsesForm';
 import { supabase } from '@/utils/supabase/client';
 import { toast } from 'sonner';
-import bcrypt from 'bcryptjs';
 import type { Candidate, User } from '@/lib/types';
 
 interface UsersEditDialogProps {
   data: {
-    user: Pick<User, "id" | "name" | "comment" | "password_digest" | "responses">;
+    user: Pick<User, "id" | "name" | "comment" | "responses">;
     candidates: Pick<Candidate, "id" | "start_time" | "end_time">[];
   };
   open: boolean;
@@ -26,13 +25,24 @@ interface UsersEditDialogProps {
   onSuccess?: () => void;
 }
 
+const EditFormSchema = z.object({
+  name: z.string().min(1, '名前を入力してください').max(10, '名前を10文字以内で入力してください'),
+  comment: z.string().max(30, 'コメントは30文字以内で入力してください'),
+  responses: z.array(z.object({
+    candidate_id: z.string(),
+    time: z.date(),
+    status: z.string(),
+  })),
+});
+
+type EditFormData = z.infer<typeof EditFormSchema>;
+
 function UsersEditDialog({ data, open, onOpenChange, onSuccess }: UsersEditDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [passwordError, setPasswordError] = useState<string | null>(null);
 
-  const form = useForm<UserFormData>({
-    resolver: zodResolver(UserFormSchema),
-    defaultValues: { name: "", comment: "", password: "", responses: [] },
+  const form = useForm<EditFormData>({
+    resolver: zodResolver(EditFormSchema),
+    defaultValues: { name: "", comment: "", responses: [] },
   });
 
   useEffect(() => {
@@ -40,27 +50,17 @@ function UsersEditDialog({ data, open, onOpenChange, onSuccess }: UsersEditDialo
       form.reset({
         name: data.user.name,
         comment: data.user.comment ?? "",
-        password: "",
         responses: data.user.responses.map(r => ({
           candidate_id: r.candidate_id,
           time: new Date(r.time),
           status: r.status,
         })),
       });
-      setPasswordError(null);
     }
   }, [open]);
 
-  const onSubmit = async (values: UserFormData) => {
+  const onSubmit = async (values: EditFormData) => {
     setIsSubmitting(true);
-    setPasswordError(null);
-
-    const isMatch = await bcrypt.compare(values.password, data.user.password_digest);
-    if (!isMatch) {
-      setPasswordError("パスワードが間違っています");
-      setIsSubmitting(false);
-      return;
-    }
 
     try {
       const { error: userError } = await supabase
@@ -102,7 +102,7 @@ function UsersEditDialog({ data, open, onOpenChange, onSuccess }: UsersEditDialo
         <DialogHeader className="p-6 pb-2 text-center shrink-0">
           <DialogTitle className="text-xl font-black">回答を編集する</DialogTitle>
           <DialogDescription>
-            パスワードを入力し、名前・コメント・回答を編集してください
+            名前・コメント・回答を編集してください
           </DialogDescription>
         </DialogHeader>
 
@@ -113,31 +113,17 @@ function UsersEditDialog({ data, open, onOpenChange, onSuccess }: UsersEditDialo
           className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-6"
         >
           <FieldGroup>
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Controller
-                name="name"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel>名前<span className="text-destructive">*</span></FieldLabel>
-                    <Input {...field} aria-invalid={fieldState.invalid} />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
-              <Controller
-                name="password"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid || !!passwordError}>
-                    <FieldLabel>パスワード<span className="text-destructive">*</span></FieldLabel>
-                    <Input {...field} aria-invalid={fieldState.invalid || !!passwordError} />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                    {!fieldState.invalid && passwordError && <FieldError errors={[{ message: passwordError }]} />}
-                  </Field>
-                )}
-              />
-            </div>
+            <Controller
+              name="name"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>名前<span className="text-destructive">*</span></FieldLabel>
+                  <Input {...field} aria-invalid={fieldState.invalid} />
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
             <Controller
               name="comment"
               control={form.control}

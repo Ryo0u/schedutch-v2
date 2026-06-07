@@ -8,6 +8,7 @@ import { Popover, PopoverContent, PopoverDescription, PopoverHeader, PopoverTitl
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import type { Candidate, User } from "@/lib/types";
+import UsersPasswordDialog from "./UsersPasswordDialog";
 import UsersEditDialog from "./UsersEditDialog";
 
 interface UsersInfoProps {
@@ -49,6 +50,29 @@ function UserComment({ comment }: { comment: string }) {
 
 function UsersInfo({ data, onSuccess }: UsersInfoProps) {
   const [editingUser, setEditingUser] = useState<UsersInfoProps["data"]["users"][0] | null>(null);
+  const [passwordOpen, setPasswordOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+
+  const handleEditClick = (user: UsersInfoProps["data"]["users"][0]) => {
+    setEditingUser(user);
+    setPasswordOpen(true);
+  };
+
+  // onOpenChange はユーザーがキャンセルした時だけ呼ばれる（成功時は onConfirm 経由で親が閉じる）
+  const handlePasswordOpenChange = (open: boolean) => {
+    setPasswordOpen(open);
+    if (!open) setEditingUser(null);
+  };
+
+  const handlePasswordConfirm = () => {
+    setPasswordOpen(false);
+    setEditOpen(true);
+  };
+
+  const handleEditOpenChange = (open: boolean) => {
+    setEditOpen(open);
+    if (!open) setEditingUser(null);
+  };
 
   const getUserColor = (name: string) => {
     const colors = [
@@ -115,7 +139,7 @@ function UsersInfo({ data, onSuccess }: UsersInfoProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setEditingUser(user)}
+                onClick={() => handleEditClick(user)}
               >
                 <Pencil className="h-4 w-4" />
               </Button>
@@ -125,12 +149,20 @@ function UsersInfo({ data, onSuccess }: UsersInfoProps) {
       </CardContent>
 
       {editingUser && (
-        <UsersEditDialog
-          data={{ user: editingUser, candidates: data.candidates }}
-          open={!!editingUser}
-          onOpenChange={(open) => { if (!open) setEditingUser(null); }}
-          onSuccess={onSuccess}
-        />
+        <>
+          <UsersPasswordDialog
+            data={{ user: editingUser }}
+            open={passwordOpen}
+            onOpenChange={handlePasswordOpenChange}
+            onConfirm={handlePasswordConfirm}
+          />
+          <UsersEditDialog
+            data={{ user: editingUser, candidates: data.candidates }}
+            open={editOpen}
+            onOpenChange={handleEditOpenChange}
+            onSuccess={onSuccess}
+          />
+        </>
       )}
     </Card>
   );

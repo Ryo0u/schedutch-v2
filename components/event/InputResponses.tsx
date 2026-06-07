@@ -1,5 +1,4 @@
-import { Control, useFieldArray } from "react-hook-form";
-import { UserFormData } from "./ResponsesForm";
+import { Control, FieldValues, useFieldArray } from "react-hook-form";
 import { TIME_OPTIONS } from "@/lib/constants";
 import { useState } from "react";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
@@ -14,17 +13,21 @@ type SlotInfo = {
   index: number;
 };
 
-interface InputResponsesProps {
-  control: Control<UserFormData>;
+type FormWithResponses = FieldValues & {
+  responses: { candidate_id: string; time: Date; status: string }[];
+};
+
+interface InputResponsesProps<T extends FormWithResponses> {
+  control: Control<T>;
   data: {
     candidates: Pick<Candidate, "id" | "start_time" | "end_time">[];
   };
 }
 
-function InputResponses({ control, data } :InputResponsesProps) {
+function InputResponses<T extends FormWithResponses>({ control, data }: InputResponsesProps<T>) {
   const { fields, update } = useFieldArray({
-    control,
-    name: "responses"
+    control: control as Control<FormWithResponses>,
+    name: "responses",
   });
   
   const [ currentState, setCurrentState ] = useState<"ok" | "maybe" | "ng">("ok");
