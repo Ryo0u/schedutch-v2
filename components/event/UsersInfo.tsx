@@ -155,6 +155,7 @@ function UsersInfo({ data, onSuccess }: UsersInfoProps) {
             open={passwordOpen}
             onOpenChange={handlePasswordOpenChange}
             onConfirm={handlePasswordConfirm}
+            onDelete={onSuccess}
           />
           <UsersEditDialog
             data={{ user: editingUser, candidates: data.candidates }}
