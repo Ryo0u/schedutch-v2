@@ -1,17 +1,21 @@
 "use client"
 
-import { MessageCircle, UserCircle } from "lucide-react";
+import { useState } from "react";
+import { MessageCircle, Pencil, UserCircle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDeviceType } from "../hooks/UseDeviceType";
 import { Popover, PopoverContent, PopoverDescription, PopoverHeader, PopoverTitle, PopoverTrigger } from "../ui/popover";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
-import type { User } from "@/lib/types";
+import type { Candidate, User } from "@/lib/types";
+import UsersEditDialog from "./UsersEditDialog";
 
 interface UsersInfoProps {
   data: {
-    users: Pick<User, "id" | "name" | "comment">[];
+    users: Pick<User, "id" | "name" | "comment" | "password_digest" | "responses">[];
+    candidates: Pick<Candidate, "id" | "start_time" | "end_time">[];
   };
+  onSuccess?: () => void;
 }
 
 
@@ -43,7 +47,9 @@ function UserComment({ comment }: { comment: string }) {
   }
 }
 
-function UsersInfo({ data }: UsersInfoProps) {
+function UsersInfo({ data, onSuccess }: UsersInfoProps) {
+  const [editingUser, setEditingUser] = useState<UsersInfoProps["data"]["users"][0] | null>(null);
+
   const getUserColor = (name: string) => {
     const colors = [
       "bg-red-50 text-red-500 hover:bg-red-500",
@@ -84,7 +90,7 @@ function UsersInfo({ data }: UsersInfoProps) {
       </CardHeader>
   
       <CardContent className="px-0">
-        <div className="divide-y divide-border border-y border-border"> 
+        <div className="divide-y divide-border border-y border-border">
           {data.users.map((user) => (
             <div
               key={user.id}
@@ -92,7 +98,7 @@ function UsersInfo({ data }: UsersInfoProps) {
             >
               <div className="flex gap-4 items-center min-w-0">
                 <div className={cn(
-                  "p-2 rounded-full transition-colors shadow-sm", 
+                  "p-2 rounded-full transition-colors shadow-sm",
                   getUserColor(user.name)
                 )}>
                   <UserCircle className="h-5 w-5" />
@@ -105,10 +111,27 @@ function UsersInfo({ data }: UsersInfoProps) {
                   <UserComment comment={user.comment} />
                 </div>
               </div>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setEditingUser(user)}
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
             </div>
           ))}
         </div>
       </CardContent>
+
+      {editingUser && (
+        <UsersEditDialog
+          data={{ user: editingUser, candidates: data.candidates }}
+          open={!!editingUser}
+          onOpenChange={(open) => { if (!open) setEditingUser(null); }}
+          onSuccess={onSuccess}
+        />
+      )}
     </Card>
   );
 }
