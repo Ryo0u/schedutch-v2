@@ -83,7 +83,7 @@ function UsersPasswordDialog({ data, open, onOpenChange, onConfirm, onDelete }: 
             {errorMsg && <FieldError errors={[{ message: errorMsg }]} />}
           </Field>
 
-          <DialogFooter className="flex-row justify-between">
+          <DialogFooter className="flex-row justify-between sm:justify-between">
             <Button
               type="button"
               variant="destructive"
