@@ -37,7 +37,7 @@ export default function EventClient({ eventId }: { eventId: string }) {
       <Separator/>
       
       <section className="mt-5 mb-8">
-        <UsersInfo data={data}/>
+        <UsersInfo data={data} onSuccess={refresh}/>
       </section>
       
       <section className="mb-8">

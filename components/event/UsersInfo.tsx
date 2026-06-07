@@ -1,17 +1,22 @@
 "use client"
 
-import { MessageCircle, UserCircle } from "lucide-react";
+import { useState } from "react";
+import { MessageCircle, Pencil, UserCircle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDeviceType } from "../hooks/UseDeviceType";
 import { Popover, PopoverContent, PopoverDescription, PopoverHeader, PopoverTitle, PopoverTrigger } from "../ui/popover";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
-import type { User } from "@/lib/types";
+import type { Candidate, User } from "@/lib/types";
+import UsersPasswordDialog from "./UsersPasswordDialog";
+import UsersEditDialog from "./UsersEditDialog";
 
 interface UsersInfoProps {
   data: {
-    users: Pick<User, "id" | "name" | "comment">[];
+    users: Pick<User, "id" | "name" | "comment" | "password_digest" | "responses">[];
+    candidates: Pick<Candidate, "id" | "start_time" | "end_time">[];
   };
+  onSuccess?: () => void;
 }
 
 
@@ -43,7 +48,32 @@ function UserComment({ comment }: { comment: string }) {
   }
 }
 
-function UsersInfo({ data }: UsersInfoProps) {
+function UsersInfo({ data, onSuccess }: UsersInfoProps) {
+  const [editingUser, setEditingUser] = useState<UsersInfoProps["data"]["users"][0] | null>(null);
+  const [passwordOpen, setPasswordOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+
+  const handleEditClick = (user: UsersInfoProps["data"]["users"][0]) => {
+    setEditingUser(user);
+    setPasswordOpen(true);
+  };
+
+  // onOpenChange はユーザーがキャンセルした時だけ呼ばれる（成功時は onConfirm 経由で親が閉じる）
+  const handlePasswordOpenChange = (open: boolean) => {
+    setPasswordOpen(open);
+    if (!open) setEditingUser(null);
+  };
+
+  const handlePasswordConfirm = () => {
+    setPasswordOpen(false);
+    setEditOpen(true);
+  };
+
+  const handleEditOpenChange = (open: boolean) => {
+    setEditOpen(open);
+    if (!open) setEditingUser(null);
+  };
+
   const getUserColor = (name: string) => {
     const colors = [
       "bg-red-50 text-red-500 hover:bg-red-500",
@@ -84,7 +114,7 @@ function UsersInfo({ data }: UsersInfoProps) {
       </CardHeader>
   
       <CardContent className="px-0">
-        <div className="divide-y divide-border border-y border-border"> 
+        <div className="divide-y divide-border border-y border-border">
           {data.users.map((user) => (
             <div
               key={user.id}
@@ -92,7 +122,7 @@ function UsersInfo({ data }: UsersInfoProps) {
             >
               <div className="flex gap-4 items-center min-w-0">
                 <div className={cn(
-                  "p-2 rounded-full transition-colors shadow-sm", 
+                  "p-2 rounded-full transition-colors shadow-sm",
                   getUserColor(user.name)
                 )}>
                   <UserCircle className="h-5 w-5" />
@@ -105,10 +135,36 @@ function UsersInfo({ data }: UsersInfoProps) {
                   <UserComment comment={user.comment} />
                 </div>
               </div>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleEditClick(user)}
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
             </div>
           ))}
         </div>
       </CardContent>
+
+      {editingUser && (
+        <>
+          <UsersPasswordDialog
+            data={{ user: editingUser }}
+            open={passwordOpen}
+            onOpenChange={handlePasswordOpenChange}
+            onConfirm={handlePasswordConfirm}
+            onDelete={onSuccess}
+          />
+          <UsersEditDialog
+            data={{ user: editingUser, candidates: data.candidates }}
+            open={editOpen}
+            onOpenChange={handleEditOpenChange}
+            onSuccess={onSuccess}
+          />
+        </>
+      )}
     </Card>
   );
 }

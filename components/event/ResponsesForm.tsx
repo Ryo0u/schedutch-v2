@@ -34,7 +34,7 @@ export type UserFormData = {
   }[];
 }
 
-const UserFormSchema = z.object({
+export const UserFormSchema = z.object({
   name:
     z.string()
       .min(1, '名前を入力してください')
