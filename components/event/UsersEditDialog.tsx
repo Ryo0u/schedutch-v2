@@ -100,7 +100,7 @@ function UsersEditDialog({ data, open, onOpenChange, onSuccess }: UsersEditDialo
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[95vw] md:max-w-2xl lg:max-w-6xl max-h-[90vh] flex flex-col p-0 overflow-hidden">
         <DialogHeader className="p-6 pb-2 text-center shrink-0">
-          <DialogTitle className="text-xl font-black">回答を編集する</DialogTitle>
+          <DialogTitle className="text-xl font-black">{data.user.name} の回答を編集する</DialogTitle>
           <DialogDescription>
             名前・コメント・回答を編集してください
           </DialogDescription>

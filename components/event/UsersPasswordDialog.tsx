@@ -22,7 +22,7 @@ function UsersPasswordDialog({ data, open, onOpenChange, onConfirm }: UsersPassw
   const [isChecking, setIsChecking] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsChecking(true);
     setErrorMsg(null);
@@ -52,7 +52,7 @@ function UsersPasswordDialog({ data, open, onOpenChange, onConfirm }: UsersPassw
           <DialogHeader className="mb-5">
             <DialogTitle className="text-center text-xl font-bold">パスワードを確認</DialogTitle>
             <DialogDescription className="text-center">
-              {data.user.name} さんのパスワードを入力してください
+            {data.user.name}さんの回答を編集するための<br/>パスワードを入力してください
             </DialogDescription>
           </DialogHeader>
 
