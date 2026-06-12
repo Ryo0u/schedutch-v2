@@ -6,6 +6,7 @@ import JoinButton from "@/components/event/JoinButton";
 import MenuButton from "@/components/event/MenuButton";
 import UsersInfo from "@/components/event/UsersInfo";
 import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
 import { supabase } from "@/utils/supabase/client";
 import ResponsesInfo from "./ResponsesInfo";
 import ExtractResponses from "./ExtractResponses";
@@ -13,15 +14,26 @@ import type { EventData } from "@/lib/types";
 
 export default function EventClient({ eventId }: { eventId: string }) {
   const [data, setData] = useState<EventData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
   const refresh = useCallback(async () => {
     const { data } = await supabase.from('events').select(`*, candidates (*), users (*, responses (*))`).eq('id', eventId).single();
     setData(data);
+    setIsLoading(false);
   }, [eventId]);
 
   useEffect(() => { refresh(); }, [refresh]);
 
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-64">
+        <Spinner className="size-8 text-muted-foreground" />
+      </div>
+    );
+  }
+
   if (!data) {
-    return <div>イベント情報を読み込めませんでした。</div>;
+    return <div className="flex justify-center items-center min-h-64 text-muted-foreground">イベント情報を読み込めませんでした。</div>;
   }
 
   return (
