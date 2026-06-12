@@ -247,17 +247,17 @@ function ExtractResponses({ data }: ExtractProps) {
                 {data.users.map((user) => (
                   <Field key={user.id} orientation="horizontal">
                     <Checkbox
-                      id={user.id}
-                      checked={selectedUserIds.has(user.id)} 
+                      id={`extract-user-${user.id}`}
+                      checked={selectedUserIds.has(user.id)}
                       onCheckedChange={() => {
                         setSelectedUserIds(prev => {
                           const next = new Set(prev);
                           next.has(user.id) ? next.delete(user.id) : next.add(user.id);
                           return next;
                         });
-                      }}                   
+                      }}
                     />
-                    <FieldLabel htmlFor={user.id}>{user.name}</FieldLabel>  
+                    <FieldLabel htmlFor={`extract-user-${user.id}`}>{user.name}</FieldLabel>
                   </Field>
                 ))}
               </FieldGroup>
