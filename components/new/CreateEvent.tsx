@@ -8,7 +8,7 @@ import { toast } from "sonner"
 import { useState } from 'react';
 import CreatedDialog from './CreatedDiaolg';
 import { Spinner } from '../ui/spinner';
-import bcrypt from 'bcryptjs';
+import { hashPassword, jstWallTimeToISO } from '@/lib/utils';
 
 interface CreateEventActionProps {
   form: UseFormReturn<FormData>;
@@ -21,24 +21,20 @@ function CreateEvent({ form }: CreateEventActionProps) {
 	
   const onSubmit = async (values: FormData) => {
       try {
-        // パスワードのハッシュ化
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassward = await bcrypt.hash(values.password, salt);
-        
-        // 候補日データをTIMESTAMP形式に整形
-        const candidatesToInsert = values.candidates.map((c, index) => {
-          const dateStr = c.date.toISOString().split('T')[0];
-          return {
-            start_time: `${dateStr}T${c.startTime}:00`,
-            end_time: `${dateStr}T${c.endTime}:00`,
-            index_number: index,
-          };
-        });
+        const hashedPassword = await hashPassword(values.password);
+
+        // 候補日データをUTC instant（ISO文字列）に整形
+        // jstWallTimeToISO でカレンダー日付+時刻をJST壁時計として扱い正しいUTCに変換する
+        const candidatesToInsert = values.candidates.map((c, index) => ({
+          start_time: jstWallTimeToISO(c.date, c.startTime),
+          end_time: jstWallTimeToISO(c.date, c.endTime),
+          index_number: index,
+        }));
         
         // supabase内でトランザクションを実装している
         const { data: eventId, error } = await supabase.rpc('create_event_with_candidates', {
           p_title: values.title,
-          p_password_digest: hashedPassward,
+          p_password_digest: hashedPassword,
           p_comment: values.comment,
           p_candidates: candidatesToInsert,
         });
