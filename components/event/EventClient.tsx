@@ -17,9 +17,12 @@ export default function EventClient({ eventId }: { eventId: string }) {
   const [isLoading, setIsLoading] = useState(true);
 
   const refresh = useCallback(async () => {
-    const { data } = await supabase.from('events').select(`*, candidates (*), users (*, responses (*))`).eq('id', eventId).single();
-    setData(data);
-    setIsLoading(false);
+    try {
+      const { data } = await supabase.from('events').select(`*, candidates (*), users (*, responses (*))`).eq('id', eventId).single();
+      setData(data);
+    } finally {
+      setIsLoading(false);
+    }
   }, [eventId]);
 
   useEffect(() => { refresh(); }, [refresh]);
