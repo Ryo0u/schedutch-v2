@@ -96,8 +96,8 @@ function UsersDeleteDialog({ data, open, onOpenChange, onSuccess }: DialogProps)
               {data.users.length > 0 ? (
                 data.users.map((user) => (
                   <Field data-invalid={!!errorMsg} orientation="horizontal" key={user.id}>
-                    <RadioGroupItem value={user.id} id={user.id} aria-invalid={!!errorMsg}/>
-                    <FieldLabel htmlFor={user.id}>{user.name}</FieldLabel>
+                    <RadioGroupItem value={user.id} id={`user-delete-${user.id}`} aria-invalid={!!errorMsg}/>
+                    <FieldLabel htmlFor={`user-delete-${user.id}`}>{user.name}</FieldLabel>
                   </Field>
                 ))
               ): (
