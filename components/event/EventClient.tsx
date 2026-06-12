@@ -6,7 +6,7 @@ import JoinButton from "@/components/event/JoinButton";
 import MenuButton from "@/components/event/MenuButton";
 import UsersInfo from "@/components/event/UsersInfo";
 import { Separator } from "@/components/ui/separator";
-import { Spinner } from "@/components/ui/spinner";
+import EventSkeleton from "@/components/event/EventSkeleton";
 import { supabase } from "@/utils/supabase/client";
 import ResponsesInfo from "./ResponsesInfo";
 import ExtractResponses from "./ExtractResponses";
@@ -25,11 +25,7 @@ export default function EventClient({ eventId }: { eventId: string }) {
   useEffect(() => { refresh(); }, [refresh]);
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-64">
-        <Spinner className="size-8 text-muted-foreground" />
-      </div>
-    );
+    return <EventSkeleton />;
   }
 
   if (!data) {
