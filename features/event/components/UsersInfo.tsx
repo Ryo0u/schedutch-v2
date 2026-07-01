@@ -16,7 +16,6 @@ interface UsersInfoProps {
     users: Pick<User, "id" | "name" | "comment" | "password_digest" | "responses">[];
     candidates: Pick<Candidate, "id" | "start_time" | "end_time">[];
   };
-  onSuccess?: () => void;
 }
 
 
@@ -48,7 +47,7 @@ function UserComment({ comment }: { comment: string }) {
   }
 }
 
-function UsersInfo({ data, onSuccess }: UsersInfoProps) {
+function UsersInfo({ data }: UsersInfoProps) {
   const [editingUser, setEditingUser] = useState<UsersInfoProps["data"]["users"][0] | null>(null);
   const [passwordOpen, setPasswordOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -155,13 +154,11 @@ function UsersInfo({ data, onSuccess }: UsersInfoProps) {
             open={passwordOpen}
             onOpenChange={handlePasswordOpenChange}
             onConfirm={handlePasswordConfirm}
-            onDelete={onSuccess}
           />
           <UsersEditDialog
             data={{ user: editingUser, candidates: data.candidates }}
             open={editOpen}
             onOpenChange={handleEditOpenChange}
-            onSuccess={onSuccess}
           />
         </>
       )}
