@@ -70,27 +70,71 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 
 ### ディレクトリ構成
 
+機能単位で凝集する `features/` 構成を採用している。
+
 ```
 schedutch-v2/
 ├── app/                  # App Router（ルーティング）
 │   ├── new/page.tsx      # イベント作成
 │   └── event/[id]/page.tsx  # イベント閲覧・回答（EventClient を描画）
+├── features/
+│   ├── event/            # 閲覧・回答機能
+│   │   ├── components/   # EventClient ほか機能コンポーネント
+│   │   ├── types.ts      # EventData など event固有の型
+│   │   └── index.ts      # barrel（公開面。app からはここ経由で import）
+│   └── new/              # 作成機能
+│       ├── components/   # CreateEvent ほか
+│       └── index.ts      # barrel
+├── hooks/                # 複数featureで使う共通hook（UseDeviceType）
 ├── components/
-│   ├── event/            # 閲覧・回答ページの機能コンポーネント
-│   ├── new/              # 作成ページの機能コンポーネント
 │   ├── ui/               # shadcn/ui ベースの汎用プリミティブ
 │   ├── layout/           # Header など共通レイアウト
-│   ├── hooks/            # 共通カスタムhook（UseDeviceType）
 │   └── providers/        # ThemeProvider
-├── lib/                  # constants(TIME_OPTIONS) / types(EventData等) / utils(toJST等)
+├── lib/                  # constants(TIME_OPTIONS) / utils(toJST等)
 └── utils/supabase/       # Supabase クライアント（シングルトン）
 ```
 
+feature 間の直接 import は禁止。共有したくなったものは `lib/` か `components/ui/` に昇格させる。
+
 ### 今後の方針（未実装）
 
-規模拡大に備え、機能単位で凝集する `features/` 構成への移行を検討中。段階は以下:
+Supabase アクセスを `features/{feature}/api/` に集約し、`hooks/` で TanStack Query 化する。`data`/`onSuccess` の prop drilling を解消する狙い。Supabase を BaaS として使う方針は維持（自前バックエンド・モノレポ化はしない）。
 
-1. `components/event`・`components/new` を `features/{event,new}/components/` へ移動（ロジック変更なし）
-2. Supabase アクセスを `features/{feature}/api/` に集約し、`hooks/` で TanStack Query 化。`data`/`onSuccess` の prop drilling を解消
+## Git規約
 
-Supabase を BaaS として使う方針は維持（自前バックエンド・モノレポ化はしない）。
+### コミット
+
+Conventional Commits に従う。プレフィックスは英語、本文（説明）は日本語。
+
+```
+<type>: <日本語の要約>
+```
+
+| type | 用途 |
+|---|---|
+| `feat` | 新機能 |
+| `fix` | バグ修正 |
+| `refactor` | 挙動を変えないコード改善 |
+| `style` | 表示・スタイルのみの変更（ロジック非変更） |
+| `docs` | ドキュメント |
+| `chore` | 設定・依存・雑務 |
+| `test` | テスト |
+
+- 例: `feat: ユーザー編集ダイアログを追加` / `fix: 削除ボタンのPC上での位置を修正`
+- 1コミット1目的。無関係な変更を混ぜない。
+- 確認なしに自動コミット・自動pushしない。
+- テストコードやドキュメントを確認なしに削除・生成しない。
+
+### ブランチ
+
+`<type>/<英語ケバブケース>` 形式。type はコミットと同じ語彙を使う。
+
+- 例: `feature/tanstack-query`、`refactor/features-structure`、`fix/dialog-position`
+- ベースは `develop`。作業ブランチは `develop` から切る。
+
+### プルリクエスト
+
+- 向き先は `develop`（`develop` → `main` は別途リリース時にまとめる）。
+- タイトルはコミットと同じ Conventional Commits 形式。
+- 本文に「概要 / 変更内容 / 検証（build・lint結果）」を日本語で記載する。
+- マージ後は作業ブランチを削除する。
