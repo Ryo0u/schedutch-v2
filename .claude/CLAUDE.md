@@ -21,10 +21,10 @@ Next.js 16 App Router + React 19 + TypeScript。バックエンドは Supabase�
 
 | ルート | 役割 |
 |---|---|
-| `/new` | イベント作成フォーム（Client Component） |
+| `/new` | イベント作成フォーム（Server Component。`CreateEventContainer` を描画） |
 | `/event/[id]` | イベント閲覧・回答ページ |
 
-`/event/[id]/page.tsx` は Server Component だが、データ取得は全て `EventClient.tsx`（Client Component）が担う。`EventClient` は `useEvent`（TanStack Query）で結合クエリを取得し、loading/エラーのガードと全体レイアウトのみを担う。各セクションコンポーネント（`EventInfo` / `MenuButton` / `JoinButton` / `UsersInfo` / `ResponsesInfo` / `ExtractResponses`）は `data` を prop で受け取らず、`eventId` を受けて自身で `useEvent` する（TanStack Query のキャッシュ共有により再フェッチは起きない）。Supabase への実アクセスは `features/event/api/` に集約している。
+`/new/page.tsx`・`/event/[id]/page.tsx` はいずれも薄い Server Component で、client 境界のオーケストレーションを担う `Container` コンポーネント（`CreateEventContainer` / `EventContainer`）を描画するだけ。`CreateEventContainer`（Client Component）は `useForm` + `formSchema` とフォーム全体のレイアウトを内包し、静的なヒーロー部分は presentational な `NewHero` に切り出している。`EventContainer`（Client Component）は `useEvent`（TanStack Query）で結合クエリを取得し、loading/エラーのガードと全体レイアウトのみを担う。各セクションコンポーネント（`EventInfo` / `MenuButton` / `JoinButton` / `UsersInfo` / `ResponsesInfo` / `ExtractResponses`）は `data` を prop で受け取らず、`eventId` を受けて自身で `useEvent` する（TanStack Query のキャッシュ共有により再フェッチは起きない）。Supabase への実アクセスは `features/event/api/` に集約している。フォームの型・zod スキーマは各 feature 直下の `schema.ts`（`features/event/schema.ts` / `features/new/schema.ts`）に集約する。
 
 ```ts
 // features/event/api/eventApi.ts の取得クエリ（1回のクエリで全データを取得）
@@ -75,18 +75,20 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 ```
 schedutch-v2/
 ├── app/                  # App Router（ルーティング）
-│   ├── new/page.tsx      # イベント作成
-│   └── event/[id]/page.tsx  # イベント閲覧・回答（EventClient を描画）
+│   ├── new/page.tsx      # イベント作成（CreateEventContainer を描画）
+│   └── event/[id]/page.tsx  # イベント閲覧・回答（EventContainer を描画）
 ├── features/
 │   ├── event/            # 閲覧・回答機能
-│   │   ├── components/   # EventClient ほか機能コンポーネント
+│   │   ├── components/   # EventContainer ほか機能コンポーネント
 │   │   ├── api/          # Supabase アクセス（eventApi.ts）
 │   │   ├── hooks/        # TanStack Query hook（useEvent / useEventMutations）
+│   │   ├── schema.ts     # 回答フォームの型・zodスキーマ
 │   │   ├── types.ts      # EventData など event固有の型
 │   │   └── index.ts      # barrel（公開面。app からはここ経由で import）
 │   └── new/              # 作成機能
-│       ├── components/   # CreateEvent ほか
+│       ├── components/   # CreateEventContainer / NewHero ほか
 │       ├── api/          # Supabase アクセス（eventApi.ts）
+│       ├── schema.ts     # 作成フォームの型・zodスキーマ
 │       ├── hooks/        # useCreateEvent
 │       └── index.ts      # barrel
 ├── hooks/                # 複数featureで使う共通hook（UseDeviceType）
@@ -104,7 +106,7 @@ feature 間の直接 import は禁止。共有したくなったものは `lib/`
 
 ### 今後の方針
 
-Supabase アクセスの `features/{feature}/api/` 集約と TanStack Query 化は実装済み（[データ更新パターン](#データ更新パターン) 参照）。取得データの受け渡しは `EventClient` 起点の `data` prop 配布をやめ、各セクションが `eventId` を受けて自身で `useEvent` する形に統一済み（`onSuccess`/`refresh` の prop drilling も廃止済み）。Supabase を BaaS として使う方針は維持（自前バックエンド・モノレポ化はしない）。
+Supabase アクセスの `features/{feature}/api/` 集約と TanStack Query 化は実装済み（[データ更新パターン](#データ更新パターン) 参照）。取得データの受け渡しは `EventContainer` 起点の `data` prop 配布をやめ、各セクションが `eventId` を受けて自身で `useEvent` する形に統一済み（`onSuccess`/`refresh` の prop drilling も廃止済み）。Supabase を BaaS として使う方針は維持（自前バックエンド・モノレポ化はしない）。
 
 ## Git規約
 
@@ -166,7 +168,7 @@ Conventional Commits に従う。プレフィックスは英語、本文（説�
 ### 命名・ファイル
 
 - 変数・関数は camelCase、型・コンポーネントは PascalCase。
-- コンポーネントファイルは PascalCase（例: `EventClient.tsx`）。hook は `useXxx.ts`（camelCase）。
+- コンポーネントファイルは PascalCase（例: `EventContainer.tsx`）。hook は `useXxx.ts`（camelCase）。
 - 新規ファイルにタイポ・表記ゆれを持ち込まない（既存の `hooks/UseDeviceType.tsx`・`CreatedDiaolg.tsx` は表記ゆれ／タイポ。当該ファイルを触る際に是正してよい）。
 
 ### ドキュメント更新
