@@ -1,4 +1,4 @@
-import { FormData } from '@/app/new/page';
+import { FormData } from '@/features/new/schema';
 import { Control, Controller } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import {

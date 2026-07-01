@@ -1,4 +1,4 @@
-import { FormData } from '@/app/new/page';
+import { FormData } from '@/features/new/schema';
 import { Control, Controller, useFieldArray, useFormState, useWatch } from 'react-hook-form';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
