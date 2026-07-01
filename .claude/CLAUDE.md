@@ -24,7 +24,7 @@ Next.js 16 App Router + React 19 + TypeScript。バックエンドは Supabase�
 | `/new` | イベント作成フォーム（Client Component） |
 | `/event/[id]` | イベント閲覧・回答ページ |
 
-`/event/[id]/page.tsx` は Server Component だが、データ取得は全て `EventClient.tsx`（Client Component）が担う。`EventClient` は `useEvent`（TanStack Query）で結合クエリのデータを一括取得し、`data` オブジェクトを子コンポーネントに渡す。Supabase への実アクセスは `features/event/api/` に集約している。
+`/event/[id]/page.tsx` は Server Component だが、データ取得は全て `EventClient.tsx`（Client Component）が担う。`EventClient` は `useEvent`（TanStack Query）で結合クエリを取得し、loading/エラーのガードと全体レイアウトのみを担う。各セクションコンポーネント（`EventInfo` / `MenuButton` / `JoinButton` / `UsersInfo` / `ResponsesInfo` / `ExtractResponses`）は `data` を prop で受け取らず、`eventId` を受けて自身で `useEvent` する（TanStack Query のキャッシュ共有により再フェッチは起きない）。Supabase への実アクセスは `features/event/api/` に集約している。
 
 ```ts
 // features/event/api/eventApi.ts の取得クエリ（1回のクエリで全データを取得）
@@ -53,7 +53,7 @@ Supabase は UTC で保存する。表示時は `lib/utils.ts` の `toJST()` で
 
 ### データ更新パターン
 
-TanStack Query で管理する。取得は `features/event/hooks/useEvent.ts` の `useEvent`、更新は `features/event/hooks/useEventMutations.ts` の各 mutation hook（`useSaveResponses` / `useUpdateUser` / `useDeleteUser` / `useDeleteEvent`）を使う。mutation 成功時に hook 内で `eventKeys.detail(eventId)` を `invalidateQueries` するため、コンポーネント間で `onSuccess`/`refresh` を prop drilling しない。QueryClient は `components/providers/QueryProvider.tsx` で提供する。
+TanStack Query で管理する。取得は `features/event/hooks/useEvent.ts` の `useEvent`、更新は `features/event/hooks/useEventMutations.ts` の各 mutation hook（`useSaveResponses` / `useUpdateUser` / `useDeleteUser` / `useDeleteEvent`）を使う。mutation 成功時に hook 内で `eventKeys.detail(eventId)` を `invalidateQueries` するため、コンポーネント間で `onSuccess`/`refresh` を prop drilling しない。同様に取得データも `data` を prop で配布せず、各セクションが `eventId` を受けて自身で `useEvent` する（取得・更新とも「使う場所が hook を直呼びする」形で対称）。QueryClient は `components/providers/QueryProvider.tsx` で提供する。
 
 ### UIコンポーネント
 
@@ -104,7 +104,7 @@ feature 間の直接 import は禁止。共有したくなったものは `lib/`
 
 ### 今後の方針
 
-Supabase アクセスの `features/{feature}/api/` 集約と TanStack Query 化は実装済み（[データ更新パターン](#データ更新パターン) 参照）。`data` の受け渡しは `EventClient` 起点の prop で維持し、`onSuccess`/`refresh` の prop drilling は廃止済み。Supabase を BaaS として使う方針は維持（自前バックエンド・モノレポ化はしない）。
+Supabase アクセスの `features/{feature}/api/` 集約と TanStack Query 化は実装済み（[データ更新パターン](#データ更新パターン) 参照）。取得データの受け渡しは `EventClient` 起点の `data` prop 配布をやめ、各セクションが `eventId` を受けて自身で `useEvent` する形に統一済み（`onSuccess`/`refresh` の prop drilling も廃止済み）。Supabase を BaaS として使う方針は維持（自前バックエンド・モノレポ化はしない）。
 
 ## Git規約
 
