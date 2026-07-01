@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { InputGroup, InputGroupAddon, InputGroupText, InputGroupTextarea } from '@/components/ui/input-group';
-import InputResponses from './InputResponses';
+import InputResponses from '../form/InputResponses';
 import { toast } from 'sonner';
 import type { Candidate, User } from '@/features/event-detail/types';
 import { useUpdateUser } from '@/features/event-detail/hooks/useEventMutations';

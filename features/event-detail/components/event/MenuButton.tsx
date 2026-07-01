@@ -6,7 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
 import { useState } from "react"
 import EventEditDialog from "./EventEditDialog"
 import EventDeleteDialog from "./EventDeleteDialog"
-import UsersDeleteDialog from "./UsersDeleteDialog"
+import UsersDeleteDialog from "../users/UsersDeleteDialog"
 import EventShareDialog from "./EventShareDialog"
 import { useEvent } from "@/features/event-detail/hooks/useEvent";
 

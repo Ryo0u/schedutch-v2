@@ -1,14 +1,14 @@
 "use client"
 
-import EventInfo from "@/features/event-detail/components/EventInfo";
-import JoinButton from "@/features/event-detail/components/JoinButton";
-import MenuButton from "@/features/event-detail/components/MenuButton";
-import UsersInfo from "@/features/event-detail/components/UsersInfo";
+import EventInfo from "@/features/event-detail/components/event/EventInfo";
+import JoinButton from "@/features/event-detail/components/responses/JoinButton";
+import MenuButton from "@/features/event-detail/components/event/MenuButton";
+import UsersInfo from "@/features/event-detail/components/users/UsersInfo";
 import { Separator } from "@/components/ui/separator";
 import EventSkeleton from "@/features/event-detail/components/EventSkeleton";
 import { useEvent } from "@/features/event-detail/hooks/useEvent";
-import ResponsesInfo from "./ResponsesInfo";
-import ExtractResponses from "./ExtractResponses";
+import ResponsesInfo from "./responses/ResponsesInfo";
+import ExtractResponses from "./extract/ExtractResponses";
 
 export default function EventContainer({ eventId }: { eventId: string }) {
   const { data, isLoading } = useEvent(eventId);
