@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
+import { QueryProvider } from '@/components/providers/QueryProvider';
 import Header from '@/components/layout/Header';
 import { Toaster } from '@/components/ui/sonner';
 
@@ -33,9 +34,11 @@ export default function RootLayout({
     >
       <body className="flex min-h-full flex-col">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <Toaster richColors />
-          <Header />
-          {children}
+          <QueryProvider>
+            <Toaster richColors />
+            <Header />
+            {children}
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>
