@@ -67,3 +67,30 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 ```
 
 `.env.local` に記載。Supabase クライアントは `utils/supabase/client.ts` でシングルトンとして export している。
+
+### ディレクトリ構成
+
+```
+schedutch-v2/
+├── app/                  # App Router（ルーティング）
+│   ├── new/page.tsx      # イベント作成
+│   └── event/[id]/page.tsx  # イベント閲覧・回答（EventClient を描画）
+├── components/
+│   ├── event/            # 閲覧・回答ページの機能コンポーネント
+│   ├── new/              # 作成ページの機能コンポーネント
+│   ├── ui/               # shadcn/ui ベースの汎用プリミティブ
+│   ├── layout/           # Header など共通レイアウト
+│   ├── hooks/            # 共通カスタムhook（UseDeviceType）
+│   └── providers/        # ThemeProvider
+├── lib/                  # constants(TIME_OPTIONS) / types(EventData等) / utils(toJST等)
+└── utils/supabase/       # Supabase クライアント（シングルトン）
+```
+
+### 今後の方針（未実装）
+
+規模拡大に備え、機能単位で凝集する `features/` 構成への移行を検討中。段階は以下:
+
+1. `components/event`・`components/new` を `features/{event,new}/components/` へ移動（ロジック変更なし）
+2. Supabase アクセスを `features/{feature}/api/` に集約し、`hooks/` で TanStack Query 化。`data`/`onSuccess` の prop drilling を解消
+
+Supabase を BaaS として使う方針は維持（自前バックエンド・モノレポ化はしない）。
