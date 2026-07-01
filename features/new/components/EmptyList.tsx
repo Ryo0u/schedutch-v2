@@ -1,5 +1,5 @@
 import { CalendarClock } from "lucide-react"
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "../ui/empty"
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 
 function EmptyList() {
   return (

@@ -1,13 +1,13 @@
 import { Control, Controller } from 'react-hook-form';
 import { UserFormData } from './ResponsesForm';
-import { Field, FieldError, FieldGroup, FieldLabel } from '../ui/field';
-import { Input } from '../ui/input';
+import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
   InputGroupTextarea,
-} from '../ui/input-group';
+} from '@/components/ui/input-group';
 
 interface InputUserProps {
   control: Control<UserFormData>;

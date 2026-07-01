@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import ResponsesForm from './ResponsesForm';
-import type { Candidate } from '@/lib/types';
+import type { Candidate } from '@/features/event/types';
 
 interface EventCandidatesProps {
   data: {

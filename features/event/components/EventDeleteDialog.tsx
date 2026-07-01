@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { Button } from "../ui/button";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "../ui/dialog";
-import { Input } from "../ui/input";
-import { Field, FieldError } from "../ui/field";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Field, FieldError } from "@/components/ui/field";
 import { Trash2 } from "lucide-react";
 import bcrypt from "bcryptjs";
 import { supabase } from "@/utils/supabase/client";

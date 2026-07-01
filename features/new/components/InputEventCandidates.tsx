@@ -1,17 +1,17 @@
 import { FormData } from '@/app/new/page';
 import { Control, Controller, useFieldArray, useWatch } from 'react-hook-form';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card"
-import { Separator } from "../ui/separator"
-import { Calendar } from '../ui/calendar';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+import { Calendar } from '@/components/ui/calendar';
 import { useState } from 'react';
 import { type DateRange } from "react-day-picker"
 import { addDays, getDate } from "date-fns"
 import { ja } from "date-fns/locale"
-import { Field, FieldError, FieldGroup, FieldLabel } from '../ui/field';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../ui/select';
-import { Button } from '../ui/button';
+import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import { useDeviceType } from '../hooks/UseDeviceType';
+import { useDeviceType } from '@/hooks/UseDeviceType';
 import { TIME_OPTIONS } from '@/lib/constants';
 
 

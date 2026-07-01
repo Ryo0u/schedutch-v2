@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Button } from "../ui/button";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "../ui/dialog";
-import { Input } from "../ui/input";
-import { Field } from "../ui/field";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Field } from "@/components/ui/field";
 import { Edit } from "lucide-react";
 
 interface DialogProps {

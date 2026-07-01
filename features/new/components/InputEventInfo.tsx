@@ -7,10 +7,10 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '../ui/card';
-import { Field, FieldGroup, FieldLabel, FieldError, FieldDescription } from '../ui/field';
-import { Separator } from '../ui/separator';
-import { InputGroup, InputGroupAddon, InputGroupText, InputGroupTextarea } from '../ui/input-group';
+} from '@/components/ui/card';
+import { Field, FieldGroup, FieldLabel, FieldError, FieldDescription } from '@/components/ui/field';
+import { Separator } from '@/components/ui/separator';
+import { InputGroup, InputGroupAddon, InputGroupText, InputGroupTextarea } from '@/components/ui/input-group';
 
 interface InputEventProps {
   control: Control<FormData>;

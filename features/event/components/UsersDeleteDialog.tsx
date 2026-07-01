@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { Button } from "../ui/button";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "../ui/dialog";
-import { Input } from "../ui/input";
-import { Field, FieldError, FieldLabel, FieldSet } from "../ui/field";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Field, FieldError, FieldLabel, FieldSet } from "@/components/ui/field";
 import { Trash2 } from "lucide-react";
-import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import bcrypt from "bcryptjs";
 import { supabase } from "@/utils/supabase/client";
 import { toast } from "sonner";
