@@ -54,7 +54,7 @@ function CreateEvent({ form }: CreateEventActionProps) {
     <div>
 			<Separator className="my-8" />
       
-      <div className='flex flex-col sm:flex-row gap-3 justify-between items-center bg-muted/30 p-4 rounded-xl border border-border'>
+      <div className='flex flex-col sm:flex-row gap-3 justify-between items-center bg-card p-4 rounded-xl border border-primary/20 shadow-md shadow-primary/10'>
         <p className="text-sm text-muted-foreground ml-2">
           入力内容を確認して送信してください
         </p>
