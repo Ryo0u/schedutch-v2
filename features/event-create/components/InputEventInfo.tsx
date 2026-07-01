@@ -19,7 +19,7 @@ interface InputEventProps {
 const InputEventInfo = ({ control }: InputEventProps) => {
   return (
     <div>
-      <Card>
+      <Card className="shadow-md shadow-primary/10 ring-primary/20">
         <CardHeader>
           <CardTitle className="text-center text-xl font-bold">
             基本情報

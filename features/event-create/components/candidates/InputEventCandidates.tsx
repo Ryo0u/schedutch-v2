@@ -5,7 +5,7 @@ import { Separator } from "@/components/ui/separator"
 import { Calendar } from '@/components/ui/calendar';
 import { useState } from 'react';
 import { type DateRange } from "react-day-picker"
-import { addDays, getDate } from "date-fns"
+import { addDays } from "date-fns"
 import { ja } from "date-fns/locale"
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -77,7 +77,7 @@ const InputEventCandidates = ({ control }: InputEventProps) => {
 	
   return (
     <div>
-      <Card>
+      <Card className="shadow-md shadow-primary/10 ring-primary/20">
 				<CardHeader>
 					<CardTitle className="text-center text-xl font-bold">
 						候補日
