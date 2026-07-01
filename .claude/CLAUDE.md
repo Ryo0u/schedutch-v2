@@ -70,27 +70,99 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 
 ### ディレクトリ構成
 
+機能単位で凝集する `features/` 構成を採用している。
+
 ```
 schedutch-v2/
 ├── app/                  # App Router（ルーティング）
 │   ├── new/page.tsx      # イベント作成
 │   └── event/[id]/page.tsx  # イベント閲覧・回答（EventClient を描画）
+├── features/
+│   ├── event/            # 閲覧・回答機能
+│   │   ├── components/   # EventClient ほか機能コンポーネント
+│   │   ├── types.ts      # EventData など event固有の型
+│   │   └── index.ts      # barrel（公開面。app からはここ経由で import）
+│   └── new/              # 作成機能
+│       ├── components/   # CreateEvent ほか
+│       └── index.ts      # barrel
+├── hooks/                # 複数featureで使う共通hook（UseDeviceType）
 ├── components/
-│   ├── event/            # 閲覧・回答ページの機能コンポーネント
-│   ├── new/              # 作成ページの機能コンポーネント
 │   ├── ui/               # shadcn/ui ベースの汎用プリミティブ
 │   ├── layout/           # Header など共通レイアウト
-│   ├── hooks/            # 共通カスタムhook（UseDeviceType）
 │   └── providers/        # ThemeProvider
-├── lib/                  # constants(TIME_OPTIONS) / types(EventData等) / utils(toJST等)
+├── lib/                  # constants(TIME_OPTIONS) / utils(toJST等)
 └── utils/supabase/       # Supabase クライアント（シングルトン）
 ```
 
+feature 間の直接 import は禁止。共有したくなったものは `lib/` か `components/ui/` に昇格させる。
+
 ### 今後の方針（未実装）
 
-規模拡大に備え、機能単位で凝集する `features/` 構成への移行を検討中。段階は以下:
+Supabase アクセスを `features/{feature}/api/` に集約し、`hooks/` で TanStack Query 化する。`data`/`onSuccess` の prop drilling を解消する狙い。Supabase を BaaS として使う方針は維持（自前バックエンド・モノレポ化はしない）。
 
-1. `components/event`・`components/new` を `features/{event,new}/components/` へ移動（ロジック変更なし）
-2. Supabase アクセスを `features/{feature}/api/` に集約し、`hooks/` で TanStack Query 化。`data`/`onSuccess` の prop drilling を解消
+## Git規約
 
-Supabase を BaaS として使う方針は維持（自前バックエンド・モノレポ化はしない）。
+### コミット
+
+Conventional Commits に従う。プレフィックスは英語、本文（説明）は日本語。
+
+```
+<type>: <日本語の要約>
+```
+
+| type | 用途 |
+|---|---|
+| `feat` | 新機能 |
+| `fix` | バグ修正 |
+| `refactor` | 挙動を変えないコード改善 |
+| `style` | 表示・スタイルのみの変更（ロジック非変更） |
+| `docs` | ドキュメント |
+| `chore` | 設定・依存・雑務 |
+| `test` | テスト |
+
+- 例: `feat: ユーザー編集ダイアログを追加` / `fix: 削除ボタンのPC上での位置を修正`
+- 1コミット1目的。無関係な変更を混ぜない。
+- 確認なしに自動コミット・自動pushしない。
+- テストコードやドキュメントを確認なしに削除・生成しない。
+
+### ブランチ
+
+`<type>/<英語ケバブケース>` 形式。type はコミットと同じ語彙を使う。
+
+- 例: `feature/tanstack-query`、`refactor/features-structure`、`fix/dialog-position`
+- ベースは `develop`。作業ブランチは `develop` から切る。
+
+### プルリクエスト
+
+- 向き先は `develop`（`develop` → `main` は別途リリース時にまとめる）。
+- タイトルはコミットと同じ Conventional Commits 形式。
+- 本文に「概要 / 変更内容 / 検証（build・lint結果）」を日本語で記載する。
+- マージ後は作業ブランチを削除する。
+
+## 開発規約
+
+### 状態管理の使い分け
+
+状態は種類ごとに道具を固定し、混在させない。
+
+- **サーバー状態**（Supabase のデータ）: 現状は `EventClient` の `refresh` パターン（[データ更新パターン](#データ更新パターン) 参照）。将来は TanStack Query に移行（[今後の方針](#今後の方針未実装)）。**サーバーデータを Zustand 等のクライアントストアに複製しない**。
+- **クライアント UI 状態**: `useState` / Context。複数コンポーネントで共有する状態が増えたら Zustand を検討する（先回りで導入しない）。
+- **フォーム状態**: `react-hook-form` + `zod` で統一。
+
+### データアクセス
+
+- ミューテーションは Supabase RPC 経由（`create_event_with_candidates` / `save_user_responses`）。複数テーブルにまたがり整合性が必要な操作は RPC 化を優先する。
+- パスワードは**クライアントで `bcryptjs` によりハッシュ化してから**保存する。生パスワードを Supabase に送らない。
+- 型の置き場: feature 固有なら `features/{feature}/types.ts`、複数 feature で共有するもののみ `lib/`。
+- 時刻は UTC 保存・表示時に `toJST()` で変換。時刻選択肢は `TIME_OPTIONS` を共通使用する。
+
+### 命名・ファイル
+
+- 変数・関数は camelCase、型・コンポーネントは PascalCase。
+- コンポーネントファイルは PascalCase（例: `EventClient.tsx`）。hook は `useXxx.ts`（camelCase）。
+- 新規ファイルにタイポ・表記ゆれを持ち込まない（既存の `hooks/UseDeviceType.tsx`・`CreatedDiaolg.tsx` は表記ゆれ／タイポ。当該ファイルを触る際に是正してよい）。
+
+### ドキュメント更新
+
+- 次を変更したら**同じ PR 内で** CLAUDE.md も更新する: ディレクトリ構成、命名規則、状態管理／データアクセス方針、ライブラリの導入・変更。
+- README は指示があるときのみ変更する（勝手に生成・変更しない）。
