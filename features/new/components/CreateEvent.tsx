@@ -1,13 +1,13 @@
 import { supabase } from '@/utils/supabase/client';
-import { Separator } from '../ui/separator';
-import { Button } from '../ui/button';
+import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
 import { Eraser, Plus } from 'lucide-react';
 import { UseFormReturn } from 'react-hook-form';
 import { FormData } from '@/app/new/page';
 import { toast } from "sonner"
 import { useState } from 'react';
 import CreatedDialog from './CreatedDiaolg';
-import { Spinner } from '../ui/spinner';
+import { Spinner } from '@/components/ui/spinner';
 import { hashPassword, jstWallTimeToISO } from '@/lib/utils';
 
 interface CreateEventActionProps {

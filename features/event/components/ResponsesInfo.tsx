@@ -1,8 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { Separator } from "../ui/separator";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { TIME_OPTIONS } from "@/lib/constants";
 import { cn, jstHHMM, formatJSTDate } from "@/lib/utils";
-import type { Candidate, User } from "@/lib/types";
+import type { Candidate, User } from "@/features/event/types";
 
 interface ResponsesInfoProps {
   data: {

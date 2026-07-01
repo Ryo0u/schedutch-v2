@@ -1,14 +1,14 @@
 "use client"
 
 import { useState } from "react";
-import { Button } from "../ui/button";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
-import { Field, FieldError, FieldLabel } from "../ui/field";
-import { Input } from "../ui/input";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import bcrypt from "bcryptjs";
 import { supabase } from "@/utils/supabase/client";
 import { toast } from "sonner";
-import type { User } from "@/lib/types";
+import type { User } from "@/features/event/types";
 
 interface UsersPasswordDialogProps {
   data: {

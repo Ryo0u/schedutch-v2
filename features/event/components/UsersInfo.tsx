@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { MessageCircle, Pencil, UserCircle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useDeviceType } from "../hooks/UseDeviceType";
-import { Popover, PopoverContent, PopoverDescription, PopoverHeader, PopoverTitle, PopoverTrigger } from "../ui/popover";
-import { Button } from "../ui/button";
+import { useDeviceType } from "@/hooks/UseDeviceType";
+import { Popover, PopoverContent, PopoverDescription, PopoverHeader, PopoverTitle, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import type { Candidate, User } from "@/lib/types";
+import type { Candidate, User } from "@/features/event/types";
 import UsersPasswordDialog from "./UsersPasswordDialog";
 import UsersEditDialog from "./UsersEditDialog";
 

@@ -3,10 +3,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import InputEventInfo from '@/components/new/InputEventInfo';
-import InputEventCandidates from '@/components/new/InputEventCandidates';
-import CandidatesList from '@/components/new/CandidatesList';
-import CreateEvent from '@/components/new/CreateEvent';
+import { InputEventInfo, InputEventCandidates, CandidatesList, CreateEvent } from '@/features/new';
 import { Badge } from '@/components/ui/badge';
 
 export type FormData = {

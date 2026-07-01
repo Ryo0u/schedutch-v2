@@ -3,16 +3,16 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import InputUserInfo from './InputUserInfo';
-import { Separator } from '../ui/separator';
+import { Separator } from '@/components/ui/separator';
 import InputResponses from './InputResponses';
 import { useEffect } from 'react';
-import { Button } from '../ui/button';
+import { Button } from '@/components/ui/button';
 import { hashPassword } from '@/lib/utils';
 import { supabase } from '@/utils/supabase/client';
 import { useParams } from 'next/navigation';
-import { Candidate } from '@/lib/types';
+import { Candidate } from '@/features/event/types';
 
 interface ResposesFromProps {
   data: {

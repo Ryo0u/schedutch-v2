@@ -1,14 +1,14 @@
 import { FormData } from '@/app/new/page';
 import { Control, Controller, useFieldArray, useFormState, useWatch } from 'react-hook-form';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card"
-import { Separator } from "../ui/separator"
-import { Field, FieldContent, FieldGroup, FieldLabel } from '../ui/field';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+import { Field, FieldContent, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react'; 
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
-import { Item, ItemActions, ItemContent, ItemGroup, ItemTitle } from '../ui/item';
+import { Item, ItemActions, ItemContent, ItemGroup, ItemTitle } from '@/components/ui/item';
 import EmptyList from './EmptyList';
 import { TIME_OPTIONS } from "@/lib/constants";
 

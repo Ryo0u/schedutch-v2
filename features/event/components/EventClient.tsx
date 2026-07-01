@@ -1,16 +1,16 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react";
-import EventInfo from "@/components/event/EventInfo";
-import JoinButton from "@/components/event/JoinButton";
-import MenuButton from "@/components/event/MenuButton";
-import UsersInfo from "@/components/event/UsersInfo";
+import EventInfo from "@/features/event/components/EventInfo";
+import JoinButton from "@/features/event/components/JoinButton";
+import MenuButton from "@/features/event/components/MenuButton";
+import UsersInfo from "@/features/event/components/UsersInfo";
 import { Separator } from "@/components/ui/separator";
-import EventSkeleton from "@/components/event/EventSkeleton";
+import EventSkeleton from "@/features/event/components/EventSkeleton";
 import { supabase } from "@/utils/supabase/client";
 import ResponsesInfo from "./ResponsesInfo";
 import ExtractResponses from "./ExtractResponses";
-import type { EventData } from "@/lib/types";
+import type { EventData } from "@/features/event/types";
 
 export default function EventClient({ eventId }: { eventId: string }) {
   const [data, setData] = useState<EventData | null>(null);

@@ -1,14 +1,14 @@
 "use client"
 
 import { ChevronDown, Edit, Share2, Trash2 } from "lucide-react"
-import { Button } from "../ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu"
+import { Button } from "@/components/ui/button"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useState } from "react"
 import EventEditDialog from "./EventEditDialog"
 import EventDeleteDialog from "./EventDeleteDialog"
 import UsersDeleteDialog from "./UsersDeleteDialog"
 import EventShareDialog from "./EventShareDialog"
-import type { EventData } from "@/lib/types";
+import type { EventData } from "@/features/event/types";
 
 interface MenuProps {
   data: EventData;
