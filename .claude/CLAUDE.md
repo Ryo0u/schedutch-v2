@@ -138,3 +138,31 @@ Conventional Commits に従う。プレフィックスは英語、本文（説�
 - タイトルはコミットと同じ Conventional Commits 形式。
 - 本文に「概要 / 変更内容 / 検証（build・lint結果）」を日本語で記載する。
 - マージ後は作業ブランチを削除する。
+
+## 開発規約
+
+### 状態管理の使い分け
+
+状態は種類ごとに道具を固定し、混在させない。
+
+- **サーバー状態**（Supabase のデータ）: 現状は `EventClient` の `refresh` パターン（[データ更新パターン](#データ更新パターン) 参照）。将来は TanStack Query に移行（[今後の方針](#今後の方針未実装)）。**サーバーデータを Zustand 等のクライアントストアに複製しない**。
+- **クライアント UI 状態**: `useState` / Context。複数コンポーネントで共有する状態が増えたら Zustand を検討する（先回りで導入しない）。
+- **フォーム状態**: `react-hook-form` + `zod` で統一。
+
+### データアクセス
+
+- ミューテーションは Supabase RPC 経由（`create_event_with_candidates` / `save_user_responses`）。複数テーブルにまたがり整合性が必要な操作は RPC 化を優先する。
+- パスワードは**クライアントで `bcryptjs` によりハッシュ化してから**保存する。生パスワードを Supabase に送らない。
+- 型の置き場: feature 固有なら `features/{feature}/types.ts`、複数 feature で共有するもののみ `lib/`。
+- 時刻は UTC 保存・表示時に `toJST()` で変換。時刻選択肢は `TIME_OPTIONS` を共通使用する。
+
+### 命名・ファイル
+
+- 変数・関数は camelCase、型・コンポーネントは PascalCase。
+- コンポーネントファイルは PascalCase（例: `EventClient.tsx`）。hook は `useXxx.ts`（camelCase）。
+- 新規ファイルにタイポ・表記ゆれを持ち込まない（既存の `hooks/UseDeviceType.tsx`・`CreatedDiaolg.tsx` は表記ゆれ／タイポ。当該ファイルを触る際に是正してよい）。
+
+### ドキュメント更新
+
+- 次を変更したら**同じ PR 内で** CLAUDE.md も更新する: ディレクトリ構成、命名規則、状態管理／データアクセス方針、ライブラリの導入・変更。
+- README は指示があるときのみ変更する（勝手に生成・変更しない）。
