@@ -2,7 +2,7 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Eraser, Plus } from 'lucide-react';
 import { UseFormReturn } from 'react-hook-form';
-import { FormData } from '@/app/new/page';
+import { FormData } from '@/features/new/schema';
 import { toast } from "sonner"
 import { useState } from 'react';
 import CreatedDialog from './CreatedDiaolg';
