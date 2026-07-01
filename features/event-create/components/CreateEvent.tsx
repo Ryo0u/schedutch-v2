@@ -5,7 +5,7 @@ import { UseFormReturn } from 'react-hook-form';
 import { FormData } from '@/features/event-create/schema';
 import { toast } from "sonner"
 import { useState } from 'react';
-import CreatedDialog from './CreatedDiaolg';
+import CreatedDialog from './CreatedDialog';
 import { Spinner } from '@/components/ui/spinner';
 import { hashPassword, jstWallTimeToISO } from '@/lib/utils';
 import { useCreateEvent } from '@/features/event-create/hooks/useCreateEvent';

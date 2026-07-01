@@ -6,8 +6,8 @@ import * as z from 'zod';
 import { formSchema } from '@/features/event-create/schema';
 import NewHero from './NewHero';
 import InputEventInfo from './InputEventInfo';
-import InputEventCandidates from './InputEventCandidates';
-import CandidatesList from './CandidatesList';
+import InputEventCandidates from './candidates/InputEventCandidates';
+import CandidatesList from './candidates/CandidatesList';
 import CreateEvent from './CreateEvent';
 
 export default function CreateEventContainer() {
