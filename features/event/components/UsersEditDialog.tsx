@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -11,9 +12,9 @@ import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field
 import { Input } from '@/components/ui/input';
 import { InputGroup, InputGroupAddon, InputGroupText, InputGroupTextarea } from '@/components/ui/input-group';
 import InputResponses from './InputResponses';
-import { supabase } from '@/utils/supabase/client';
 import { toast } from 'sonner';
 import type { Candidate, User } from '@/features/event/types';
+import { useUpdateUser } from '@/features/event/hooks/useEventMutations';
 
 interface UsersEditDialogProps {
   data: {
@@ -22,7 +23,6 @@ interface UsersEditDialogProps {
   };
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess?: () => void;
 }
 
 const EditFormSchema = z.object({
@@ -37,8 +37,11 @@ const EditFormSchema = z.object({
 
 type EditFormData = z.infer<typeof EditFormSchema>;
 
-function UsersEditDialog({ data, open, onOpenChange, onSuccess }: UsersEditDialogProps) {
+function UsersEditDialog({ data, open, onOpenChange }: UsersEditDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const params = useParams();
+  const eventId = params.id as string;
+  const updateUser = useUpdateUser(eventId);
 
   const form = useForm<EditFormData>({
     resolver: zodResolver(EditFormSchema),
@@ -63,30 +66,20 @@ function UsersEditDialog({ data, open, onOpenChange, onSuccess }: UsersEditDialo
     setIsSubmitting(true);
 
     try {
-      const { error: userError } = await supabase
-        .from('users')
-        .update({ name: values.name, comment: values.comment })
-        .eq('id', data.user.id);
-      if (userError) throw userError;
-
-      const { error: deleteError } = await supabase
-        .from('responses')
-        .delete()
-        .eq('user_id', data.user.id);
-      if (deleteError) throw deleteError;
-
       const formattedResponses = values.responses.map(r => ({
-        user_id: data.user.id,
         candidate_id: r.candidate_id,
         time: r.time.toISOString(),
         status: r.status,
       }));
 
-      const { error: insertError } = await supabase.from('responses').insert(formattedResponses);
-      if (insertError) throw insertError;
+      await updateUser.mutateAsync({
+        userId: data.user.id,
+        name: values.name,
+        comment: values.comment,
+        responses: formattedResponses,
+      });
 
       toast.success("回答を更新しました", { position: 'top-center' });
-      onSuccess?.();
       onOpenChange(false);
     } catch (error) {
       console.error('Failed to update user:', error);

@@ -5,9 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Field, FieldError } from "@/components/ui/field";
 import { Trash2 } from "lucide-react";
 import bcrypt from "bcryptjs";
-import { supabase } from "@/utils/supabase/client";
 import { toast } from "sonner";
 import { useRouter } from 'next/navigation';
+import { useDeleteEvent } from "@/features/event/hooks/useEventMutations";
 
 interface DialogProps {
   open: boolean;
@@ -23,6 +23,7 @@ function EventDeleteDialog({ open, onOpenChange, data }: DialogProps) {
   const [ isDeleting, setIsDeleting ] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const router = useRouter();
+  const deleteEvent = useDeleteEvent();
   
   useEffect(() => {
     if (!open) {
@@ -40,12 +41,11 @@ function EventDeleteDialog({ open, onOpenChange, data }: DialogProps) {
     
     if (isMatch) {
       try {
-        const { error} =  await supabase.from("events").delete().eq("id", data.id);
-        if (error) throw error;
-        
+        await deleteEvent.mutateAsync(data.id);
+
         toast.success("イベントを削除しました", {position: 'top-center'})
         router.push("/")
-        
+
       } catch (error) {
         toast.error("イベントの削除に失敗しました", {position: 'top-center'})
         console.log("failed to delete event", error)

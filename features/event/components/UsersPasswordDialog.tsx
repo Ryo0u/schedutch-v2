@@ -6,9 +6,10 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import bcrypt from "bcryptjs";
-import { supabase } from "@/utils/supabase/client";
+import { useParams } from "next/navigation";
 import { toast } from "sonner";
 import type { User } from "@/features/event/types";
+import { useDeleteUser } from "@/features/event/hooks/useEventMutations";
 
 interface UsersPasswordDialogProps {
   data: {
@@ -17,13 +18,15 @@ interface UsersPasswordDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
-  onDelete?: () => void;
 }
 
-function UsersPasswordDialog({ data, open, onOpenChange, onConfirm, onDelete }: UsersPasswordDialogProps) {
+function UsersPasswordDialog({ data, open, onOpenChange, onConfirm }: UsersPasswordDialogProps) {
   const [password, setPassword] = useState("");
   const [isChecking, setIsChecking] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const params = useParams();
+  const eventId = params.id as string;
+  const deleteUser = useDeleteUser(eventId);
 
   const handleAction = async (action: "edit" | "delete") => {
     setIsChecking(true);
@@ -40,11 +43,9 @@ function UsersPasswordDialog({ data, open, onOpenChange, onConfirm, onDelete }: 
       onConfirm();
     } else {
       try {
-        const { error } = await supabase.from("users").delete().eq("id", data.user.id);
-        if (error) throw error;
+        await deleteUser.mutateAsync(data.user.id);
         toast.success("回答を削除しました", { position: "top-center" });
         onOpenChange(false);
-        onDelete?.();
       } catch {
         toast.error("削除に失敗しました", { position: "top-center" });
       }

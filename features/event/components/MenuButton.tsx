@@ -12,10 +12,9 @@ import type { EventData } from "@/features/event/types";
 
 interface MenuProps {
   data: EventData;
-  onSuccess: () => void;
 }
 
-function MenuButton({ data, onSuccess }: MenuProps) {
+function MenuButton({ data }: MenuProps) {
   const [ isOpen, setIsOpen ] = useState(false); // パスワード承認画面
   const [ actionType, setActionType ] = useState<"eventEdit" | "eventShare" | "eventDelete" | "usersDelete" | null>(null)
   
@@ -65,7 +64,7 @@ function MenuButton({ data, onSuccess }: MenuProps) {
         <EventDeleteDialog data={data} open={isOpen} onOpenChange={setIsOpen} />
       )}
       {actionType === "usersDelete" && (
-        <UsersDeleteDialog data={data} open={isOpen} onOpenChange={setIsOpen} onSuccess={onSuccess} />
+        <UsersDeleteDialog data={data} open={isOpen} onOpenChange={setIsOpen} />
       )}
     
     </>

@@ -6,8 +6,9 @@ import { Field, FieldError, FieldLabel, FieldSet } from "@/components/ui/field";
 import { Trash2 } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import bcrypt from "bcryptjs";
-import { supabase } from "@/utils/supabase/client";
+import { useParams } from "next/navigation";
 import { toast } from "sonner";
+import { useDeleteUser } from "@/features/event/hooks/useEventMutations";
 
 interface DialogProps {
   data: {
@@ -19,14 +20,16 @@ interface DialogProps {
   };
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess?: () => void;
 }
 
-function UsersDeleteDialog({ data, open, onOpenChange, onSuccess }: DialogProps) {
+function UsersDeleteDialog({ data, open, onOpenChange }: DialogProps) {
   const [ password, setPassword ] = useState("");
   const [ userId, setUserId ] = useState("");
   const [ isDeleting, setIsDeleting ] = useState(false);
   const [ errorMsg, setErrorMsg ] = useState<string | null>(null);
+  const params = useParams();
+  const eventId = params.id as string;
+  const deleteUser = useDeleteUser(eventId);
   
   useEffect(() => {
     if (!open) {
@@ -43,12 +46,10 @@ function UsersDeleteDialog({ data, open, onOpenChange, onSuccess }: DialogProps)
     
     if (isMatch && userId) {
       try {
-        const { error} =  await supabase.from("users").delete().eq("id", userId);
-        if (error) throw error;
-        
+        await deleteUser.mutateAsync(userId);
+
         toast.success("参加者を削除しました", {position: 'top-center'})
-        onSuccess?.();
-        
+
       } catch (error) {
         console.log("failed to delete user", error)
         toast.error("参加者の削除に失敗しました", {position: 'top-center'})

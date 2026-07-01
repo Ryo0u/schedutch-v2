@@ -10,9 +10,9 @@ import InputResponses from './InputResponses';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { hashPassword } from '@/lib/utils';
-import { supabase } from '@/utils/supabase/client';
 import { useParams } from 'next/navigation';
 import { Candidate } from '@/features/event/types';
+import { useSaveResponses } from '@/features/event/hooks/useEventMutations';
 
 interface ResposesFromProps {
   data: {
@@ -20,7 +20,6 @@ interface ResposesFromProps {
   };
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess: () => void;
 }
 
 export type UserFormData = {
@@ -55,7 +54,7 @@ export const UserFormSchema = z.object({
     ),
 })
 
-function ResponsesForm({ data, open, onOpenChange, onSuccess }: ResposesFromProps) {
+function ResponsesForm({ data, open, onOpenChange }: ResposesFromProps) {
   const form = useForm<z.infer<typeof UserFormSchema>>({
     resolver: zodResolver(UserFormSchema),
     defaultValues: {
@@ -68,7 +67,8 @@ function ResponsesForm({ data, open, onOpenChange, onSuccess }: ResposesFromProp
   
   const params = useParams();
   const eventId = params.id as string;
-  
+  const saveResponses = useSaveResponses(eventId);
+
   // responsesの初期化
   useEffect(() => {
     if (open && data.candidates) {
@@ -105,18 +105,15 @@ function ResponsesForm({ data, open, onOpenChange, onSuccess }: ResposesFromProp
         time: res.time.toISOString(),
         status: res.status
       }));
-      
-      const { data, error } = await supabase.rpc("save_user_responses", {
-        p_event_id: eventId,
-        p_name: values.name,
-        p_comment: values.comment,
-        p_password: hashedPassword,
-        p_response_data: formattedResponses
-      })
-      
-      if (error) throw error;
-      
-      onSuccess?.();
+
+      await saveResponses.mutateAsync({
+        eventId,
+        name: values.name,
+        comment: values.comment,
+        passwordDigest: hashedPassword,
+        responses: formattedResponses,
+      });
+
       onOpenChange(false);
       form.reset();
     } catch (error) {
