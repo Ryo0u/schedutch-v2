@@ -1,4 +1,3 @@
-import { supabase } from '@/utils/supabase/client';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Eraser, Plus } from 'lucide-react';
@@ -9,6 +8,7 @@ import { useState } from 'react';
 import CreatedDialog from './CreatedDiaolg';
 import { Spinner } from '@/components/ui/spinner';
 import { hashPassword, jstWallTimeToISO } from '@/lib/utils';
+import { useCreateEvent } from '@/features/new/hooks/useCreateEvent';
 
 interface CreateEventActionProps {
   form: UseFormReturn<FormData>;
@@ -18,6 +18,7 @@ function CreateEvent({ form }: CreateEventActionProps) {
   const { isSubmitting } = form.formState;
   const [showDialog, setShowDialog] = useState(false);
   const [createdEventId, setCreatedEventId] = useState<string | null>(null);
+  const createEvent = useCreateEvent();
 	
   const onSubmit = async (values: FormData) => {
       try {
@@ -32,19 +33,17 @@ function CreateEvent({ form }: CreateEventActionProps) {
         }));
         
         // supabase内でトランザクションを実装している
-        const { data: eventId, error } = await supabase.rpc('create_event_with_candidates', {
-          p_title: values.title,
-          p_password_digest: hashedPassword,
-          p_comment: values.comment,
-          p_candidates: candidatesToInsert,
+        const eventId = await createEvent.mutateAsync({
+          title: values.title,
+          passwordDigest: hashedPassword,
+          comment: values.comment,
+          candidates: candidatesToInsert,
         });
-        
-        if (error) throw error;
-        
+
         // ダイアログを表示
         setCreatedEventId(eventId);
         setShowDialog(true);
-        
+
       } catch (error) {
         console.error('Failed to create event:', error);
         toast.error('イベント作成に失敗しました', {position: 'top-center'})
