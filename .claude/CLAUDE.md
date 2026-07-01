@@ -24,10 +24,10 @@ Next.js 16 App Router + React 19 + TypeScript。バックエンドは Supabase�
 | `/new` | イベント作成フォーム（Client Component） |
 | `/event/[id]` | イベント閲覧・回答ページ |
 
-`/event/[id]/page.tsx` は Server Component だが、データ取得は全て `EventClient.tsx`（Client Component）が担う。`EventClient` が Supabase から結合クエリでデータを一括取得し、`data` オブジェクトを子コンポーネントに渡す。
+`/event/[id]/page.tsx` は Server Component だが、データ取得は全て `EventClient.tsx`（Client Component）が担う。`EventClient` は `useEvent`（TanStack Query）で結合クエリのデータを一括取得し、`data` オブジェクトを子コンポーネントに渡す。Supabase への実アクセスは `features/event/api/` に集約している。
 
 ```ts
-// EventClient の取得クエリ（1回のクエリで全データを取得）
+// features/event/api/eventApi.ts の取得クエリ（1回のクエリで全データを取得）
 supabase.from('events').select(`*, candidates (*), users (*, responses (*))`)
 ```
 
@@ -53,7 +53,7 @@ Supabase は UTC で保存する。表示時は `lib/utils.ts` の `toJST()` で
 
 ### データ更新パターン
 
-`EventClient` が `refresh` コールバックを定義し、子コンポーネントに `onSuccess` として渡す。ミューテーション成功後に子が `onSuccess()` を呼ぶことでデータを再取得する。
+TanStack Query で管理する。取得は `features/event/hooks/useEvent.ts` の `useEvent`、更新は `features/event/hooks/useEventMutations.ts` の各 mutation hook（`useSaveResponses` / `useUpdateUser` / `useDeleteUser` / `useDeleteEvent`）を使う。mutation 成功時に hook 内で `eventKeys.detail(eventId)` を `invalidateQueries` するため、コンポーネント間で `onSuccess`/`refresh` を prop drilling しない。QueryClient は `components/providers/QueryProvider.tsx` で提供する。
 
 ### UIコンポーネント
 
@@ -80,25 +80,31 @@ schedutch-v2/
 ├── features/
 │   ├── event/            # 閲覧・回答機能
 │   │   ├── components/   # EventClient ほか機能コンポーネント
+│   │   ├── api/          # Supabase アクセス（eventApi.ts）
+│   │   ├── hooks/        # TanStack Query hook（useEvent / useEventMutations）
 │   │   ├── types.ts      # EventData など event固有の型
 │   │   └── index.ts      # barrel（公開面。app からはここ経由で import）
 │   └── new/              # 作成機能
 │       ├── components/   # CreateEvent ほか
+│       ├── api/          # Supabase アクセス（eventApi.ts）
+│       ├── hooks/        # useCreateEvent
 │       └── index.ts      # barrel
 ├── hooks/                # 複数featureで使う共通hook（UseDeviceType）
 ├── components/
 │   ├── ui/               # shadcn/ui ベースの汎用プリミティブ
 │   ├── layout/           # Header など共通レイアウト
-│   └── providers/        # ThemeProvider
+│   └── providers/        # ThemeProvider / QueryProvider
 ├── lib/                  # constants(TIME_OPTIONS) / utils(toJST等)
 └── utils/supabase/       # Supabase クライアント（シングルトン）
 ```
 
+feature 固有の Supabase アクセスは `features/{feature}/api/`、それを包む query/mutation hook は `features/{feature}/hooks/` に置く。トップの `hooks/` は複数 feature で共有する hook 専用。
+
 feature 間の直接 import は禁止。共有したくなったものは `lib/` か `components/ui/` に昇格させる。
 
-### 今後の方針（未実装）
+### 今後の方針
 
-Supabase アクセスを `features/{feature}/api/` に集約し、`hooks/` で TanStack Query 化する。`data`/`onSuccess` の prop drilling を解消する狙い。Supabase を BaaS として使う方針は維持（自前バックエンド・モノレポ化はしない）。
+Supabase アクセスの `features/{feature}/api/` 集約と TanStack Query 化は実装済み（[データ更新パターン](#データ更新パターン) 参照）。`data` の受け渡しは `EventClient` 起点の prop で維持し、`onSuccess`/`refresh` の prop drilling は廃止済み。Supabase を BaaS として使う方針は維持（自前バックエンド・モノレポ化はしない）。
 
 ## Git規約
 
@@ -145,14 +151,15 @@ Conventional Commits に従う。プレフィックスは英語、本文（説�
 
 状態は種類ごとに道具を固定し、混在させない。
 
-- **サーバー状態**（Supabase のデータ）: 現状は `EventClient` の `refresh` パターン（[データ更新パターン](#データ更新パターン) 参照）。将来は TanStack Query に移行（[今後の方針](#今後の方針未実装)）。**サーバーデータを Zustand 等のクライアントストアに複製しない**。
+- **サーバー状態**（Supabase のデータ）: TanStack Query で管理する（[データ更新パターン](#データ更新パターン) 参照）。**サーバーデータを Zustand 等のクライアントストアに複製しない**。
 - **クライアント UI 状態**: `useState` / Context。複数コンポーネントで共有する状態が増えたら Zustand を検討する（先回りで導入しない）。
 - **フォーム状態**: `react-hook-form` + `zod` で統一。
 
 ### データアクセス
 
+- Supabase への実アクセス（select / rpc / insert 等）は `features/{feature}/api/` の関数に集約し、コンポーネントから直接 `supabase` を呼ばない。api 関数は TanStack Query hook（`features/{feature}/hooks/`）から呼ぶ。
 - ミューテーションは Supabase RPC 経由（`create_event_with_candidates` / `save_user_responses`）。複数テーブルにまたがり整合性が必要な操作は RPC 化を優先する。
-- パスワードは**クライアントで `bcryptjs` によりハッシュ化してから**保存する。生パスワードを Supabase に送らない。
+- パスワードは**クライアントで `bcryptjs` によりハッシュ化してから**保存する。生パスワードを Supabase に送らない（ハッシュ化はコンポーネント側で行い、api 関数にはダイジェストを渡す）。
 - 型の置き場: feature 固有なら `features/{feature}/types.ts`、複数 feature で共有するもののみ `lib/`。
 - 時刻は UTC 保存・表示時に `toJST()` で変換。時刻選択肢は `TIME_OPTIONS` を共通使用する。
 
