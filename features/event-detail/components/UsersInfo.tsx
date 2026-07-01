@@ -7,8 +7,8 @@ import { useDeviceType } from "@/hooks/UseDeviceType";
 import { Popover, PopoverContent, PopoverDescription, PopoverHeader, PopoverTitle, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import type { User } from "@/features/event/types";
-import { useEvent } from "@/features/event/hooks/useEvent";
+import type { User } from "@/features/event-detail/types";
+import { useEvent } from "@/features/event-detail/hooks/useEvent";
 import UsersPasswordDialog from "./UsersPasswordDialog";
 import UsersEditDialog from "./UsersEditDialog";
 

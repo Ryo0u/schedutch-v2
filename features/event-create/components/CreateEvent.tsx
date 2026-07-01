@@ -2,13 +2,13 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Eraser, Plus } from 'lucide-react';
 import { UseFormReturn } from 'react-hook-form';
-import { FormData } from '@/features/new/schema';
+import { FormData } from '@/features/event-create/schema';
 import { toast } from "sonner"
 import { useState } from 'react';
 import CreatedDialog from './CreatedDiaolg';
 import { Spinner } from '@/components/ui/spinner';
 import { hashPassword, jstWallTimeToISO } from '@/lib/utils';
-import { useCreateEvent } from '@/features/new/hooks/useCreateEvent';
+import { useCreateEvent } from '@/features/event-create/hooks/useCreateEvent';
 
 interface CreateEventActionProps {
   form: UseFormReturn<FormData>;

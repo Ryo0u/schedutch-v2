@@ -3,7 +3,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { formSchema } from '@/features/new/schema';
+import { formSchema } from '@/features/event-create/schema';
 import NewHero from './NewHero';
 import InputEventInfo from './InputEventInfo';
 import InputEventCandidates from './InputEventCandidates';

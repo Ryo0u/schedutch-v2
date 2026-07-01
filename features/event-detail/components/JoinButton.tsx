@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import ResponsesForm from './ResponsesForm';
-import { useEvent } from '@/features/event/hooks/useEvent';
+import { useEvent } from '@/features/event-detail/hooks/useEvent';
 
 interface JoinButtonProps {
   eventId: string;

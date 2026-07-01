@@ -8,7 +8,7 @@ import EventEditDialog from "./EventEditDialog"
 import EventDeleteDialog from "./EventDeleteDialog"
 import UsersDeleteDialog from "./UsersDeleteDialog"
 import EventShareDialog from "./EventShareDialog"
-import { useEvent } from "@/features/event/hooks/useEvent";
+import { useEvent } from "@/features/event-detail/hooks/useEvent";
 
 interface MenuProps {
   eventId: string;

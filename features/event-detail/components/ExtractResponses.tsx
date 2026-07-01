@@ -10,8 +10,8 @@ import { ChevronDownIcon, CopyIcon, Plus } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn, jstHHMM, formatJSTDate } from "@/lib/utils";
-import type { Candidate, User } from "@/features/event/types";
-import { useEvent } from "@/features/event/hooks/useEvent";
+import type { Candidate, User } from "@/features/event-detail/types";
+import { useEvent } from "@/features/event-detail/hooks/useEvent";
 
 interface ExtractProps {
   data: {

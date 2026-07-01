@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { TIME_OPTIONS } from "@/lib/constants";
 import { cn, jstHHMM, formatJSTDate } from "@/lib/utils";
-import { useEvent } from "@/features/event/hooks/useEvent";
+import { useEvent } from "@/features/event-detail/hooks/useEvent";
 
 interface ResponsesInfoProps {
   eventId: string;

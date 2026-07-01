@@ -11,9 +11,9 @@ import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { hashPassword } from '@/lib/utils';
 import { useParams } from 'next/navigation';
-import { Candidate } from '@/features/event/types';
-import { UserFormData, UserFormSchema } from '@/features/event/schema';
-import { useSaveResponses } from '@/features/event/hooks/useEventMutations';
+import { Candidate } from '@/features/event-detail/types';
+import { UserFormData, UserFormSchema } from '@/features/event-detail/schema';
+import { useSaveResponses } from '@/features/event-detail/hooks/useEventMutations';
 
 interface ResposesFromProps {
   data: {

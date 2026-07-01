@@ -1,5 +1,5 @@
 import { Control, Controller } from 'react-hook-form';
-import { UserFormData } from '@/features/event/schema';
+import { UserFormData } from '@/features/event-detail/schema';
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import {

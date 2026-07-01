@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import bcrypt from "bcryptjs";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
-import { useDeleteUser } from "@/features/event/hooks/useEventMutations";
+import { useDeleteUser } from "@/features/event-detail/hooks/useEventMutations";
 
 interface DialogProps {
   data: {

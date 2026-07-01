@@ -1,12 +1,12 @@
 "use client"
 
-import EventInfo from "@/features/event/components/EventInfo";
-import JoinButton from "@/features/event/components/JoinButton";
-import MenuButton from "@/features/event/components/MenuButton";
-import UsersInfo from "@/features/event/components/UsersInfo";
+import EventInfo from "@/features/event-detail/components/EventInfo";
+import JoinButton from "@/features/event-detail/components/JoinButton";
+import MenuButton from "@/features/event-detail/components/MenuButton";
+import UsersInfo from "@/features/event-detail/components/UsersInfo";
 import { Separator } from "@/components/ui/separator";
-import EventSkeleton from "@/features/event/components/EventSkeleton";
-import { useEvent } from "@/features/event/hooks/useEvent";
+import EventSkeleton from "@/features/event-detail/components/EventSkeleton";
+import { useEvent } from "@/features/event-detail/hooks/useEvent";
 import ResponsesInfo from "./ResponsesInfo";
 import ExtractResponses from "./ExtractResponses";
 

@@ -13,8 +13,8 @@ import { Input } from '@/components/ui/input';
 import { InputGroup, InputGroupAddon, InputGroupText, InputGroupTextarea } from '@/components/ui/input-group';
 import InputResponses from './InputResponses';
 import { toast } from 'sonner';
-import type { Candidate, User } from '@/features/event/types';
-import { useUpdateUser } from '@/features/event/hooks/useEventMutations';
+import type { Candidate, User } from '@/features/event-detail/types';
+import { useUpdateUser } from '@/features/event-detail/hooks/useEventMutations';
 
 interface UsersEditDialogProps {
   data: {

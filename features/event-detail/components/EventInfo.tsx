@@ -1,5 +1,5 @@
 import { Calendar, MessageSquare } from "lucide-react";
-import { useEvent } from "@/features/event/hooks/useEvent";
+import { useEvent } from "@/features/event-detail/hooks/useEvent";
 
 interface EventInfoProps {
   eventId: string;

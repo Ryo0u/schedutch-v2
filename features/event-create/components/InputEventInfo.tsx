@@ -1,4 +1,4 @@
-import { FormData } from '@/features/new/schema';
+import { FormData } from '@/features/event-create/schema';
 import { Control, Controller } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import {

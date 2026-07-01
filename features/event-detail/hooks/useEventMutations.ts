@@ -4,7 +4,7 @@ import {
   updateUserWithResponses,
   deleteUser,
   deleteEvent,
-} from "@/features/event/api/eventApi";
+} from "@/features/event-detail/api/eventApi";
 import { eventKeys } from "./useEvent";
 
 /** 参加者と回答を新規保存し、成功後にイベントを再取得する */

@@ -3,7 +3,7 @@ import { TIME_OPTIONS } from "@/lib/constants";
 import { useState } from "react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn, jstHHMM, formatJSTDate } from "@/lib/utils";
-import type { Candidate } from "@/features/event/types";
+import type { Candidate } from "@/features/event-detail/types";
 
 type SlotInfo = {
   id: string;

@@ -7,7 +7,7 @@ import { Trash2 } from "lucide-react";
 import bcrypt from "bcryptjs";
 import { toast } from "sonner";
 import { useRouter } from 'next/navigation';
-import { useDeleteEvent } from "@/features/event/hooks/useEventMutations";
+import { useDeleteEvent } from "@/features/event-detail/hooks/useEventMutations";
 
 interface DialogProps {
   open: boolean;

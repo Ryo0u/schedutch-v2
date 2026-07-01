@@ -1,5 +1,5 @@
 import { supabase } from "@/utils/supabase/client";
-import type { EventData, ResponseStatus } from "@/features/event/types";
+import type { EventData, ResponseStatus } from "@/features/event-detail/types";
 
 /** 保存用に整形済みの回答（time は ISO 文字列） */
 export interface ResponseInput {

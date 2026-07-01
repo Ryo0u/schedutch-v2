@@ -8,8 +8,8 @@ import { Input } from "@/components/ui/input";
 import bcrypt from "bcryptjs";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
-import type { User } from "@/features/event/types";
-import { useDeleteUser } from "@/features/event/hooks/useEventMutations";
+import type { User } from "@/features/event-detail/types";
+import { useDeleteUser } from "@/features/event-detail/hooks/useEventMutations";
 
 interface UsersPasswordDialogProps {
   data: {
