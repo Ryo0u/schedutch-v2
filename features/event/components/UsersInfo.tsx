@@ -7,15 +7,13 @@ import { useDeviceType } from "@/hooks/UseDeviceType";
 import { Popover, PopoverContent, PopoverDescription, PopoverHeader, PopoverTitle, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import type { Candidate, User } from "@/features/event/types";
+import type { User } from "@/features/event/types";
+import { useEvent } from "@/features/event/hooks/useEvent";
 import UsersPasswordDialog from "./UsersPasswordDialog";
 import UsersEditDialog from "./UsersEditDialog";
 
 interface UsersInfoProps {
-  data: {
-    users: Pick<User, "id" | "name" | "comment" | "password_digest" | "responses">[];
-    candidates: Pick<Candidate, "id" | "start_time" | "end_time">[];
-  };
+  eventId: string;
 }
 
 
@@ -47,12 +45,13 @@ function UserComment({ comment }: { comment: string }) {
   }
 }
 
-function UsersInfo({ data }: UsersInfoProps) {
-  const [editingUser, setEditingUser] = useState<UsersInfoProps["data"]["users"][0] | null>(null);
+function UsersInfo({ eventId }: UsersInfoProps) {
+  const { data } = useEvent(eventId);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
   const [passwordOpen, setPasswordOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
 
-  const handleEditClick = (user: UsersInfoProps["data"]["users"][0]) => {
+  const handleEditClick = (user: User) => {
     setEditingUser(user);
     setPasswordOpen(true);
   };
@@ -90,6 +89,8 @@ function UsersInfo({ data }: UsersInfoProps) {
     return colors[charCodeSum % colors.length];
   };
   
+  if (!data) return null;
+
   // 参加者がまだいない場合の表示
   if (!data.users || data.users.length === 0) {
     return (
