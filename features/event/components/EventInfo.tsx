@@ -1,13 +1,14 @@
 import { Calendar, MessageSquare } from "lucide-react";
+import { useEvent } from "@/features/event/hooks/useEvent";
 
 interface EventInfoProps {
-  data: {
-    title: string;
-    comment: string;
-  };
+  eventId: string;
 }
 
-function EventInfo({data}: EventInfoProps) {
+function EventInfo({ eventId }: EventInfoProps) {
+  const { data } = useEvent(eventId);
+  if (!data) return null;
+
   return (
     <div className="flex flex-col gap-4 mt-5">
       

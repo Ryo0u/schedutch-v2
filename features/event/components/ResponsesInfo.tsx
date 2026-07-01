@@ -2,16 +2,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { TIME_OPTIONS } from "@/lib/constants";
 import { cn, jstHHMM, formatJSTDate } from "@/lib/utils";
-import type { Candidate, User } from "@/features/event/types";
+import { useEvent } from "@/features/event/hooks/useEvent";
 
 interface ResponsesInfoProps {
-  data: {
-    candidates: Pick<Candidate, "id" | "start_time" | "end_time">[];
-    users: Pick<User, "id" | "name" | "responses">[];
-  };
+  eventId: string;
 }
 
-function ResponsesInfo({ data }: ResponsesInfoProps) {
+function ResponsesInfo({ eventId }: ResponsesInfoProps) {
+  const { data } = useEvent(eventId);
+  if (!data) return null;
+
   return (
     <Card>
       <CardHeader>

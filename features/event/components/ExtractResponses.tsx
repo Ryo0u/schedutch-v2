@@ -11,6 +11,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn, jstHHMM, formatJSTDate } from "@/lib/utils";
 import type { Candidate, User } from "@/features/event/types";
+import { useEvent } from "@/features/event/hooks/useEvent";
 
 interface ExtractProps {
   data: {
@@ -36,7 +37,7 @@ const DurationOption = [
   { label: "3時間以上", value: "180" },
 ];
 
-function ExtractResponses({ data }: ExtractProps) {
+function ExtractView({ data }: ExtractProps) {
   const SLOT_INTERVAL = 30 * 60 * 1000;
   
   // 条件のフラグ管理
@@ -427,6 +428,12 @@ function ExtractResponses({ data }: ExtractProps) {
       </CardContent>
     </Card>
   )
+}
+
+function ExtractResponses({ eventId }: { eventId: string }) {
+  const { data } = useEvent(eventId);
+  if (!data) return null;
+  return <ExtractView data={data} />;
 }
 
 export default ExtractResponses

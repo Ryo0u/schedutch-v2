@@ -24,25 +24,25 @@ export default function EventClient({ eventId }: { eventId: string }) {
   return (
     <div className="w-full max-w-6xl mx-auto px-3">
       <section className="flex flex-col sm:flex-row justify-between sm:items-end gap-8 mt-5 mb-8">
-        <EventInfo data={data}/>
+        <EventInfo eventId={eventId}/>
         <div className="flex items-center gap-3">
-          <MenuButton data={data}/>
-          <JoinButton data={data}/>
+          <MenuButton eventId={eventId}/>
+          <JoinButton eventId={eventId}/>
         </div>
       </section>
 
       <Separator/>
 
       <section className="mt-5 mb-8">
-        <UsersInfo data={data}/>
+        <UsersInfo eventId={eventId}/>
       </section>
       
       <section className="mb-8">
-        <ResponsesInfo data={data}/>
+        <ResponsesInfo eventId={eventId}/>
       </section>
       
       <section className="mb-8">
-        <ExtractResponses data={data}/>
+        <ExtractResponses eventId={eventId}/>
       </section>
     </div>
   );

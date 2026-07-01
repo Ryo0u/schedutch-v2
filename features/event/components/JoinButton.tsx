@@ -3,16 +3,17 @@
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import ResponsesForm from './ResponsesForm';
-import type { Candidate } from '@/features/event/types';
+import { useEvent } from '@/features/event/hooks/useEvent';
 
-interface EventCandidatesProps {
-  data: {
-    candidates: Pick<Candidate, "id" | "start_time" | "end_time">[];
-  };
+interface JoinButtonProps {
+  eventId: string;
 }
 
-export default function JoinButton({ data }: EventCandidatesProps) {
+export default function JoinButton({ eventId }: JoinButtonProps) {
+  const { data } = useEvent(eventId);
   const [isOpen, setIsOpen] = useState(false);
+
+  if (!data) return null;
 
   return (
     <>

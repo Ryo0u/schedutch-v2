@@ -8,16 +8,19 @@ import EventEditDialog from "./EventEditDialog"
 import EventDeleteDialog from "./EventDeleteDialog"
 import UsersDeleteDialog from "./UsersDeleteDialog"
 import EventShareDialog from "./EventShareDialog"
-import type { EventData } from "@/features/event/types";
+import { useEvent } from "@/features/event/hooks/useEvent";
 
 interface MenuProps {
-  data: EventData;
+  eventId: string;
 }
 
-function MenuButton({ data }: MenuProps) {
+function MenuButton({ eventId }: MenuProps) {
+  const { data } = useEvent(eventId);
   const [ isOpen, setIsOpen ] = useState(false); // パスワード承認画面
   const [ actionType, setActionType ] = useState<"eventEdit" | "eventShare" | "eventDelete" | "usersDelete" | null>(null)
-  
+
+  if (!data) return null;
+
   const handleMenuClick = (action: "eventEdit" | "eventShare" | "eventDelete" | "usersDelete") => {
     setActionType(action);
     setIsOpen(true);
