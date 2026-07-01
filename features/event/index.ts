@@ -1,2 +1,2 @@
-export { default as EventClient } from "./components/EventClient";
+export { default as EventContainer } from "./components/EventContainer";
 export * from "./types";

@@ -10,7 +10,7 @@ import { useEvent } from "@/features/event/hooks/useEvent";
 import ResponsesInfo from "./ResponsesInfo";
 import ExtractResponses from "./ExtractResponses";
 
-export default function EventClient({ eventId }: { eventId: string }) {
+export default function EventContainer({ eventId }: { eventId: string }) {
   const { data, isLoading } = useEvent(eventId);
 
   if (isLoading) {
