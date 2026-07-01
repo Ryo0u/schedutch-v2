@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# claude code (個人設定・権限承認はコミットしない)
+.claude/settings.json
