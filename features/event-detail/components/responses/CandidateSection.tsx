@@ -19,7 +19,7 @@ export default function CandidateSection({ candidate, users, displayedTimes }: C
   return (
     <tbody id={`candidate-${candidate.id}`} className="scroll-mt-24">
       <tr>
-        <th rowSpan={2} className="sticky left-0 z-30 border bg-foreground p-1 sm:p-2 text-[10px] sm:text-xs text-center text-background min-w-10 sm:min-w-24">
+        <th rowSpan={2} className="sticky left-0 z-30 border bg-primary/80 p-1 sm:p-2 text-[10px] sm:text-xs text-center text-primary-foreground min-w-10 sm:min-w-24">
           {dateLabel}
         </th>
 
@@ -60,7 +60,7 @@ export default function CandidateSection({ candidate, users, displayedTimes }: C
 
         return (
           <tr key={user.id} className="hover:bg-muted/40">
-            <td className="sticky left-0 z-30 border bg-foreground/90 p-1 sm:p-2 text-center text-background font-bold min-w-15 max-w-20 sm:max-w-30 sm:min-w-24 h-7 sm:h-9">
+            <td className="sticky left-0 z-30 border bg-muted p-1 sm:p-2 text-center text-foreground font-bold min-w-15 max-w-20 sm:max-w-30 sm:min-w-24 h-7 sm:h-9">
               <div className="text-[11px] sm:text-xs truncate" title={user.name}>
                 {user.name}
               </div>
@@ -73,9 +73,9 @@ export default function CandidateSection({ candidate, users, displayedTimes }: C
                   key={time}
                   className={cn(
                     "border-b border-x border-muted bg-muted text-center text-[8px] sm:text-[10px] transition-all",
-                    status === "ok" && "bg-blue-400 text-white",
-                    status === "maybe" && "bg-yellow-300 text-yellow-800",
-                    status === "ng" && "bg-gray-400 text-gray-600"
+                    status === "ok" && "bg-blue-400/70 text-white",
+                    status === "maybe" && "bg-yellow-300/70 text-yellow-800",
+                    status === "ng" && "bg-gray-400/70 text-gray-600"
                   )}
                 >
                   {status === "ok" ? "⚫︎" : status === "maybe" ? "▲" : status === "ng" ? "✖︎" : ""}
