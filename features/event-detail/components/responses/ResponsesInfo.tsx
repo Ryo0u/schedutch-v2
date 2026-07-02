@@ -35,7 +35,7 @@ function ResponsesInfo({ eventId }: ResponsesInfoProps) {
               });
 
               return (
-                <tbody key={candidate.id} className="">
+                <tbody key={candidate.id} id={`candidate-${candidate.id}`} className="scroll-mt-24">
                   <tr>
                     <th rowSpan={2} className="sticky left-0 z-30 border bg-foreground p-1 sm:p-2 text-[10px] sm:text-xs text-center text-background min-w-10 sm:min-w-24">
                       {dateKey}
