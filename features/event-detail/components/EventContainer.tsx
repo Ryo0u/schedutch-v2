@@ -9,7 +9,7 @@ import EventSkeleton from "@/features/event-detail/components/EventSkeleton";
 import { useEvent } from "@/features/event-detail/hooks/useEvent";
 import ResponsesInfo from "./responses/ResponsesInfo";
 import ExtractResponses from "./extract/ExtractResponses";
-import EventSideNav from "./EventSideNav";
+import EventSideNav from "./sidebar/EventSideNav";
 
 export default function EventContainer({ eventId }: { eventId: string }) {
   const { data, isLoading } = useEvent(eventId);
