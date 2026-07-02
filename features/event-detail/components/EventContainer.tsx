@@ -25,7 +25,7 @@ export default function EventContainer({ eventId }: { eventId: string }) {
   return (
     <div className="w-full max-w-6xl mx-auto px-3">
       <aside className="hidden 2xl:block">
-        <EventSideNav />
+        <EventSideNav eventId={eventId} />
       </aside>
 
       <section id="event-info" className="flex flex-col sm:flex-row justify-between sm:items-end gap-8 mt-5 mb-8 scroll-mt-20">
