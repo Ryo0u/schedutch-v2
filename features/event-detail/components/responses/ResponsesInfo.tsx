@@ -25,7 +25,23 @@ function ResponsesInfo({ eventId }: ResponsesInfoProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-xl font-black">予定一覧</CardTitle>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <CardTitle className="text-xl font-black">予定一覧</CardTitle>
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1.5">
+              <span className="inline-block w-3 h-3 rounded-sm bg-blue-400" />
+              参加できる
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="inline-block w-3 h-3 rounded-sm bg-yellow-300" />
+              未定
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="inline-block w-3 h-3 rounded-sm bg-gray-400" />
+              参加できない
+            </span>
+          </div>
+        </div>
       </CardHeader>
 
       <Separator />
