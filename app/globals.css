@@ -117,6 +117,27 @@
   --sidebar-ring: oklch(0.55 0.16 266);
 }
 
+@keyframes cellIn {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.cell-in {
+  animation: cellIn 0.35s ease-out backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cell-in {
+    animation: none;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
