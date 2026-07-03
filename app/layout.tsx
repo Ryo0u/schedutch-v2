@@ -1,19 +1,32 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Zen_Kaku_Gothic_New, Noto_Sans_JP, IBM_Plex_Mono } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { QueryProvider } from '@/components/providers/QueryProvider';
 import Header from '@/components/layout/Header';
 import { Toaster } from '@/components/ui/sonner';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const notoSansJP = Noto_Sans_JP({
+  variable: '--font-sans',
   subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  display: 'swap',
+  preload: false,
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const zenKakuGothicNew = Zen_Kaku_Gothic_New({
+  variable: '--font-heading',
   subsets: ['latin'],
+  weight: ['700', '900'],
+  display: 'swap',
+  preload: false,
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+  variable: '--font-mono',
+  subsets: ['latin'],
+  weight: ['500'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -29,7 +42,7 @@ export default function RootLayout({
   return (
     <html
       lang="ja"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${notoSansJP.variable} ${zenKakuGothicNew.variable} ${ibmPlexMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col">

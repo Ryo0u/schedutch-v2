@@ -11,15 +11,15 @@ const GRID_LEFT = NAME_W + GAP;
 const SLOT_LABELS = ['15', '16', '17', '18', '19', '20'];
 
 const MEMBERS = [
-  { name: 'りょう', cells: 'oooxxooooooo' },
-  { name: 'れおん', cells: 'xxoottooooxx' },
-  { name: 'はな', cells: 'ooooooooooто'.replace('т', 't') },
+  { name: 'Aさん', cells: 'oooxxooooooo' },
+  { name: 'Bさん', cells: 'xxoottooooxx' },
+  { name: 'Cさん', cells: 'ooooooooooто'.replace('т', 't') },
 ];
 
 const HL_START = 6;
 const HL_END = 9;
 
-const RESULT_TEXT = '7/3  18:00 - 20:00 : りょう, れおん, はな';
+const RESULT_TEXT = '7/3  18:00 - 20:00 : Aさん, Bさん, Cさん';
 
 type CellStatus = 'o' | 't' | 'x';
 
@@ -81,10 +81,10 @@ export default function HeroGrid() {
   }, [phase]);
 
   return (
-    <div className="w-full rounded-2xl border bg-card p-4 shadow-xl shadow-primary/10 sm:p-6">
+    <div className="card-pop w-full p-4 sm:p-6">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <span className="rounded-md bg-primary px-3 py-1 text-sm font-bold text-primary-foreground">
-          7月3日(金)
+          4月1日(月)
         </span>
         <div className="flex items-center gap-3 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">

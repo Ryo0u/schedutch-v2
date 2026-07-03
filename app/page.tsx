@@ -5,6 +5,7 @@ import ExtractSection from '@/features/home/components/ExtractSection';
 import FeaturesSection from '@/features/home/components/FeaturesSection';
 import CtaSection from '@/features/home/components/CtaSection';
 import LpFooter from '@/features/home/components/LpFooter';
+import MobileCtaBar from '@/features/home/components/MobileCtaBar';
 
 export default function Page() {
   return (
@@ -16,6 +17,7 @@ export default function Page() {
       <FeaturesSection />
       <CtaSection />
       <LpFooter />
+      <MobileCtaBar />
     </div>
   );
 }
