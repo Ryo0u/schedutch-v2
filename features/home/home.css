@@ -1,0 +1,91 @@
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-line {
+  animation: fadeSlideUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-line {
+    animation: none;
+  }
+}
+
+@keyframes cellIn {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.cell-in {
+  animation: cellIn 0.35s ease-out backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cell-in {
+    animation: none;
+  }
+}
+
+@layer components {
+  .card-pop {
+    border-radius: var(--radius-2xl);
+    border: 2px solid var(--foreground);
+    background-color: var(--color-card);
+    box-shadow: 5px 5px 0 var(--shadow-ink);
+    opacity: 0.92;
+  }
+
+  .dark .card-pop {
+    opacity: 1;
+    border-color: oklch(1 0 0 / 25%);
+  }
+
+  a.card-pop,
+  button.card-pop,
+  .card-pop-interactive {
+    transition:
+      transform 150ms ease,
+      box-shadow 150ms ease;
+  }
+
+  a.card-pop:hover,
+  button.card-pop:hover,
+  .card-pop-interactive:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 7px 7px 0 var(--shadow-ink);
+  }
+
+  .marker {
+    background-image: linear-gradient(transparent 58%, var(--color-accent) 58%);
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+
+  .sticker {
+    display: inline-block;
+    border: 2px solid var(--foreground);
+    border-radius: var(--radius-md);
+    background-color: var(--color-background);
+    padding: 0.25rem 0.75rem;
+    box-shadow: 2px 2px 0 var(--shadow-ink);
+    transform: rotate(-2deg);
+  }
+
+  .dark .sticker {
+    border-color: oklch(1 0 0 / 25%);
+  }
+}

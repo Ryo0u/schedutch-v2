@@ -1,18 +1,4 @@
-const CONDITIONS = [
-  'AさんとBさんが両方参加できる枠',
-  '3人以上集まれる枠',
-  '2時間以上連続して空いている枠',
-  '▲（未定）も予定に含める',
-  'この日付範囲だけ対象にする',
-];
-
-const EXTRACT_RESULT = `7/3
-06:00 - 08:00 : A, B, C
-15:30 - 20:00 : A, B(▲), C
-
-7/4
-06:00 - 07:30 : A, B, C
-19:30 - 21:00 : A, B, C`;
+import { CONDITIONS, EXTRACT_RESULT } from '../../constants';
 
 export default function ExtractSection() {
   return (

@@ -1,3 +1,4 @@
+import '@/features/home/home.css';
 import {
   HeroSection,
   StepsSection,

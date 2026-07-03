@@ -75,9 +75,21 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 ```
 schedutch-v2/
 ├── app/                  # App Router（ルーティング）
+│   ├── page.tsx          # トップ（LP。home featureのセクションを描画）
 │   ├── new/page.tsx      # イベント作成（CreateEventContainer を描画）
 │   └── event/[id]/page.tsx  # イベント閲覧・回答（EventContainer を描画）
 ├── features/
+│   ├── home/              # トップページ（LP）
+│   │   ├── components/    # 直下: LpFooter / MobileCtaBar / ScrollReveal（複数セクション横断）
+│   │   │   ├── hero/          # HeroSection, HeroGrid
+│   │   │   ├── steps/         # StepsSection, StepCard, BrowserFrame
+│   │   │   ├── comparison/    # ComparisonSection, LegacyToolCard, PreviewCard
+│   │   │   ├── extract/       # ExtractSection
+│   │   │   ├── features/      # FeaturesSection
+│   │   │   └── cta/           # CtaSection
+│   │   ├── constants.ts   # 各セクションの表示用データ（STEPS/FEATURES/CONDITIONS等）
+│   │   ├── home.css       # LP専用スタイル（card-pop/marker/sticker等。app/page.tsxでimport）
+│   │   └── index.ts       # barrel
 │   ├── event-detail/     # 閲覧・回答機能（/event/[id]）
 │   │   ├── components/   # 直下: EventContainer(親) / EventSkeleton
 │   │   │   ├── event/        # EventInfo, MenuButton, Event{Edit,Delete,Share}Dialog
