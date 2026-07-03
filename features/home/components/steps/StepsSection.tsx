@@ -4,11 +4,11 @@ import { STEPS } from '../../constants';
 
 export default function StepsSection() {
   return (
-    <section id="how" className="pt-24 pb-32 sm:pt-32 sm:pb-40">
+    <section id="how" className="relative bg-muted pt-24 pb-32 sm:pt-32 sm:pb-40">
       {/* セクションヘッダー */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <h2 className="font-heading text-3xl font-black tracking-tight text-foreground sm:text-4xl">
-          使い方は、4ステップ。
+          使い方は、<span className="marker">4ステップ</span>。
         </h2>
         <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground">
           アカウント登録不要。URLを共有するだけで、全員の予定が揃います。

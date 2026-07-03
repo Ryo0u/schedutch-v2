@@ -8,7 +8,7 @@ const cellColor: Record<CellStatus, string> = {
 
 export default function PreviewCard() {
   return (
-    <div className="card-pop p-6">
+    <div className="card-pop min-w-0 p-6">
       <span className="sticker font-mono text-xs tracking-widest text-primary">
         Schedutch
       </span>
