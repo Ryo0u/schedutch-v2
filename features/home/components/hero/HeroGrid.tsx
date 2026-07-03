@@ -148,11 +148,11 @@ export default function HeroGrid() {
       </div>
 
       <div
-        className={`mt-4 rounded-lg border border-primary/20 bg-primary/10 px-4 py-3 transition-all duration-500 ${phase >= 2 ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}
+        className={`card-pop mt-4 bg-muted p-5 transition-all duration-500 ${phase >= 2 ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}
       >
-        <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
+        <div className="mb-2 flex items-center justify-between text-xs text-muted-foreground">
           <span>抽出結果</span>
-          <span>コピーして共有 ⧉</span>
+          <span aria-hidden="true">⧉ コピー</span>
         </div>
         <p className="font-mono text-xs text-primary sm:text-sm">
           {typed}
