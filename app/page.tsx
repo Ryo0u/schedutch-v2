@@ -6,7 +6,6 @@ import {
   ExtractSection,
   FeaturesSection,
   CtaSection,
-  LpFooter,
   MobileCtaBar,
 } from '@/features/home';
 
@@ -19,7 +18,6 @@ export default function Page() {
       <ExtractSection />
       <FeaturesSection />
       <CtaSection />
-      <LpFooter />
       <MobileCtaBar />
     </div>
   );
