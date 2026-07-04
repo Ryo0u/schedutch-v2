@@ -1,13 +1,17 @@
-import { cn, jstHHMM, formatJSTDate } from "@/lib/utils";
-import type { Candidate, User } from "@/features/event-detail/types";
+import { useMemo } from "react";
+import { cn, jstHHMM, formatJSTDate, jstWallTimeToISO } from "@/lib/utils";
+import type { Candidate, TimeBlock, User } from "@/features/event-detail/types";
 
 interface CandidateSectionProps {
   candidate: Candidate;
   users: User[];
   displayedTimes: string[];
+  extractedBlocks: TimeBlock[];
 }
 
-export default function CandidateSection({ candidate, users, displayedTimes }: CandidateSectionProps) {
+type HighlightFlags = { inBlock: boolean; isStart: boolean; isEnd: boolean };
+
+export default function CandidateSection({ candidate, users, displayedTimes, extractedBlocks }: CandidateSectionProps) {
   const startHHMM = jstHHMM(candidate.start_time);
   const endHHMM = jstHHMM(candidate.end_time);
   const dateLabel = formatJSTDate(candidate.start_time, {
@@ -15,6 +19,23 @@ export default function CandidateSection({ candidate, users, displayedTimes }: C
     day: "numeric",
     weekday: "short",
   });
+
+  // 各時刻スロットが抽出結果ブロックの範囲内かどうかのフラグを事前計算
+  // (block.end は最終スロットの開始時刻なので範囲判定は <= でよい)
+  const highlightMap = useMemo(() => {
+    const map = new Map<string, HighlightFlags>();
+    if (extractedBlocks.length === 0) return map;
+
+    const candidateDate = new Date(candidate.start_time);
+    for (const time of displayedTimes) {
+      const t = new Date(jstWallTimeToISO(candidateDate, time)).getTime();
+      const block = extractedBlocks.find((b) => b.start <= t && t <= b.end);
+      if (block) {
+        map.set(time, { inBlock: true, isStart: t === block.start, isEnd: t === block.end });
+      }
+    }
+    return map;
+  }, [extractedBlocks, candidate.start_time, displayedTimes]);
 
   return (
     <tbody id={`candidate-${candidate.id}`} className="scroll-mt-24">
@@ -52,11 +73,14 @@ export default function CandidateSection({ candidate, users, displayedTimes }: C
       </tr>
 
       {/* ユーザー行 */}
-      {users.map((user) => {
+      {users.map((user, userIndex) => {
         const responseMap = user.responses.reduce((acc, res) => {
           acc[`${res.candidate_id}-${jstHHMM(res.time)}`] = res.status;
           return acc;
         }, {} as Record<string, string>);
+
+        const isFirstRow = userIndex === 0;
+        const isLastRow = userIndex === users.length - 1;
 
         return (
           <tr key={user.id} className="hover:bg-muted/40">
@@ -68,6 +92,8 @@ export default function CandidateSection({ candidate, users, displayedTimes }: C
 
             {displayedTimes.map((time) => {
               const status = responseMap[`${candidate.id}-${time}`];
+              const highlight = highlightMap.get(time);
+              const isExtracting = extractedBlocks.length > 0;
               return (
                 <td
                   key={time}
@@ -75,7 +101,13 @@ export default function CandidateSection({ candidate, users, displayedTimes }: C
                     "border-b border-x border-muted bg-muted text-center text-[8px] sm:text-[10px] transition-all",
                     status === "ok" && "bg-blue-400/70 text-white",
                     status === "maybe" && "bg-yellow-300/70 text-yellow-800",
-                    status === "ng" && "bg-gray-400/70 text-gray-600"
+                    status === "ng" && "bg-gray-400/70 text-gray-600",
+                    // 抽出中は範囲外のセルをグレーで薄くし、範囲の外周を primary の太枠で囲う
+                    isExtracting && !highlight && "opacity-25",
+                    highlight?.isStart && "border-l-2 border-l-primary",
+                    highlight?.isEnd && "border-r-2 border-r-primary",
+                    highlight && isFirstRow && "border-t-2 border-t-primary",
+                    highlight && isLastRow && "border-b-2 border-b-primary"
                   )}
                 >
                   {status === "ok" ? "⚫︎" : status === "maybe" ? "▲" : status === "ng" ? "✖︎" : ""}

@@ -101,7 +101,7 @@ function UsersInfo({ eventId }: UsersInfoProps) {
   }
 
   return (
-    <Card>
+    <Card className="shadow-md shadow-primary/10 ring-primary/20">
       <CardHeader>
         <div className="flex gap-4 items-center">
           <CardTitle className="text-xl font-black tracking-tight text-foreground">

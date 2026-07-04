@@ -3,6 +3,7 @@ import { Separator } from "@/components/ui/separator";
 import { TIME_OPTIONS } from "@/lib/constants";
 import { jstHHMM } from "@/lib/utils";
 import { useEvent } from "@/features/event-detail/hooks/useEvent";
+import { useExtractSlotsContext } from "../extract/ExtractSlotsContext";
 import CandidateSection from "./CandidateSection";
 
 interface ResponsesInfoProps {
@@ -11,6 +12,7 @@ interface ResponsesInfoProps {
 
 function ResponsesInfo({ eventId }: ResponsesInfoProps) {
   const { data } = useEvent(eventId);
+  const { extractedBlocks, isHighlightEnabled } = useExtractSlotsContext();
   if (!data) return null;
 
   // 全候補の時間範囲の和集合で表示列を絞る
@@ -23,21 +25,21 @@ function ResponsesInfo({ eventId }: ResponsesInfoProps) {
   const displayedTimes = TIME_OPTIONS.filter((t) => t >= globalStart && t < globalEnd);
 
   return (
-    <Card>
+    <Card className="shadow-md shadow-primary/10 ring-primary/20">
       <CardHeader>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <CardTitle className="text-xl font-black">予定一覧</CardTitle>
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
             <span className="flex items-center gap-1.5">
-              <span className="inline-block w-3 h-3 rounded-sm bg-blue-400/70" />
+              <span className="inline-block w-3 h-3 rounded-sm bg-blue-400/80" />
               参加できる
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="inline-block w-3 h-3 rounded-sm bg-yellow-300/70" />
+              <span className="inline-block w-3 h-3 rounded-sm bg-yellow-300/80" />
               未定
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="inline-block w-3 h-3 rounded-sm bg-gray-400/70" />
+              <span className="inline-block w-3 h-3 rounded-sm bg-gray-400/80" />
               参加できない
             </span>
           </div>
@@ -47,7 +49,7 @@ function ResponsesInfo({ eventId }: ResponsesInfoProps) {
       <Separator />
 
       <CardContent>
-        <div className="w-full overflow-x-auto">
+        <div className="w-full overflow-x-auto p-1.5 sm:p-3">
           <table className="min-w-max mx-auto">
             {data.candidates.map((candidate) => (
               <CandidateSection
@@ -55,6 +57,7 @@ function ResponsesInfo({ eventId }: ResponsesInfoProps) {
                 candidate={candidate}
                 users={data.users}
                 displayedTimes={displayedTimes}
+                extractedBlocks={isHighlightEnabled ? extractedBlocks : []}
               />
             ))}
           </table>
