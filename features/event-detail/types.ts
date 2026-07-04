@@ -32,3 +32,7 @@ export interface EventData {
   candidates: Candidate[];
   users: User[];
 }
+
+export type ParticipantInfo = { name: string; status: string };
+
+export type TimeBlock = { start: number; end: number; participants: ParticipantInfo[] };
