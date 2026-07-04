@@ -25,6 +25,9 @@ export function useExtractSlots({ candidates, users }: UseExtractSlotsArgs) {
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
   const [extractedBlocks, setExtractedBlocks] = useState<TimeBlock[]>([]);
 
+  // 抽出結果を予定一覧の表にハイライト表示するかどうか
+  const [isHighlightEnabled, setIsHighlightEnabled] = useState(true);
+
   const availableDates = useMemo(() => {
     // JST の "YYYY-MM-DD" で一意な日付リストを作成（ブラウザTZ非依存）
     const dates = candidates.map(c =>
@@ -165,5 +168,8 @@ export function useExtractSlots({ candidates, users }: UseExtractSlotsArgs) {
     // 結果
     availableSlots,
     extractedBlocks,
+    // 表へのハイライト表示
+    isHighlightEnabled,
+    setIsHighlightEnabled,
   };
 }

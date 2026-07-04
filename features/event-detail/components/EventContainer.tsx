@@ -9,6 +9,7 @@ import EventSkeleton from "@/features/event-detail/components/EventSkeleton";
 import { useEvent } from "@/features/event-detail/hooks/useEvent";
 import ResponsesInfo from "./responses/ResponsesInfo";
 import ExtractResponses from "./extract/ExtractResponses";
+import { ExtractSlotsProvider } from "./extract/ExtractSlotsContext";
 import EventSideNav from "./sidebar/EventSideNav";
 
 export default function EventContainer({ eventId }: { eventId: string }) {
@@ -42,13 +43,15 @@ export default function EventContainer({ eventId }: { eventId: string }) {
         <UsersInfo eventId={eventId}/>
       </section>
 
-      <section id="responses-info" className="mb-8 scroll-mt-20">
-        <ResponsesInfo eventId={eventId}/>
-      </section>
+      <ExtractSlotsProvider eventId={eventId}>
+        <section id="responses-info" className="mb-8 scroll-mt-20">
+          <ResponsesInfo eventId={eventId}/>
+        </section>
 
-      <section id="extract-responses" className="mb-8 scroll-mt-20">
-        <ExtractResponses eventId={eventId}/>
-      </section>
+        <section id="extract-responses" className="mb-8 scroll-mt-20">
+          <ExtractResponses eventId={eventId}/>
+        </section>
+      </ExtractSlotsProvider>
     </div>
   );
 }

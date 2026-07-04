@@ -3,6 +3,7 @@ import { Separator } from "@/components/ui/separator";
 import { TIME_OPTIONS } from "@/lib/constants";
 import { jstHHMM } from "@/lib/utils";
 import { useEvent } from "@/features/event-detail/hooks/useEvent";
+import { useExtractSlotsContext } from "../extract/ExtractSlotsContext";
 import CandidateSection from "./CandidateSection";
 
 interface ResponsesInfoProps {
@@ -11,6 +12,7 @@ interface ResponsesInfoProps {
 
 function ResponsesInfo({ eventId }: ResponsesInfoProps) {
   const { data } = useEvent(eventId);
+  const { extractedBlocks, isHighlightEnabled } = useExtractSlotsContext();
   if (!data) return null;
 
   // 全候補の時間範囲の和集合で表示列を絞る
@@ -55,6 +57,7 @@ function ResponsesInfo({ eventId }: ResponsesInfoProps) {
                 candidate={candidate}
                 users={data.users}
                 displayedTimes={displayedTimes}
+                extractedBlocks={isHighlightEnabled ? extractedBlocks : []}
               />
             ))}
           </table>

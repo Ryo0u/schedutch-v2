@@ -1,18 +1,17 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Field, FieldLabel } from "@/components/ui/field";
 import { useEvent } from "@/features/event-detail/hooks/useEvent";
-import { useExtractSlots } from "./hooks/useExtractSlots";
+import { useExtractSlotsContext } from "./ExtractSlotsContext";
 import ParticipantSelector from "./ParticipantSelector";
 import ExtractFilters from "./ExtractFilters";
 import ExtractResultPanel from "./ExtractResultPanel";
 
 function ExtractResponses({ eventId }: { eventId: string }) {
   const { data } = useEvent(eventId);
-  const extract = useExtractSlots({
-    candidates: data?.candidates ?? [],
-    users: data?.users ?? [],
-  });
+  const extract = useExtractSlotsContext();
 
   if (!data) return null;
 
@@ -67,8 +66,18 @@ function ExtractResponses({ eventId }: { eventId: string }) {
           </div>
         </div>
 
-        <div className="flex-1">
+        <div className="flex-1 flex flex-col gap-3">
           <ExtractResultPanel slots={extract.availableSlots} />
+          <Field orientation="horizontal" className="justify-start gap-2">
+            <Checkbox
+              id="highlight-toggle"
+              checked={extract.isHighlightEnabled}
+              onCheckedChange={(checked) => extract.setIsHighlightEnabled(!!checked)}
+            />
+            <FieldLabel htmlFor="highlight-toggle" className="text-sm cursor-pointer">
+              抽出結果を予定一覧にハイライト表示する
+            </FieldLabel>
+          </Field>
         </div>
       </CardContent>
     </Card>
