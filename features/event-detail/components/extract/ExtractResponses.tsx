@@ -227,7 +227,7 @@ function ExtractView({ data }: ExtractProps) {
   };
   
   return (
-    <Card>
+    <Card className="shadow-md shadow-primary/10 ring-primary/20">
       <CardHeader>
         <CardTitle className="text-xl font-black">予定抽出</CardTitle>
         <CardDescription>
