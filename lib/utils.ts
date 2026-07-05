@@ -1,6 +1,5 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import bcrypt from "bcryptjs"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -32,12 +31,6 @@ export function formatJSTDate(
 ): string {
   const d = input instanceof Date ? input : new Date(input);
   return d.toLocaleDateString("ja-JP", { ...opts, timeZone: "Asia/Tokyo" });
-}
-
-/** 平文パスワードを bcrypt でハッシュ化して返す */
-export async function hashPassword(plain: string): Promise<string> {
-  const salt = await bcrypt.genSalt(10);
-  return bcrypt.hash(plain, salt);
 }
 
 /*

@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   saveUserResponses,
   updateUserWithResponses,
+  updateEvent,
   deleteUser,
   deleteEvent,
 } from "@/features/event-detail/api/eventApi";
@@ -29,11 +30,23 @@ export function useUpdateUser(eventId: string) {
   });
 }
 
+/** イベント情報を更新し、成功後にイベントを再取得する */
+export function useUpdateEvent(eventId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateEvent,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: eventKeys.detail(eventId) });
+    },
+  });
+}
+
 /** 参加者を削除し、成功後にイベントを再取得する */
 export function useDeleteUser(eventId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: deleteUser,
+    mutationFn: ({ userId, password }: { userId: string; password: string }) =>
+      deleteUser(userId, password),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: eventKeys.detail(eventId) });
     },
@@ -43,6 +56,7 @@ export function useDeleteUser(eventId: string) {
 /** イベントを削除する（削除後は画面遷移するため invalidate は不要） */
 export function useDeleteEvent() {
   return useMutation({
-    mutationFn: deleteEvent,
+    mutationFn: ({ eventId, password }: { eventId: string; password: string }) =>
+      deleteEvent(eventId, password),
   });
 }

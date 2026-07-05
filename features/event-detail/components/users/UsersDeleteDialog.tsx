@@ -5,14 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Field, FieldError, FieldLabel, FieldSet } from "@/components/ui/field";
 import { Trash2 } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import bcrypt from "bcryptjs";
-import { useParams } from "next/navigation";
 import { toast } from "sonner";
 import { useDeleteUser } from "@/features/event-detail/hooks/useEventMutations";
+import { usePasswordConfirm } from "@/features/event-detail/hooks/usePasswordConfirm";
 
 interface DialogProps {
+  eventId: string;
   data: {
-    password_digest: string;
     users: {
       id: string;
       name: string;
@@ -22,45 +21,35 @@ interface DialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-function UsersDeleteDialog({ data, open, onOpenChange }: DialogProps) {
+function UsersDeleteDialog({ eventId, data, open, onOpenChange }: DialogProps) {
   const [ password, setPassword ] = useState("");
   const [ userId, setUserId ] = useState("");
-  const [ isDeleting, setIsDeleting ] = useState(false);
-  const [ errorMsg, setErrorMsg ] = useState<string | null>(null);
-  const params = useParams();
-  const eventId = params.id as string;
   const deleteUser = useDeleteUser(eventId);
-  
+  const { isSubmitting, errorMsg, setErrorMsg, run } = usePasswordConfirm();
+
   useEffect(() => {
     if (!open) {
       setPassword("");
       setUserId("");
+      setErrorMsg(null);
     }
-  }, [open])
-  
+  }, [open, setErrorMsg])
+
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsDeleting(true);
-    
-    const isMatch = await bcrypt.compare(password, data.password_digest)
-    
-    if (isMatch && userId) {
-      try {
-        await deleteUser.mutateAsync(userId);
+    if (!userId) return;
 
+    try {
+      const success = await run(() => deleteUser.mutateAsync({ userId, password }));
+      if (success) {
         toast.success("参加者を削除しました", {position: 'top-center'})
-
-      } catch (error) {
-        console.log("failed to delete user", error)
-        toast.error("参加者の削除に失敗しました", {position: 'top-center'})
+        onOpenChange(false);
       }
-      
+    } catch (error) {
+      console.log("failed to delete user", error)
+      toast.error("参加者の削除に失敗しました", {position: 'top-center'})
       onOpenChange(false);
-    } else {
-      setErrorMsg("パスワードが間違っています")
     }
-    
-    setIsDeleting(false);
   }
   
   return (
@@ -115,12 +104,12 @@ function UsersDeleteDialog({ data, open, onOpenChange }: DialogProps) {
           
           <DialogFooter>
             <DialogClose render={<Button type="button" variant="outline">キャンセル</Button>}></DialogClose>
-            <Button 
-              type="submit" 
-              variant="destructive" 
-              disabled={isDeleting || !password || !userId}
+            <Button
+              type="submit"
+              variant="destructive"
+              disabled={isSubmitting || !password || !userId}
             >
-              {isDeleting ? "削除中..." : "削除する"}
+              {isSubmitting ? "削除中..." : "削除する"}
             </Button>
           </DialogFooter>
         </form>

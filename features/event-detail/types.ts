@@ -20,14 +20,12 @@ export interface User {
   event_id: string;
   name: string;
   comment: string;
-  password_digest: string;
   responses: Response[];
 }
 
 export interface EventData {
   id: string;
   title: string;
-  password_digest: string;
   comment: string;
   candidates: Candidate[];
   users: User[];

@@ -38,7 +38,14 @@ supabase.from('events').select(`*, candidates (*), users (*, responses (*))`)
 - **users**: id, event_id, name, comment, password_digest
 - **responses**: user_id, candidate_id, time, status（`"ok"` / `"maybe"` / `"ng"`）
 
-パスワードはクライアント側で `bcryptjs` によりハッシュ化してから Supabase に保存する。
+パスワードは作成時にクライアント側で `bcryptjs` によりハッシュ化してから Supabase に保存する（digest 保存）。**検証（照合）は DB 側の RPC 内で `pgcrypto` の `crypt()` により行い、`password_digest` はクライアントに一切配信しない**（events/users の当該列は anon から SELECT 権限を剥奪）。
+
+### RLS / セキュリティ方針
+
+- events / candidates / users / responses は **RLS 有効**。anon には read のみ許可し、**INSERT/UPDATE/DELETE ポリシーは付与しない**（直叩き write を全面封鎖）。
+- すべての write は **SECURITY DEFINER な RPC 経由**。パスワードが絡む操作は RPC 内で `crypt(平文, digest) = digest` により照合し、不一致なら例外を投げる。
+- 既存 digest は bcryptjs 製（`$2a$`/`$2b$`）で、`crypt()` でそのまま検証できる。
+- スキーマ・RLS・RPC は **supabase CLI のマイグレーション（`supabase/migrations/`）でバージョン管理**する。
 
 ### Supabase RPC 関数
 
@@ -46,6 +53,11 @@ supabase.from('events').select(`*, candidates (*), users (*, responses (*))`)
 
 - `create_event_with_candidates` — イベントと候補日をトランザクションで作成
 - `save_user_responses` — ユーザーと回答をまとめて保存
+- `update_event` — イベントのタイトル・コメントを更新（イベントパスワードで照合）
+- `update_user_with_responses` — 参加者情報と回答を更新・洗い替え（本人パスワードで照合）
+- `delete_event` — イベント一式を削除（イベントパスワードで照合）
+- `delete_user` — 参加者を削除（本人 or イベントパスワードのどちらかで照合）
+- `verify_user_password` — 編集ダイアログを開く前の事前検証（真偽を返す read 用途）
 
 ### 時刻の扱い
 
@@ -115,7 +127,8 @@ schedutch-v2/
 │   ├── layout/           # Header など共通レイアウト
 │   └── providers/        # ThemeProvider / QueryProvider
 ├── lib/                  # constants(TIME_OPTIONS) / utils(toJST等)
-└── utils/supabase/       # Supabase クライアント（シングルトン）
+├── utils/supabase/       # Supabase クライアント（シングルトン）
+└── supabase/             # supabase CLI（config.toml / migrations: スキーマ・RLS・RPC）
 ```
 
 feature 固有の Supabase アクセスは `features/{feature}/api/`、それを包む query/mutation hook は `features/{feature}/hooks/` に置く。トップの `hooks/` は複数 feature で共有する hook 専用。
@@ -178,8 +191,9 @@ Conventional Commits に従う。プレフィックスは英語、本文（説�
 ### データアクセス
 
 - Supabase への実アクセス（select / rpc / insert 等）は `features/{feature}/api/` の関数に集約し、コンポーネントから直接 `supabase` を呼ばない。api 関数は TanStack Query hook（`features/{feature}/hooks/`）から呼ぶ。
-- ミューテーションは Supabase RPC 経由（`create_event_with_candidates` / `save_user_responses`）。複数テーブルにまたがり整合性が必要な操作は RPC 化を優先する。
-- パスワードは**クライアントで `bcryptjs` によりハッシュ化してから**保存する。生パスワードを Supabase に送らない（ハッシュ化はコンポーネント側で行い、api 関数にはダイジェストを渡す）。
+- **write（作成・更新・削除）は全て Supabase RPC 経由**。RLS で直叩き write を封鎖しているため、`supabase.from(...).update()/.delete()/.insert()` をコンポーネントや api から直接呼ばない。
+- **パスワード検証はサーバー（RPC 内 `crypt()`）側で行う**。クライアントで `bcrypt.compare` しない。編集フローは、事前検証（`verify_user_password`）→ 検証済み平文を編集ダイアログへ引き回し → 更新 RPC が再検証、という流れ。RPC がパスワード不一致で投げた例外は `isPasswordError()`（`features/event-detail/api/eventApi.ts`）で判定してエラー表示にマッピングする。
+- パスワードは作成時に**クライアントで `bcryptjs` によりハッシュ化してから**保存する（生パスワードを保存しない）。照合は上記の通り DB 側。`password_digest` はクライアントに配信しない（型にも持たせない）。
 - 型の置き場: feature 固有なら `features/{feature}/types.ts`、複数 feature で共有するもののみ `lib/`。
 - 時刻は UTC 保存・表示時に `toJST()` で変換。時刻選択肢は `TIME_OPTIONS` を共通使用する。
 

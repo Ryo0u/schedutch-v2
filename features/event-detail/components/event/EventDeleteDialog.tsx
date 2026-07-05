@@ -4,59 +4,47 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { Input } from "@/components/ui/input";
 import { Field, FieldError } from "@/components/ui/field";
 import { Trash2 } from "lucide-react";
-import bcrypt from "bcryptjs";
 import { toast } from "sonner";
 import { useRouter } from 'next/navigation';
 import { useDeleteEvent } from "@/features/event-detail/hooks/useEventMutations";
+import { usePasswordConfirm } from "@/features/event-detail/hooks/usePasswordConfirm";
 
 interface DialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   data: {
     id: string;
-    password_digest: string;
   }
 }
 
 function EventDeleteDialog({ open, onOpenChange, data }: DialogProps) {
   const [ password, setPassword ] = useState<string>("");
-  const [ isDeleting, setIsDeleting ] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const router = useRouter();
   const deleteEvent = useDeleteEvent();
-  
+  const { isSubmitting, errorMsg, setErrorMsg, run } = usePasswordConfirm();
+
   useEffect(() => {
     if (!open) {
       // ダイアログが閉じられたら、ステートを初期値に戻す
       setPassword("");
       setErrorMsg(null);
-      setIsDeleting(false);
     }
-  }, [open]);
-  
+  }, [open, setErrorMsg]);
+
   const handleDelete = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsDeleting(true);
-    const isMatch = await bcrypt.compare(password, data.password_digest)
-    
-    if (isMatch) {
-      try {
-        await deleteEvent.mutateAsync(data.id);
 
+    try {
+      const success = await run(() => deleteEvent.mutateAsync({ eventId: data.id, password }));
+      if (success) {
         toast.success("イベントを削除しました", {position: 'top-center'})
         router.push("/")
-
-      } catch (error) {
-        toast.error("イベントの削除に失敗しました", {position: 'top-center'})
-        console.log("failed to delete event", error)
-        
-        onOpenChange(false);
       }
-    } else {
-      setErrorMsg("パスワードが正しくありません");
+    } catch (error) {
+      toast.error("イベントの削除に失敗しました", {position: 'top-center'})
+      console.log("failed to delete event", error)
+      onOpenChange(false);
     }
-    
-    setIsDeleting(false);
   }
   
   return (
@@ -84,7 +72,7 @@ function EventDeleteDialog({ open, onOpenChange, data }: DialogProps) {
           </Field>
           <DialogFooter>
             <DialogClose render={<Button type="button" variant="outline">キャンセル</Button>}></DialogClose>
-            <Button type="submit" variant="destructive" disabled={isDeleting}>{isDeleting ? "削除中..." : "削除する"}</Button>
+            <Button type="submit" variant="destructive" disabled={isSubmitting}>{isSubmitting ? "削除中..." : "削除する"}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

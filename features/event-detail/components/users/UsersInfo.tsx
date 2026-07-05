@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react";
-import { MessageCircle, Pencil, UserCircle } from "lucide-react";
+import { MessageCircle, Pencil, Trash2, UserCircle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDeviceType } from "@/hooks/UseDeviceType";
 import { Popover, PopoverContent, PopoverDescription, PopoverHeader, PopoverTitle, PopoverTrigger } from "@/components/ui/popover";
@@ -9,8 +9,9 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { User } from "@/features/event-detail/types";
 import { useEvent } from "@/features/event-detail/hooks/useEvent";
-import UsersPasswordDialog from "./UsersPasswordDialog";
+import UsersEditPasswordDialog from "./UsersEditPasswordDialog";
 import UsersEditDialog from "./UsersEditDialog";
+import UserDeleteDialog from "./UserDeleteDialog";
 
 interface UsersInfoProps {
   eventId: string;
@@ -48,8 +49,11 @@ function UserComment({ comment }: { comment: string }) {
 function UsersInfo({ eventId }: UsersInfoProps) {
   const { data } = useEvent(eventId);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [confirmedPassword, setConfirmedPassword] = useState("");
   const [passwordOpen, setPasswordOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [deletingUser, setDeletingUser] = useState<User | null>(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   const handleEditClick = (user: User) => {
     setEditingUser(user);
@@ -62,14 +66,29 @@ function UsersInfo({ eventId }: UsersInfoProps) {
     if (!open) setEditingUser(null);
   };
 
-  const handlePasswordConfirm = () => {
+  // 検証済みの平文パスワードを保持し、編集ダイアログでの再検証に渡す
+  const handlePasswordConfirm = (password: string) => {
+    setConfirmedPassword(password);
     setPasswordOpen(false);
     setEditOpen(true);
   };
 
   const handleEditOpenChange = (open: boolean) => {
     setEditOpen(open);
-    if (!open) setEditingUser(null);
+    if (!open) {
+      setEditingUser(null);
+      setConfirmedPassword("");
+    }
+  };
+
+  const handleDeleteClick = (user: User) => {
+    setDeletingUser(user);
+    setDeleteOpen(true);
+  };
+
+  const handleDeleteOpenChange = (open: boolean) => {
+    setDeleteOpen(open);
+    if (!open) setDeletingUser(null);
   };
 
   const getUserColor = (name: string) => {
@@ -136,13 +155,22 @@ function UsersInfo({ eventId }: UsersInfoProps) {
                 </div>
               </div>
 
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleEditClick(user)}
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleEditClick(user)}
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleDeleteClick(user)}
+                >
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+              </div>
             </div>
           ))}
         </div>
@@ -150,18 +178,29 @@ function UsersInfo({ eventId }: UsersInfoProps) {
 
       {editingUser && (
         <>
-          <UsersPasswordDialog
+          <UsersEditPasswordDialog
             data={{ user: editingUser }}
             open={passwordOpen}
             onOpenChange={handlePasswordOpenChange}
             onConfirm={handlePasswordConfirm}
           />
           <UsersEditDialog
+            eventId={eventId}
             data={{ user: editingUser, candidates: data.candidates }}
+            password={confirmedPassword}
             open={editOpen}
             onOpenChange={handleEditOpenChange}
           />
         </>
+      )}
+
+      {deletingUser && (
+        <UserDeleteDialog
+          eventId={eventId}
+          data={{ user: deletingUser }}
+          open={deleteOpen}
+          onOpenChange={handleDeleteOpenChange}
+        />
       )}
     </Card>
   );

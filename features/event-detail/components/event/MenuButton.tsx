@@ -58,7 +58,7 @@ function MenuButton({ eventId }: MenuProps) {
       </DropdownMenu>
     
       {actionType === "eventEdit" && (
-        <EventEditDialog open={isOpen} onOpenChange={setIsOpen} />
+        <EventEditDialog eventId={eventId} data={data} open={isOpen} onOpenChange={setIsOpen} />
       )}
       {actionType === "eventShare" && (
         <EventShareDialog open={isOpen} onOpenChange={setIsOpen}/>
@@ -67,7 +67,7 @@ function MenuButton({ eventId }: MenuProps) {
         <EventDeleteDialog data={data} open={isOpen} onOpenChange={setIsOpen} />
       )}
       {actionType === "usersDelete" && (
-        <UsersDeleteDialog data={data} open={isOpen} onOpenChange={setIsOpen} />
+        <UsersDeleteDialog eventId={eventId} data={data} open={isOpen} onOpenChange={setIsOpen} />
       )}
     
     </>
