@@ -48,6 +48,7 @@ function UserComment({ comment }: { comment: string }) {
 function UsersInfo({ eventId }: UsersInfoProps) {
   const { data } = useEvent(eventId);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [confirmedPassword, setConfirmedPassword] = useState("");
   const [passwordOpen, setPasswordOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
 
@@ -62,14 +63,19 @@ function UsersInfo({ eventId }: UsersInfoProps) {
     if (!open) setEditingUser(null);
   };
 
-  const handlePasswordConfirm = () => {
+  // 検証済みの平文パスワードを保持し、編集ダイアログでの再検証に渡す
+  const handlePasswordConfirm = (password: string) => {
+    setConfirmedPassword(password);
     setPasswordOpen(false);
     setEditOpen(true);
   };
 
   const handleEditOpenChange = (open: boolean) => {
     setEditOpen(open);
-    if (!open) setEditingUser(null);
+    if (!open) {
+      setEditingUser(null);
+      setConfirmedPassword("");
+    }
   };
 
   const getUserColor = (name: string) => {
@@ -158,6 +164,7 @@ function UsersInfo({ eventId }: UsersInfoProps) {
           />
           <UsersEditDialog
             data={{ user: editingUser, candidates: data.candidates }}
+            password={confirmedPassword}
             open={editOpen}
             onOpenChange={handleEditOpenChange}
           />

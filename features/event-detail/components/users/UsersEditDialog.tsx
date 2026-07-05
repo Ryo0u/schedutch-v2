@@ -21,6 +21,8 @@ interface UsersEditDialogProps {
     user: Pick<User, "id" | "name" | "comment" | "responses">;
     candidates: Pick<Candidate, "id" | "start_time" | "end_time">[];
   };
+  /** 事前検証済みの平文パスワード。更新 RPC が再検証する */
+  password: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -37,7 +39,7 @@ const EditFormSchema = z.object({
 
 type EditFormData = z.infer<typeof EditFormSchema>;
 
-function UsersEditDialog({ data, open, onOpenChange }: UsersEditDialogProps) {
+function UsersEditDialog({ data, password, open, onOpenChange }: UsersEditDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const params = useParams();
   const eventId = params.id as string;
@@ -74,6 +76,7 @@ function UsersEditDialog({ data, open, onOpenChange }: UsersEditDialogProps) {
 
       await updateUser.mutateAsync({
         userId: data.user.id,
+        password,
         name: values.name,
         comment: values.comment,
         responses: formattedResponses,

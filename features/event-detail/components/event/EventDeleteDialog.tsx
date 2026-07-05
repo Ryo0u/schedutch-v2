@@ -4,17 +4,16 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { Input } from "@/components/ui/input";
 import { Field, FieldError } from "@/components/ui/field";
 import { Trash2 } from "lucide-react";
-import bcrypt from "bcryptjs";
 import { toast } from "sonner";
 import { useRouter } from 'next/navigation';
 import { useDeleteEvent } from "@/features/event-detail/hooks/useEventMutations";
+import { isPasswordError } from "@/features/event-detail/api/eventApi";
 
 interface DialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   data: {
     id: string;
-    password_digest: string;
   }
 }
 
@@ -37,25 +36,23 @@ function EventDeleteDialog({ open, onOpenChange, data }: DialogProps) {
   const handleDelete = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsDeleting(true);
-    const isMatch = await bcrypt.compare(password, data.password_digest)
-    
-    if (isMatch) {
-      try {
-        await deleteEvent.mutateAsync(data.id);
+    setErrorMsg(null);
 
-        toast.success("イベントを削除しました", {position: 'top-center'})
-        router.push("/")
+    try {
+      await deleteEvent.mutateAsync({ eventId: data.id, password });
 
-      } catch (error) {
+      toast.success("イベントを削除しました", {position: 'top-center'})
+      router.push("/")
+    } catch (error) {
+      if (isPasswordError(error)) {
+        setErrorMsg("パスワードが正しくありません");
+      } else {
         toast.error("イベントの削除に失敗しました", {position: 'top-center'})
         console.log("failed to delete event", error)
-        
         onOpenChange(false);
       }
-    } else {
-      setErrorMsg("パスワードが正しくありません");
     }
-    
+
     setIsDeleting(false);
   }
   

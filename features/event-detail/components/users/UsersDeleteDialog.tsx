@@ -5,14 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Field, FieldError, FieldLabel, FieldSet } from "@/components/ui/field";
 import { Trash2 } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import bcrypt from "bcryptjs";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
 import { useDeleteUser } from "@/features/event-detail/hooks/useEventMutations";
+import { isPasswordError } from "@/features/event-detail/api/eventApi";
 
 interface DialogProps {
   data: {
-    password_digest: string;
     users: {
       id: string;
       name: string;
@@ -40,26 +39,25 @@ function UsersDeleteDialog({ data, open, onOpenChange }: DialogProps) {
   
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!userId) return;
     setIsDeleting(true);
-    
-    const isMatch = await bcrypt.compare(password, data.password_digest)
-    
-    if (isMatch && userId) {
-      try {
-        await deleteUser.mutateAsync(userId);
+    setErrorMsg(null);
 
-        toast.success("参加者を削除しました", {position: 'top-center'})
+    try {
+      await deleteUser.mutateAsync({ userId, password });
 
-      } catch (error) {
+      toast.success("参加者を削除しました", {position: 'top-center'})
+      onOpenChange(false);
+    } catch (error) {
+      if (isPasswordError(error)) {
+        setErrorMsg("パスワードが間違っています")
+      } else {
         console.log("failed to delete user", error)
         toast.error("参加者の削除に失敗しました", {position: 'top-center'})
+        onOpenChange(false);
       }
-      
-      onOpenChange(false);
-    } else {
-      setErrorMsg("パスワードが間違っています")
     }
-    
+
     setIsDeleting(false);
   }
   

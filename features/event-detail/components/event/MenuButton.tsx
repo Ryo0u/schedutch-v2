@@ -58,7 +58,7 @@ function MenuButton({ eventId }: MenuProps) {
       </DropdownMenu>
     
       {actionType === "eventEdit" && (
-        <EventEditDialog open={isOpen} onOpenChange={setIsOpen} />
+        <EventEditDialog data={data} open={isOpen} onOpenChange={setIsOpen} />
       )}
       {actionType === "eventShare" && (
         <EventShareDialog open={isOpen} onOpenChange={setIsOpen}/>

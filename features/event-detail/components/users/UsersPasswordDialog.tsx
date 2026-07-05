@@ -5,19 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import bcrypt from "bcryptjs";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
 import type { User } from "@/features/event-detail/types";
 import { useDeleteUser } from "@/features/event-detail/hooks/useEventMutations";
+import { isPasswordError, verifyUserPassword } from "@/features/event-detail/api/eventApi";
 
 interface UsersPasswordDialogProps {
   data: {
-    user: Pick<User, "id" | "name" | "password_digest">;
+    user: Pick<User, "id" | "name">;
   };
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: () => void;
+  /** 検証済みの平文パスワードを親へ渡す（編集ダイアログでの再検証に使う） */
+  onConfirm: (password: string) => void;
 }
 
 function UsersPasswordDialog({ data, open, onOpenChange, onConfirm }: UsersPasswordDialogProps) {
@@ -32,21 +33,25 @@ function UsersPasswordDialog({ data, open, onOpenChange, onConfirm }: UsersPassw
     setIsChecking(true);
     setErrorMsg(null);
 
-    const isMatch = await bcrypt.compare(password, data.user.password_digest);
-    if (!isMatch) {
-      setErrorMsg("パスワードが間違っています");
-      setIsChecking(false);
-      return;
-    }
-
-    if (action === "edit") {
-      onConfirm();
-    } else {
-      try {
-        await deleteUser.mutateAsync(data.user.id);
+    try {
+      if (action === "edit") {
+        // 編集ダイアログを開く前にサーバー側で事前検証する
+        const isMatch = await verifyUserPassword(data.user.id, password);
+        if (!isMatch) {
+          setErrorMsg("パスワードが間違っています");
+        } else {
+          onConfirm(password);
+        }
+      } else {
+        // 削除は RPC 内で照合し、不一致なら例外を投げる
+        await deleteUser.mutateAsync({ userId: data.user.id, password });
         toast.success("回答を削除しました", { position: "top-center" });
         onOpenChange(false);
-      } catch {
+      }
+    } catch (error) {
+      if (isPasswordError(error)) {
+        setErrorMsg("パスワードが間違っています");
+      } else {
         toast.error("削除に失敗しました", { position: "top-center" });
       }
     }
