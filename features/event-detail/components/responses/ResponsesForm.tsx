@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import InputResponses from '../form/InputResponses';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { hashPassword } from '@/lib/utils';
+import { hashPassword } from '@/lib/password';
 import { useParams } from 'next/navigation';
 import { Candidate } from '@/features/event-detail/types';
 import { UserFormData, UserFormSchema } from '@/features/event-detail/schema';

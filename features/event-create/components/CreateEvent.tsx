@@ -7,7 +7,8 @@ import { toast } from "sonner"
 import { useState } from 'react';
 import CreatedDialog from './CreatedDialog';
 import { Spinner } from '@/components/ui/spinner';
-import { hashPassword, jstWallTimeToISO } from '@/lib/utils';
+import { jstWallTimeToISO } from '@/lib/utils';
+import { hashPassword } from '@/lib/password';
 import { useCreateEvent } from '@/features/event-create/hooks/useCreateEvent';
 
 interface CreateEventActionProps {
