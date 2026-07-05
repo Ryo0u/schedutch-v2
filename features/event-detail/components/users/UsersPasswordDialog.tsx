@@ -29,25 +29,34 @@ function UsersPasswordDialog({ data, open, onOpenChange, onConfirm }: UsersPassw
   const eventId = params.id as string;
   const deleteUser = useDeleteUser(eventId);
 
-  const handleAction = async (action: "edit" | "delete") => {
+  // 編集ダイアログを開く前にサーバー側で事前検証する
+  const handleEdit = async () => {
     setIsChecking(true);
     setErrorMsg(null);
 
     try {
-      if (action === "edit") {
-        // 編集ダイアログを開く前にサーバー側で事前検証する
-        const isMatch = await verifyUserPassword(data.user.id, password);
-        if (!isMatch) {
-          setErrorMsg("パスワードが間違っています");
-        } else {
-          onConfirm(password);
-        }
+      const isMatch = await verifyUserPassword(data.user.id, password);
+      if (!isMatch) {
+        setErrorMsg("パスワードが間違っています");
       } else {
-        // 削除は RPC 内で照合し、不一致なら例外を投げる
-        await deleteUser.mutateAsync({ userId: data.user.id, password });
-        toast.success("回答を削除しました", { position: "top-center" });
-        onOpenChange(false);
+        onConfirm(password);
       }
+    } catch {
+      toast.error("確認に失敗しました", { position: "top-center" });
+    }
+
+    setIsChecking(false);
+  };
+
+  // 削除は RPC 内で照合し、不一致なら例外を投げる
+  const handleDelete = async () => {
+    setIsChecking(true);
+    setErrorMsg(null);
+
+    try {
+      await deleteUser.mutateAsync({ userId: data.user.id, password });
+      toast.success("回答を削除しました", { position: "top-center" });
+      onOpenChange(false);
     } catch (error) {
       if (isPasswordError(error)) {
         setErrorMsg("パスワードが間違っています");
@@ -70,7 +79,7 @@ function UsersPasswordDialog({ data, open, onOpenChange, onConfirm }: UsersPassw
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent>
-        <form onSubmit={(e) => { e.preventDefault(); handleAction("edit"); }}>
+        <form onSubmit={(e) => { e.preventDefault(); handleEdit(); }}>
           <DialogHeader className="mb-5">
             <DialogTitle className="text-center text-xl font-bold">パスワードを確認</DialogTitle>
             <DialogDescription className="text-center">
@@ -94,7 +103,7 @@ function UsersPasswordDialog({ data, open, onOpenChange, onConfirm }: UsersPassw
               type="button"
               variant="destructive"
               disabled={isChecking || !password}
-              onClick={() => handleAction("delete")}
+              onClick={handleDelete}
             >
               削除する
             </Button>
