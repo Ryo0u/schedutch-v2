@@ -5,12 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Field, FieldError, FieldLabel, FieldSet } from "@/components/ui/field";
 import { Trash2 } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useParams } from "next/navigation";
 import { toast } from "sonner";
 import { useDeleteUser } from "@/features/event-detail/hooks/useEventMutations";
 import { isPasswordError } from "@/features/event-detail/api/eventApi";
 
 interface DialogProps {
+  eventId: string;
   data: {
     users: {
       id: string;
@@ -21,13 +21,11 @@ interface DialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-function UsersDeleteDialog({ data, open, onOpenChange }: DialogProps) {
+function UsersDeleteDialog({ eventId, data, open, onOpenChange }: DialogProps) {
   const [ password, setPassword ] = useState("");
   const [ userId, setUserId ] = useState("");
   const [ isDeleting, setIsDeleting ] = useState(false);
   const [ errorMsg, setErrorMsg ] = useState<string | null>(null);
-  const params = useParams();
-  const eventId = params.id as string;
   const deleteUser = useDeleteUser(eventId);
   
   useEffect(() => {

@@ -10,12 +10,12 @@ import InputResponses from '../form/InputResponses';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { hashPassword } from '@/lib/password';
-import { useParams } from 'next/navigation';
 import { Candidate } from '@/features/event-detail/types';
 import { UserFormData, UserFormSchema } from '@/features/event-detail/schema';
 import { useSaveResponses } from '@/features/event-detail/hooks/useEventMutations';
 
 interface ResposesFromProps {
+  eventId: string;
   data: {
     candidates: Pick<Candidate, "id" | "start_time" | "end_time">[];
   };
@@ -23,7 +23,7 @@ interface ResposesFromProps {
   onOpenChange: (open: boolean) => void;
 }
 
-function ResponsesForm({ data, open, onOpenChange }: ResposesFromProps) {
+function ResponsesForm({ eventId, data, open, onOpenChange }: ResposesFromProps) {
   const form = useForm<z.infer<typeof UserFormSchema>>({
     resolver: zodResolver(UserFormSchema),
     defaultValues: {
@@ -33,9 +33,7 @@ function ResponsesForm({ data, open, onOpenChange }: ResposesFromProps) {
       responses: [],
     }
   })
-  
-  const params = useParams();
-  const eventId = params.id as string;
+
   const saveResponses = useSaveResponses(eventId);
 
   // responsesの初期化

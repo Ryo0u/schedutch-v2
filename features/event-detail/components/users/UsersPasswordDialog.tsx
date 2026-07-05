@@ -5,13 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { useParams } from "next/navigation";
 import { toast } from "sonner";
 import type { User } from "@/features/event-detail/types";
 import { useDeleteUser } from "@/features/event-detail/hooks/useEventMutations";
 import { isPasswordError, verifyUserPassword } from "@/features/event-detail/api/eventApi";
 
 interface UsersPasswordDialogProps {
+  eventId: string;
   data: {
     user: Pick<User, "id" | "name">;
   };
@@ -21,12 +21,10 @@ interface UsersPasswordDialogProps {
   onConfirm: (password: string) => void;
 }
 
-function UsersPasswordDialog({ data, open, onOpenChange, onConfirm }: UsersPasswordDialogProps) {
+function UsersPasswordDialog({ eventId, data, open, onOpenChange, onConfirm }: UsersPasswordDialogProps) {
   const [password, setPassword] = useState("");
   const [isChecking, setIsChecking] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const params = useParams();
-  const eventId = params.id as string;
   const deleteUser = useDeleteUser(eventId);
 
   // 編集ダイアログを開く前にサーバー側で事前検証する

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -14,6 +13,7 @@ import { useUpdateEvent } from "@/features/event-detail/hooks/useEventMutations"
 import { isPasswordError } from "@/features/event-detail/api/eventApi";
 
 interface DialogProps {
+  eventId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   data: {
@@ -31,10 +31,8 @@ const EditEventFormSchema = z.object({
 
 type EditEventFormData = z.infer<typeof EditEventFormSchema>;
 
-function EventEditDialog({ open, onOpenChange, data }: DialogProps) {
+function EventEditDialog({ eventId, open, onOpenChange, data }: DialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const params = useParams();
-  const eventId = params.id as string;
   const updateEvent = useUpdateEvent(eventId);
 
   const form = useForm<EditEventFormData>({

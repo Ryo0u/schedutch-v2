@@ -25,7 +25,7 @@ export default function JoinButton({ eventId }: JoinButtonProps) {
         予定を回答する
       </Button>
 
-      <ResponsesForm data={data} open={isOpen} onOpenChange={setIsOpen} />
+      <ResponsesForm eventId={eventId} data={data} open={isOpen} onOpenChange={setIsOpen} />
     </>
   );
 }

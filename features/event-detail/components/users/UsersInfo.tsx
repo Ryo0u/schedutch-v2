@@ -157,12 +157,14 @@ function UsersInfo({ eventId }: UsersInfoProps) {
       {editingUser && (
         <>
           <UsersPasswordDialog
+            eventId={eventId}
             data={{ user: editingUser }}
             open={passwordOpen}
             onOpenChange={handlePasswordOpenChange}
             onConfirm={handlePasswordConfirm}
           />
           <UsersEditDialog
+            eventId={eventId}
             data={{ user: editingUser, candidates: data.candidates }}
             password={confirmedPassword}
             open={editOpen}

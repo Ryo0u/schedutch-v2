@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -17,6 +16,7 @@ import type { Candidate, User } from '@/features/event-detail/types';
 import { useUpdateUser } from '@/features/event-detail/hooks/useEventMutations';
 
 interface UsersEditDialogProps {
+  eventId: string;
   data: {
     user: Pick<User, "id" | "name" | "comment" | "responses">;
     candidates: Pick<Candidate, "id" | "start_time" | "end_time">[];
@@ -39,10 +39,8 @@ const EditFormSchema = z.object({
 
 type EditFormData = z.infer<typeof EditFormSchema>;
 
-function UsersEditDialog({ data, password, open, onOpenChange }: UsersEditDialogProps) {
+function UsersEditDialog({ eventId, data, password, open, onOpenChange }: UsersEditDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const params = useParams();
-  const eventId = params.id as string;
   const updateUser = useUpdateUser(eventId);
 
   const form = useForm<EditFormData>({
