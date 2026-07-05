@@ -16,6 +16,15 @@ export function isPasswordError(error: unknown): boolean {
   return false;
 }
 
+/**
+ * パスワード不一致を表す例外を生成する。
+ * verifyUserPassword のように RPC の例外ではなく真偽値でパスワード不一致を
+ * 表す関数の呼び出し元で、isPasswordError による分類に載せたい場合に使う。
+ */
+export function createPasswordMismatchError(): Error & { code: string } {
+  return Object.assign(new Error("パスワードが違います"), { code: PASSWORD_MISMATCH_ERRCODE });
+}
+
 /** 編集ダイアログを開く前の事前検証。ユーザー本人のパスワードが正しいかを返す */
 export async function verifyUserPassword(userId: string, password: string): Promise<boolean> {
   const { data, error } = await supabase.rpc("verify_user_password", {

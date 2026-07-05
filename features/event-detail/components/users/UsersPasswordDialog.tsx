@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import type { User } from "@/features/event-detail/types";
 import { useDeleteUser } from "@/features/event-detail/hooks/useEventMutations";
-import { isPasswordError, verifyUserPassword } from "@/features/event-detail/api/eventApi";
+import { usePasswordConfirm } from "@/features/event-detail/hooks/usePasswordConfirm";
+import { createPasswordMismatchError, verifyUserPassword } from "@/features/event-detail/api/eventApi";
 
 interface UsersPasswordDialogProps {
   eventId: string;
@@ -23,47 +24,33 @@ interface UsersPasswordDialogProps {
 
 function UsersPasswordDialog({ eventId, data, open, onOpenChange, onConfirm }: UsersPasswordDialogProps) {
   const [password, setPassword] = useState("");
-  const [isChecking, setIsChecking] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const deleteUser = useDeleteUser(eventId);
+  const { isSubmitting, errorMsg, setErrorMsg, run } = usePasswordConfirm();
 
   // 編集ダイアログを開く前にサーバー側で事前検証する
   const handleEdit = async () => {
-    setIsChecking(true);
-    setErrorMsg(null);
-
     try {
-      const isMatch = await verifyUserPassword(data.user.id, password);
-      if (!isMatch) {
-        setErrorMsg("パスワードが間違っています");
-      } else {
-        onConfirm(password);
-      }
+      const success = await run(async () => {
+        const isMatch = await verifyUserPassword(data.user.id, password);
+        if (!isMatch) throw createPasswordMismatchError();
+      });
+      if (success) onConfirm(password);
     } catch {
       toast.error("確認に失敗しました", { position: "top-center" });
     }
-
-    setIsChecking(false);
   };
 
   // 削除は RPC 内で照合し、不一致なら例外を投げる
   const handleDelete = async () => {
-    setIsChecking(true);
-    setErrorMsg(null);
-
     try {
-      await deleteUser.mutateAsync({ userId: data.user.id, password });
-      toast.success("回答を削除しました", { position: "top-center" });
-      onOpenChange(false);
-    } catch (error) {
-      if (isPasswordError(error)) {
-        setErrorMsg("パスワードが間違っています");
-      } else {
-        toast.error("削除に失敗しました", { position: "top-center" });
+      const success = await run(() => deleteUser.mutateAsync({ userId: data.user.id, password }));
+      if (success) {
+        toast.success("回答を削除しました", { position: "top-center" });
+        onOpenChange(false);
       }
+    } catch {
+      toast.error("削除に失敗しました", { position: "top-center" });
     }
-
-    setIsChecking(false);
   };
 
   const handleOpenChange = (open: boolean) => {
@@ -100,15 +87,15 @@ function UsersPasswordDialog({ eventId, data, open, onOpenChange, onConfirm }: U
             <Button
               type="button"
               variant="destructive"
-              disabled={isChecking || !password}
+              disabled={isSubmitting || !password}
               onClick={handleDelete}
             >
               削除する
             </Button>
             <div className="flex gap-2">
               <DialogClose render={<Button type="button" variant="outline">キャンセル</Button>} />
-              <Button type="submit" disabled={isChecking || !password}>
-                {isChecking ? "確認中..." : "編集する"}
+              <Button type="submit" disabled={isSubmitting || !password}>
+                {isSubmitting ? "確認中..." : "編集する"}
               </Button>
             </div>
           </DialogFooter>
