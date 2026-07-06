@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
-import ResponsesForm from './ResponsesForm';
+import ResponsesDialog from './ResponsesDialog';
 import { useEvent } from '@/features/event-detail/hooks/useEvent';
 
 interface JoinButtonProps {
@@ -25,7 +25,7 @@ export default function JoinButton({ eventId }: JoinButtonProps) {
         予定を回答する
       </Button>
 
-      <ResponsesForm eventId={eventId} data={data} open={isOpen} onOpenChange={setIsOpen} />
+      <ResponsesDialog eventId={eventId} data={data} open={isOpen} onOpenChange={setIsOpen} />
     </>
   );
 }

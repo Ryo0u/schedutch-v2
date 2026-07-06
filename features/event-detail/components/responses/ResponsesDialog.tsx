@@ -15,7 +15,7 @@ import { UserFormData, UserFormSchema } from '@/features/event-detail/schema';
 import { useSaveResponses } from '@/features/event-detail/hooks/useEventMutations';
 import { buildInitialResponses, toResponseInputs } from '@/features/event-detail/lib/responses';
 
-interface ResposesFromProps {
+interface ResponsesDialogProps {
   eventId: string;
   data: {
     candidates: Pick<Candidate, "id" | "start_time" | "end_time">[];
@@ -24,7 +24,7 @@ interface ResposesFromProps {
   onOpenChange: (open: boolean) => void;
 }
 
-function ResponsesForm({ eventId, data, open, onOpenChange }: ResposesFromProps) {
+function ResponsesDialog({ eventId, data, open, onOpenChange }: ResponsesDialogProps) {
   const form = useForm<z.infer<typeof UserFormSchema>>({
     resolver: zodResolver(UserFormSchema),
     defaultValues: {
@@ -102,4 +102,4 @@ function ResponsesForm({ eventId, data, open, onOpenChange }: ResposesFromProps)
   )
 }
 
-export default ResponsesForm
+export default ResponsesDialog
