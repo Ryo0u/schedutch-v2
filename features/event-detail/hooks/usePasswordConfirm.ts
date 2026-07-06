@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { isPasswordError } from "@/features/event-detail/api/eventApi";
+import { isPasswordError } from "@/features/event-detail/api/errors";
 
 /**
  * パスワードを伴う操作（削除・事前検証など）の送信中フラグとエラー表示をまとめたフック。
