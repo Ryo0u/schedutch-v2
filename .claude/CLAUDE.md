@@ -104,13 +104,14 @@ schedutch-v2/
 │   │   └── index.ts       # barrel
 │   ├── event-detail/     # 閲覧・回答機能（/event/[id]）
 │   │   ├── components/   # 直下: EventContainer(親) / EventSkeleton
-│   │   │   ├── event/        # EventInfo, MenuButton, Event{Edit,Delete,Share}Dialog
-│   │   │   ├── users/        # UsersInfo, Users{Edit,Delete,Password}Dialog
-│   │   │   ├── responses/    # ResponsesForm, ResponsesInfo, JoinButton
+│   │   │   ├── event/        # EventInfo, MenuButton, EventEditDialog, EventDeleteDialog, EventShareDialog
+│   │   │   ├── users/        # UsersInfo, UsersEditDialog, UsersEditPasswordDialog, SelectUserDeleteDialog（一覧から選んで削除）, UserDeleteDialog（対象確定済みの削除）
+│   │   │   ├── responses/    # ResponsesDialog, ResponsesInfo, JoinButton
 │   │   │   ├── extract/      # ExtractResponses
-│   │   │   └── form/         # InputResponses, InputUserInfo（users/responses共有）
+│   │   │   ├── form/         # InputResponses, InputUserInfo（users/responses共有）
+│   │   │   └── shared/       # DeleteDialogShell（削除ダイアログ共通骨格。presentational）
 │   │   ├── api/          # Supabase アクセス（eventApi.ts / errors.ts）
-│   │   ├── hooks/        # TanStack Query hook（useEvent / useEventMutations）
+│   │   ├── hooks/        # TanStack Query hook（useEvent / useEventMutations）＋ usePasswordConfirm / useResetOnOpen（ダイアログopen時のreset定型）
 │   │   ├── lib/          # pure関数（status.ts: 回答ステータス表示定義 / responses.ts: 回答データ整形 / validation.ts: バリデーション文言）
 │   │   ├── schema.ts     # 回答フォームの型・zodスキーマ
 │   │   ├── types.ts      # EventData など固有の型

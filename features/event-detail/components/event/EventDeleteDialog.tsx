@@ -1,13 +1,12 @@
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "@/components/ui/dialog";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Field, FieldError } from "@/components/ui/field";
-import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from 'next/navigation';
 import { useDeleteEvent } from "@/features/event-detail/hooks/useEventMutations";
 import { usePasswordConfirm } from "@/features/event-detail/hooks/usePasswordConfirm";
+import { useResetOnOpen } from "@/features/event-detail/hooks/useResetOnOpen";
+import DeleteDialogShell from "@/features/event-detail/components/shared/DeleteDialogShell";
 
 interface DialogProps {
   open: boolean;
@@ -23,13 +22,10 @@ function EventDeleteDialog({ open, onOpenChange, data }: DialogProps) {
   const deleteEvent = useDeleteEvent();
   const { isSubmitting, errorMsg, setErrorMsg, run } = usePasswordConfirm();
 
-  useEffect(() => {
-    if (!open) {
-      // ダイアログが閉じられたら、ステートを初期値に戻す
-      setPassword("");
-      setErrorMsg(null);
-    }
-  }, [open, setErrorMsg]);
+  useResetOnOpen(open, () => {
+    setPassword("");
+    setErrorMsg(null);
+  });
 
   const handleDelete = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -46,37 +42,27 @@ function EventDeleteDialog({ open, onOpenChange, data }: DialogProps) {
       onOpenChange(false);
     }
   }
-  
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <form onSubmit={handleDelete}>
-          <DialogHeader className="mb-5">
-            <DialogTitle className="flex flex-col justify-center items-center gap-3 text-destructive">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-destructive/10">
-                <Trash2 className="h-5 w-5" />
-              </div>
-              <span className="text-xl font-bold">イベントを削除する</span>
-            </DialogTitle>
-            <DialogDescription className="text-center">編集用パスワードを入力してください</DialogDescription>
-          </DialogHeader>
-          <Field className="mb-5">
-            <Input
-              autoFocus
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="......."
-              aria-invalid={!!errorMsg}
-            />
-            {errorMsg && <FieldError errors={[{ message: errorMsg }]}/>}
-          </Field>
-          <DialogFooter>
-            <DialogClose render={<Button type="button" variant="outline">キャンセル</Button>}></DialogClose>
-            <Button type="submit" variant="destructive" disabled={isSubmitting}>{isSubmitting ? "削除中..." : "削除する"}</Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <DeleteDialogShell
+      open={open}
+      onOpenChange={onOpenChange}
+      title="イベントを削除する"
+      description="編集用パスワードを入力してください"
+      onSubmit={handleDelete}
+      isSubmitting={isSubmitting}
+    >
+      <Field className="mb-5">
+        <Input
+          autoFocus
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="......."
+          aria-invalid={!!errorMsg}
+        />
+        {errorMsg && <FieldError errors={[{ message: errorMsg }]}/>}
+      </Field>
+    </DeleteDialogShell>
   )
 }
 
