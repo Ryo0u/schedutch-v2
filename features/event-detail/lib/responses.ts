@@ -1,4 +1,5 @@
 import { SLOT_INTERVAL_MS } from "@/lib/constants";
+import { jstHHMM } from "@/lib/datetime";
 import type { ResponseInput } from "@/features/event-detail/api/eventApi";
 import type { Candidate } from "@/features/event-detail/types";
 
@@ -39,4 +40,18 @@ export function toResponseInputs(responses: ResponseFormValue[]): ResponseInput[
     time: r.time.toISOString(),
     status: r.status,
   }));
+}
+
+/** 回答フィールド配列を「candidate_id-HHmm」キーのマップに変換する（InputResponsesのセル検索用） */
+export function buildResponseSlotMap<T extends { candidate_id: string; time: Date }>(
+  fields: T[]
+): Record<string, T & { index: number }> {
+  return fields.reduce(
+    (acc, field, index) => {
+      const hhmm = jstHHMM(field.time);
+      acc[`${field.candidate_id}-${hhmm}`] = { ...field, index };
+      return acc;
+    },
+    {} as Record<string, T & { index: number }>
+  );
 }
