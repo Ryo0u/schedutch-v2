@@ -4,7 +4,8 @@ import { useState } from "react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
 import { jstHHMM, formatJSTDate } from "@/lib/datetime";
-import type { Candidate } from "@/features/event-detail/types";
+import { RESPONSE_STATUSES, STATUS_META } from "@/features/event-detail/lib/status";
+import type { Candidate, ResponseStatus } from "@/features/event-detail/types";
 
 type SlotInfo = {
   id: string;
@@ -31,7 +32,7 @@ function InputResponses<T extends FormWithResponses>({ control, data }: InputRes
     name: "responses",
   });
   
-  const [ currentState, setCurrentState ] = useState<"ok" | "maybe" | "ng">("ok");
+  const [ currentState, setCurrentState ] = useState<ResponseStatus>("ok");
   const isSelected = (value: string) => currentState === value;
   
   const [ isDragging, setIsDragging ] = useState(false);
@@ -86,32 +87,20 @@ function InputResponses<T extends FormWithResponses>({ control, data }: InputRes
     >
       <div className="sticky right-0 top-0 z-40 mb-2 flex justify-end">
         <ToggleGroup size="sm" spacing={2} variant="outline">
-          <ToggleGroupItem
-            value="ok"
-            onClick={() => setCurrentState("ok")}
-            className={cn("bg-background", isSelected("ok") && "border-blue-400! text-blue-400!")}
-          >
-            <span className="sm:hidden">⚫︎</span>
-            <span className="hidden sm:inline">参加（⚫︎）</span>
-          </ToggleGroupItem>
-
-          <ToggleGroupItem
-            value="maybe"
-            onClick={() => setCurrentState("maybe")}
-            className={cn("bg-background", isSelected("maybe") && "border-yellow-300! text-yellow-400")}
-          >
-            <span className="sm:hidden">▲</span>
-            <span className="hidden sm:inline">未定（▲）</span>
-          </ToggleGroupItem>
-
-          <ToggleGroupItem
-            value="ng"
-            onClick={() => setCurrentState("ng")}
-            className={cn("bg-background", isSelected("ng") && "border-gray-400! text-gray-400")}
-          >
-            <span className="sm:hidden">✖︎</span>
-            <span className="hidden sm:inline">不参加（✖︎）</span>
-          </ToggleGroupItem>
+          {RESPONSE_STATUSES.map((status) => {
+            const meta = STATUS_META[status];
+            return (
+              <ToggleGroupItem
+                key={status}
+                value={status}
+                onClick={() => setCurrentState(status)}
+                className={cn("bg-background", isSelected(status) && meta.toggleActiveClass)}
+              >
+                <span className="sm:hidden">{meta.symbol}</span>
+                <span className="hidden sm:inline">{meta.label}（{meta.symbol}）</span>
+              </ToggleGroupItem>
+            );
+          })}
         </ToggleGroup>
       </div>
       
@@ -161,6 +150,8 @@ function InputResponses<T extends FormWithResponses>({ control, data }: InputRes
                         return <td key={timeOption} className="bg-muted border-b border-border" />;
                       }
 
+                      const meta = STATUS_META[slotInfo.status as ResponseStatus];
+
                       return (
                         <td
                           key={timeOption}
@@ -182,15 +173,13 @@ function InputResponses<T extends FormWithResponses>({ control, data }: InputRes
                             setIsDragging(true);
                             handleSlotUpdate(slotInfo);
                           }}
-                          className={`
-                            border-b border-l border text-center transition-all cursor-pointer select-none touch-none
-                            ${slotInfo?.status === "ok" ? "bg-blue-400 text-white" : ""}
-                            ${slotInfo?.status === "maybe" ? "bg-yellow-300 text-yellow-800" : ""}
-                            ${slotInfo?.status === "ng" ? "bg-gray-400 text-gray-600" : ""}
-                          `}
+                          className={cn(
+                            "border-b border-l border text-center transition-all cursor-pointer select-none touch-none",
+                            meta?.inputCellClass
+                          )}
                         >
                           <span className="text-[10px] pointer-events-none">
-                            {slotInfo?.status === "ok" ? "⚫︎" : slotInfo?.status === "maybe" ? "▲" : slotInfo?.status === "ng" ? "✖︎" : ""}
+                            {meta?.symbol ?? ""}
                           </span>
                         </td>
                       );

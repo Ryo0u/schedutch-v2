@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { TIME_OPTIONS } from "@/lib/constants";
 import { jstHHMM } from "@/lib/datetime";
+import { RESPONSE_STATUSES, STATUS_META } from "@/features/event-detail/lib/status";
 import { useEvent } from "@/features/event-detail/hooks/useEvent";
 import { useExtractSlotsContext } from "../extract/ExtractSlotsContext";
 import CandidateSection from "./CandidateSection";
@@ -30,18 +31,12 @@ function ResponsesInfo({ eventId }: ResponsesInfoProps) {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <CardTitle className="text-xl font-black">予定一覧</CardTitle>
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1.5">
-              <span className="inline-block w-3 h-3 rounded-sm bg-blue-400/80" />
-              参加できる
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="inline-block w-3 h-3 rounded-sm bg-yellow-300/80" />
-              未定
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="inline-block w-3 h-3 rounded-sm bg-gray-400/80" />
-              参加できない
-            </span>
+            {RESPONSE_STATUSES.map((status) => (
+              <span key={status} className="flex items-center gap-1.5">
+                <span className={`inline-block w-3 h-3 rounded-sm ${STATUS_META[status].legendDotClass}`} />
+                {status === "ok" ? "参加できる" : status === "maybe" ? "未定" : "参加できない"}
+              </span>
+            ))}
           </div>
         </div>
       </CardHeader>

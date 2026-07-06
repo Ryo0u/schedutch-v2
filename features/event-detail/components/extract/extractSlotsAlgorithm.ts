@@ -1,5 +1,6 @@
 import { jstHHMM, formatJSTDate } from "@/lib/datetime";
 import { SLOT_INTERVAL_MS } from "@/lib/constants";
+import { STATUS_META } from "@/features/event-detail/lib/status";
 import type { ParticipantInfo, TimeBlock, User } from "@/features/event-detail/types";
 
 // 抽出条件（アルゴリズムへの入力の内部表現）
@@ -116,8 +117,8 @@ const formatExtractTimes = (blocks: TimeBlock[]): string[] => {
     daysBlocks.forEach(block => {
       const start = jstHHMM(block.start);
       const end = jstHHMM(block.end + SLOT_INTERVAL_MS);
-      // 表示時に maybe の人には (▲) を付ける
-      const names = block.participants.map(p => p.status === 'maybe' ? `${p.name}(▲)` : p.name).join(', ');
+      // 表示時に maybe の人には symbol を付ける
+      const names = block.participants.map(p => p.status === 'maybe' ? `${p.name}(${STATUS_META.maybe.symbol})` : p.name).join(', ');
       result.push(`${start} - ${end} : ${names}`);
     });
     result.push("");
