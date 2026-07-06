@@ -1,7 +1,9 @@
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { jstHHMM, formatJSTDate, jstWallTimeToISO } from "@/lib/datetime";
-import type { Candidate, TimeBlock, User } from "@/features/event-detail/types";
+import { STATUS_META } from "@/features/event-detail/lib/status";
+import type { TimeBlock } from "@/features/event-detail/components/extract/extractSlotsAlgorithm";
+import type { Candidate, ResponseStatus, User } from "@/features/event-detail/types";
 
 interface CandidateSectionProps {
   candidate: Candidate;
@@ -92,7 +94,8 @@ export default function CandidateSection({ candidate, users, displayedTimes, ext
             </td>
 
             {displayedTimes.map((time) => {
-              const status = responseMap[`${candidate.id}-${time}`];
+              const status = responseMap[`${candidate.id}-${time}`] as ResponseStatus | undefined;
+              const meta = status ? STATUS_META[status] : undefined;
               const highlight = highlightMap.get(time);
               const isExtracting = extractedBlocks.length > 0;
               return (
@@ -100,9 +103,7 @@ export default function CandidateSection({ candidate, users, displayedTimes, ext
                   key={time}
                   className={cn(
                     "border-b border-x border-muted bg-muted text-center text-[8px] sm:text-[10px] transition-all",
-                    status === "ok" && "bg-blue-400/70 text-white",
-                    status === "maybe" && "bg-yellow-300/70 text-yellow-800",
-                    status === "ng" && "bg-gray-400/70 text-gray-600",
+                    meta?.candidateCellClass,
                     // 抽出中は範囲外のセルをグレーで薄くし、範囲の外周を primary の太枠で囲う
                     isExtracting && !highlight && "opacity-25",
                     highlight?.isStart && "border-l-2 border-l-primary",
@@ -111,7 +112,7 @@ export default function CandidateSection({ candidate, users, displayedTimes, ext
                     highlight && isLastRow && "border-b-2 border-b-primary"
                   )}
                 >
-                  {status === "ok" ? "⚫︎" : status === "maybe" ? "▲" : status === "ng" ? "✖︎" : ""}
+                  {meta?.symbol ?? ""}
                 </td>
               );
             })}

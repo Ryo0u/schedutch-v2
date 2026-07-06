@@ -109,8 +109,9 @@ schedutch-v2/
 │   │   │   ├── responses/    # ResponsesForm, ResponsesInfo, JoinButton
 │   │   │   ├── extract/      # ExtractResponses
 │   │   │   └── form/         # InputResponses, InputUserInfo（users/responses共有）
-│   │   ├── api/          # Supabase アクセス（eventApi.ts）
+│   │   ├── api/          # Supabase アクセス（eventApi.ts / errors.ts）
 │   │   ├── hooks/        # TanStack Query hook（useEvent / useEventMutations）
+│   │   ├── lib/          # pure関数（status.ts: 回答ステータス表示定義 / responses.ts: 回答データ整形 / validation.ts: バリデーション文言）
 │   │   ├── schema.ts     # 回答フォームの型・zodスキーマ
 │   │   ├── types.ts      # EventData など固有の型
 │   │   └── index.ts      # barrel（公開面。app からはここ経由で import）

@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
@@ -14,6 +13,8 @@ import InputResponses from '../form/InputResponses';
 import { toast } from 'sonner';
 import type { Candidate, User } from '@/features/event-detail/types';
 import { useUpdateUser } from '@/features/event-detail/hooks/useEventMutations';
+import { toResponseInputs } from '@/features/event-detail/lib/responses';
+import { UserEditFormSchema, type UserEditFormData } from '@/features/event-detail/schema';
 
 interface UsersEditDialogProps {
   eventId: string;
@@ -27,24 +28,12 @@ interface UsersEditDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const EditFormSchema = z.object({
-  name: z.string().min(1, '名前を入力してください').max(10, '名前を10文字以内で入力してください'),
-  comment: z.string().max(30, 'コメントは30文字以内で入力してください'),
-  responses: z.array(z.object({
-    candidate_id: z.string(),
-    time: z.date(),
-    status: z.string(),
-  })),
-});
-
-type EditFormData = z.infer<typeof EditFormSchema>;
-
 function UsersEditDialog({ eventId, data, password, open, onOpenChange }: UsersEditDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const updateUser = useUpdateUser(eventId);
 
-  const form = useForm<EditFormData>({
-    resolver: zodResolver(EditFormSchema),
+  const form = useForm<UserEditFormData>({
+    resolver: zodResolver(UserEditFormSchema),
     defaultValues: { name: "", comment: "", responses: [] },
   });
 
@@ -62,15 +51,11 @@ function UsersEditDialog({ eventId, data, password, open, onOpenChange }: UsersE
     }
   }, [open]);
 
-  const onSubmit = async (values: EditFormData) => {
+  const onSubmit = async (values: UserEditFormData) => {
     setIsSubmitting(true);
 
     try {
-      const formattedResponses = values.responses.map(r => ({
-        candidate_id: r.candidate_id,
-        time: r.time.toISOString(),
-        status: r.status,
-      }));
+      const formattedResponses = toResponseInputs(values.responses);
 
       await updateUser.mutateAsync({
         userId: data.user.id,
