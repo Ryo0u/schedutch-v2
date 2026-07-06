@@ -1,35 +1,35 @@
+import type { Tables } from "@/lib/database.types";
+
 export type ResponseStatus = "ok" | "maybe" | "ng";
 
-export interface Response {
+/**
+ * DB上は event_id / comment / index_number 等が nullable だが、
+ * これは他テーブルからの参照を断ち切らないための保守的な制約であり、
+ * RPC 経由の書き込みでは常に値が入る。getEvent の結合クエリで取得した
+ * レコードは常にこれらが埋まっている前提で、Row型のnullableを外して定義する。
+ */
+export type Response = Omit<Tables<"responses">, "user_id" | "candidate_id" | "status"> & {
   user_id: string;
   candidate_id: string;
-  time: string;
   status: ResponseStatus;
-}
+};
 
-export interface Candidate {
-  id: string;
+export type Candidate = Omit<Tables<"candidates">, "event_id" | "index_number"> & {
   event_id: string;
-  start_time: string;
-  end_time: string;
   index_number: number;
-}
+};
 
-export interface User {
-  id: string;
+export type User = Omit<Tables<"users">, "event_id" | "comment" | "password_digest"> & {
   event_id: string;
-  name: string;
   comment: string;
   responses: Response[];
-}
+};
 
-export interface EventData {
-  id: string;
-  title: string;
+export type EventData = Omit<Tables<"events">, "comment" | "password_digest" | "created_at"> & {
   comment: string;
   candidates: Candidate[];
   users: User[];
-}
+};
 
 export type ParticipantInfo = { name: string; status: string };
 
