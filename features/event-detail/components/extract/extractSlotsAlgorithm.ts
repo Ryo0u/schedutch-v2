@@ -1,4 +1,5 @@
-import { jstHHMM, formatJSTDate } from "@/lib/utils";
+import { jstHHMM, formatJSTDate } from "@/lib/datetime";
+import { SLOT_INTERVAL_MS } from "@/lib/constants";
 import type { ParticipantInfo, TimeBlock, User } from "@/features/event-detail/types";
 
 // 抽出条件（アルゴリズムへの入力の内部表現）
@@ -7,8 +8,6 @@ export type FilterCondition =
   | { type: 'HEADCOUNTS'; counts: number[] }
   | { type: 'DURATION'; minMinutes: number }
   | { type: 'DATERANGE'; start: number, end: number };
-
-export const SLOT_INTERVAL = 30 * 60 * 1000;
 
 type ExtractUser = Pick<User, "id" | "name" | "responses">;
 
@@ -79,7 +78,7 @@ const createMergedBlocks = (
 
     const lastBlock = acc[acc.length - 1];
     // 「時間が連続」かつ「参加者と状態が一致」なら結合
-    if (lastBlock && time === lastBlock.end + SLOT_INTERVAL && areParticipantsEqual(lastBlock.participants, currentParticipants)) {
+    if (lastBlock && time === lastBlock.end + SLOT_INTERVAL_MS && areParticipantsEqual(lastBlock.participants, currentParticipants)) {
       lastBlock.end = time;
     } else {
       acc.push({ start: time, end: time, participants: currentParticipants });
@@ -93,7 +92,7 @@ const checkBlockConditions = (block: TimeBlock, conditions: FilterCondition[]) =
   return conditions.every(cond => {
     switch (cond.type) {
       case 'DURATION': {
-        const durationMs = (block.end + SLOT_INTERVAL) - block.start;
+        const durationMs = (block.end + SLOT_INTERVAL_MS) - block.start;
         return durationMs >= cond.minMinutes * 60 * 1000;
       }
       default:
@@ -116,7 +115,7 @@ const formatExtractTimes = (blocks: TimeBlock[]): string[] => {
     result.push(date);
     daysBlocks.forEach(block => {
       const start = jstHHMM(block.start);
-      const end = jstHHMM(block.end + SLOT_INTERVAL);
+      const end = jstHHMM(block.end + SLOT_INTERVAL_MS);
       // 表示時に maybe の人には (▲) を付ける
       const names = block.participants.map(p => p.status === 'maybe' ? `${p.name}(▲)` : p.name).join(', ');
       result.push(`${start} - ${end} : ${names}`);

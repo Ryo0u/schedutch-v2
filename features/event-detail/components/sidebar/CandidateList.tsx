@@ -1,6 +1,7 @@
 "use client"
 
-import { cn, formatJSTDate } from "@/lib/utils"
+import { cn } from "@/lib/utils"
+import { formatJSTDate } from "@/lib/datetime"
 import type { Candidate } from "@/features/event-detail/types"
 
 interface CandidateListProps {

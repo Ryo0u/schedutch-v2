@@ -10,6 +10,7 @@ import InputResponses from '../form/InputResponses';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { hashPassword } from '@/lib/password';
+import { SLOT_INTERVAL_MS } from '@/lib/constants';
 import { Candidate } from '@/features/event-detail/types';
 import { UserFormData, UserFormSchema } from '@/features/event-detail/schema';
 import { useSaveResponses } from '@/features/event-detail/hooks/useEventMutations';
@@ -52,7 +53,7 @@ function ResponsesForm({ eventId, data, open, onOpenChange }: ResposesFromProps)
             time: new Date(currentMs),
             status: "ok",
           });
-          currentMs += 30 * 60000; // 30分進める
+          currentMs += SLOT_INTERVAL_MS;
         }
       })
       

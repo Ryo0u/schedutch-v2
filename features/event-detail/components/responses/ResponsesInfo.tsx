@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { TIME_OPTIONS } from "@/lib/constants";
-import { jstHHMM } from "@/lib/utils";
+import { jstHHMM } from "@/lib/datetime";
 import { useEvent } from "@/features/event-detail/hooks/useEvent";
 import { useExtractSlotsContext } from "../extract/ExtractSlotsContext";
 import CandidateSection from "./CandidateSection";
