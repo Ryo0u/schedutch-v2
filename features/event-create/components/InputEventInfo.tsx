@@ -1,6 +1,5 @@
 import { FormData } from '@/features/event-create/schema';
-import { Control, Controller } from 'react-hook-form';
-import { Input } from '@/components/ui/input';
+import { Control } from 'react-hook-form';
 import {
   Card,
   CardContent,
@@ -8,9 +7,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Field, FieldGroup, FieldLabel, FieldError, FieldDescription } from '@/components/ui/field';
+import { FieldGroup } from '@/components/ui/field';
 import { Separator } from '@/components/ui/separator';
-import { InputGroup, InputGroupAddon, InputGroupText, InputGroupTextarea } from '@/components/ui/input-group';
+import TextField from '@/components/form/TextField';
+import TextareaCounterField from '@/components/form/TextareaCounterField';
 
 interface InputEventProps {
   control: Control<FormData>;
@@ -33,76 +33,30 @@ const InputEventInfo = ({ control }: InputEventProps) => {
 
         <CardContent>
           <FieldGroup>
-            <Controller
-              name="title"
+            <TextField
               control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="title">
-                    イベント名<span className="text-destructive">*</span>
-                  </FieldLabel>
-                  <Input
-                    id="title"
-                    {...field}
-                    placeholder="例: ⚪︎⚪︎の練習日程"
-                    aria-invalid={fieldState.invalid}
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
+              name="title"
+              label="イベント名"
+              required
+              placeholder="例: ⚪︎⚪︎の練習日程"
             />
 
-            <Controller
+            <TextField
+              control={control}
               name="password"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="password">
-                    編集用パスワード<span className="text-destructive">*</span>
-                  </FieldLabel>
-                  <Input
-                    id="password"
-                    {...field}
-                    aria-invalid={fieldState.invalid}
-                  />
-                  <FieldDescription>
-                    イベントの削除の際に必要となります
-                  </FieldDescription>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
+              label="編集用パスワード"
+              required
+              description="イベントの削除の際に必要となります"
             />
-            
-            <Controller
-              name='comment'
+
+            <TextareaCounterField
               control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='comment'>コメント</FieldLabel>
-                  <InputGroup>
-                    <InputGroupTextarea
-                      id='comment'
-                      {...field}
-                      rows={10}
-                      className="min-h-18 resize-none"
-                      placeholder="頑張ります！！"
-                      aria-invalid={fieldState.invalid}
-                    />
-                    <InputGroupAddon align="block-end">
-                      <InputGroupText className="tabular-nums">
-                        {field.value.length}/30文字
-                      </InputGroupText>
-                    </InputGroupAddon>
-                  </InputGroup>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
+              name="comment"
+              label="コメント"
+              rows={10}
+              maxLength={30}
+              className="min-h-18 resize-none"
+              placeholder="頑張ります！！"
             />
           </FieldGroup>
         </CardContent>

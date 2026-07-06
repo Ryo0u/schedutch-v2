@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { InputGroup, InputGroupAddon, InputGroupText, InputGroupTextarea } from "@/components/ui/input-group";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { FieldGroup } from "@/components/ui/field";
+import TextField from "@/components/form/TextField";
+import TextareaCounterField from "@/components/form/TextareaCounterField";
 import { Edit } from "lucide-react";
 import { toast } from "sonner";
 import { useUpdateEvent } from "@/features/event-detail/hooks/useEventMutations";
@@ -78,49 +78,9 @@ function EventEditDialog({ eventId, open, onOpenChange, data }: DialogProps) {
           </DialogHeader>
 
           <FieldGroup className="mb-5">
-            <Controller
-              name="title"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel>タイトル<span className="text-destructive">*</span></FieldLabel>
-                  <Input {...field} aria-invalid={fieldState.invalid} />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-            <Controller
-              name="comment"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel>コメント</FieldLabel>
-                  <InputGroup>
-                    <InputGroupTextarea
-                      {...field}
-                      rows={4}
-                      className="min-h-15 resize-none"
-                      aria-invalid={fieldState.invalid}
-                    />
-                    <InputGroupAddon align="block-end">
-                      <InputGroupText className="tabular-nums">{field.value.length}/30</InputGroupText>
-                    </InputGroupAddon>
-                  </InputGroup>
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-            <Controller
-              name="password"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel>編集用パスワード<span className="text-destructive">*</span></FieldLabel>
-                  <Input {...field} placeholder="......." aria-invalid={fieldState.invalid} />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
+            <TextField control={form.control} name="title" label="タイトル" required />
+            <TextareaCounterField control={form.control} name="comment" label="コメント" rows={4} maxLength={30} />
+            <TextField control={form.control} name="password" label="編集用パスワード" required placeholder="......." />
           </FieldGroup>
 
           <DialogFooter>

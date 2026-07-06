@@ -1,14 +1,14 @@
 "use client"
 
 import { useEffect, useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { InputGroup, InputGroupAddon, InputGroupText, InputGroupTextarea } from '@/components/ui/input-group';
+import { FieldGroup } from '@/components/ui/field';
+import TextField from '@/components/form/TextField';
+import TextareaCounterField from '@/components/form/TextareaCounterField';
 import InputResponses from '../form/InputResponses';
 import { toast } from 'sonner';
 import type { Candidate, User } from '@/features/event-detail/types';
@@ -92,38 +92,8 @@ function UsersEditDialog({ eventId, data, password, open, onOpenChange }: UsersE
           className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-6"
         >
           <FieldGroup>
-            <Controller
-              name="name"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel>名前<span className="text-destructive">*</span></FieldLabel>
-                  <Input {...field} aria-invalid={fieldState.invalid} />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-            <Controller
-              name="comment"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel>コメント</FieldLabel>
-                  <InputGroup>
-                    <InputGroupTextarea
-                      {...field}
-                      rows={10}
-                      className="min-h-15 resize-none"
-                      aria-invalid={fieldState.invalid}
-                    />
-                    <InputGroupAddon align="block-end">
-                      <InputGroupText className="tabular-nums">{field.value.length}/30</InputGroupText>
-                    </InputGroupAddon>
-                  </InputGroup>
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
+            <TextField control={form.control} name="name" label="名前" required />
+            <TextareaCounterField control={form.control} name="comment" label="コメント" rows={10} maxLength={30} />
           </FieldGroup>
 
           <Separator />
