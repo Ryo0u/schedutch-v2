@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import { nameSchema, commentSchema } from './lib/validation';
 
 export type UserFormData = {
   name: string;
@@ -12,12 +13,8 @@ export type UserFormData = {
 };
 
 export const UserFormSchema = z.object({
-  name:
-    z.string()
-      .min(1, '名前を入力してください')
-      .max(10, '名前を10文字以内で入力してください'),
-  comment:
-    z.string().max(30, 'コメントは30文字以内で入力してください'),
+  name: nameSchema,
+  comment: commentSchema,
   password:
     z.string()
       .min(3, 'パスワードを3文字以上で入力してください')
@@ -31,3 +28,17 @@ export const UserFormSchema = z.object({
       })
     ),
 });
+
+/** UsersEditDialog: パスワードは事前検証済みのため編集フォームに含めない */
+export const UserEditFormSchema = UserFormSchema.omit({ password: true });
+export type UserEditFormData = z.infer<typeof UserEditFormSchema>;
+
+export const EventEditFormSchema = z.object({
+  title:
+    z.string()
+      .min(1, 'タイトルを入力してください')
+      .max(10, 'タイトルを10文字以内で入力してください'),
+  comment: commentSchema,
+  password: z.string().min(1, '編集用パスワードを入力してください'),
+});
+export type EventEditFormData = z.infer<typeof EventEditFormSchema>;

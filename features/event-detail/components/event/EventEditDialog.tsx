@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -11,6 +10,7 @@ import { Edit } from "lucide-react";
 import { toast } from "sonner";
 import { useUpdateEvent } from "@/features/event-detail/hooks/useEventMutations";
 import { isPasswordError } from "@/features/event-detail/api/errors";
+import { EventEditFormSchema, type EventEditFormData } from "@/features/event-detail/schema";
 
 interface DialogProps {
   eventId: string;
@@ -23,20 +23,12 @@ interface DialogProps {
   };
 }
 
-const EditEventFormSchema = z.object({
-  title: z.string().min(1, "タイトルを入力してください").max(10, "タイトルを10文字以内で入力してください"),
-  comment: z.string().max(30, "コメントは30文字以内で入力してください"),
-  password: z.string().min(1, "編集用パスワードを入力してください"),
-});
-
-type EditEventFormData = z.infer<typeof EditEventFormSchema>;
-
 function EventEditDialog({ eventId, open, onOpenChange, data }: DialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const updateEvent = useUpdateEvent(eventId);
 
-  const form = useForm<EditEventFormData>({
-    resolver: zodResolver(EditEventFormSchema),
+  const form = useForm<EventEditFormData>({
+    resolver: zodResolver(EventEditFormSchema),
     defaultValues: { title: "", comment: "", password: "" },
   });
 
@@ -46,7 +38,7 @@ function EventEditDialog({ eventId, open, onOpenChange, data }: DialogProps) {
     }
   }, [open]);
 
-  const onSubmit = async (values: EditEventFormData) => {
+  const onSubmit = async (values: EventEditFormData) => {
     setIsSubmitting(true);
 
     try {
