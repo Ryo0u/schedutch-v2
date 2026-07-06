@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Schedutch v2
 
-## Getting Started
+登録・ログイン不要で使える URL 共有型の日程調整サービス。イベントを作成して URL を共有し、参加者が 30 分単位で予定を回答する。書き込み操作はイベント・参加者ごとのパスワードで保護される。
 
-First, run the development server:
+詳しい仕様は [docs/](docs/README.md) を、開発規約（コーディング・Git・ディレクトリ構成）は [.claude/CLAUDE.md](.claude/CLAUDE.md) を参照。
+
+## 技術スタック
+
+- Next.js 16 (App Router) + React 19 + TypeScript
+- Supabase（DB・RPC のみ。認証機能は未使用）
+- TanStack Query / react-hook-form + zod / Tailwind CSS v4 + shadcn/ui
+
+## セットアップ
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`.env.local` に以下を設定する。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## コマンド
 
-## Learn More
+```bash
+npm run dev       # 開発サーバー起動 (localhost:3000)
+npm run build     # プロダクションビルド
+npm run lint      # ESLint
+npm run prettier  # Prettierによるフォーマット
+npm run gen:types # Supabaseのローカルスキーマから型を生成
+```
 
-To learn more about Next.js, take a look at the following resources:
+テストは未導入。
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## ローカル Supabase（Docker）
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+このプロジェクトは Supabase CLI 経由でローカル DB を Docker コンテナ群として起動する（`supabase start` / `npx supabase start`）。Postgres・Studio・Auth・Realtime・Storage・Kong など 10 コンテナ以上が同時に立ち上がるため、**メモリを多く消費する**。
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- 作業が終わったら **必ず `supabase stop` で停止する**。起動しっぱなしにすると、他の開発コンテナ（devcontainer など）がメモリ不足で起動できなくなることがある。
+- 現在の起動状況は `docker ps` で確認できる。`supabase_*_schedutch-v2` という名前のコンテナが該当する。
+- 型生成（`npm run gen:types`）はローカル DB が起動している必要がある。生成が終わったら速やかに停止してよい。

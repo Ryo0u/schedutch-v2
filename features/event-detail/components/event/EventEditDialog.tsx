@@ -10,7 +10,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field
 import { Edit } from "lucide-react";
 import { toast } from "sonner";
 import { useUpdateEvent } from "@/features/event-detail/hooks/useEventMutations";
-import { isPasswordError } from "@/features/event-detail/api/eventApi";
+import { isPasswordError } from "@/features/event-detail/api/errors";
 
 interface DialogProps {
   eventId: string;

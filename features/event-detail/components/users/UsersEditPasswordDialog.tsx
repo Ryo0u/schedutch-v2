@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import type { User } from "@/features/event-detail/types";
 import { usePasswordConfirm } from "@/features/event-detail/hooks/usePasswordConfirm";
-import { createPasswordMismatchError, verifyUserPassword } from "@/features/event-detail/api/eventApi";
+import { verifyUserPassword } from "@/features/event-detail/api/eventApi";
+import { createPasswordMismatchError } from "@/features/event-detail/api/errors";
 
 interface UsersEditPasswordDialogProps {
   data: {
