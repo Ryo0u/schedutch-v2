@@ -1,19 +1,13 @@
 import { Control, FieldValues, useFieldArray } from "react-hook-form";
-import { TIME_OPTIONS } from "@/lib/constants";
 import { useState } from "react";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { TIME_OPTIONS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-import { jstHHMM, formatJSTDate } from "@/lib/datetime";
-import { RESPONSE_STATUSES, STATUS_META } from "@/features/event-detail/lib/status";
+import { formatJSTDate } from "@/lib/datetime";
+import { STATUS_META } from "@/features/event-detail/lib/status";
+import { buildResponseSlotMap } from "@/features/event-detail/lib/responses";
+import { useResponseDrag } from "@/features/event-detail/hooks/useResponseDrag";
+import StatusToggle from "./StatusToggle";
 import type { Candidate, ResponseStatus } from "@/features/event-detail/types";
-
-type SlotInfo = {
-  id: string;
-  candidate_id: string;
-  time: Date;
-  status: string;
-  index: number;
-};
 
 type FormWithResponses = FieldValues & {
   responses: { candidate_id: string; time: Date; status: string }[];
@@ -31,79 +25,20 @@ function InputResponses<T extends FormWithResponses>({ control, data }: InputRes
     control: control as Control<FormWithResponses>,
     name: "responses",
   });
-  
-  const [ currentState, setCurrentState ] = useState<ResponseStatus>("ok");
-  const isSelected = (value: string) => currentState === value;
-  
-  const [ isDragging, setIsDragging ] = useState(false);
-  
-  const responseMap = fields.reduce((acc, field, index) => {
-    const hhmm = jstHHMM(field.time);
-    acc[`${field.candidate_id}-${hhmm}`] = { ...field, index };
-    return acc;
-  }, {} as Record<string, SlotInfo>);
 
-  // PCでの回答更新ハンドラ
-  const handleSlotUpdate = (slotInfo: SlotInfo) => {
-    update(slotInfo.index, {
-      ...fields[slotInfo.index],
-      status: currentState,
-      candidate_id: slotInfo.candidate_id,
-      time: slotInfo.time,
-    });
-  };
-  
-  // スマホでの回答更新ハンドラ
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging) return;
+  const [currentState, setCurrentState] = useState<ResponseStatus>("ok");
 
-    const touch = e.touches[0];
-    if (!touch) return;
-    const element = document.elementFromPoint(touch.clientX, touch.clientY);
-    if (!element) return;
+  const responseMap = buildResponseSlotMap(fields);
+  const { containerHandlers, handleTouchMove, cellHandlers } = useResponseDrag(
+    fields,
+    update,
+    currentState
+  );
 
-    const tdElement = element.closest("[data-index]");
-    if (tdElement) {
-      const index = Number(tdElement.getAttribute("data-index"));
-      const slotField = fields[index];
-
-      if (slotField) {
-        update(index, {
-          ...slotField,
-          status: currentState,
-          candidate_id: slotField.candidate_id,
-          time: slotField.time,
-        });
-      }
-    }
-  };
-  
   return (
-    <div className="w-full select-none"
-      onMouseUp={() => setIsDragging(false)}
-      onMouseLeave={() => setIsDragging(false)}
-      onTouchEnd={() => setIsDragging(false)}
-      onTouchCancel={() => setIsDragging(false)}
-    >
-      <div className="sticky right-0 top-0 z-40 mb-2 flex justify-end">
-        <ToggleGroup size="sm" spacing={2} variant="outline">
-          {RESPONSE_STATUSES.map((status) => {
-            const meta = STATUS_META[status];
-            return (
-              <ToggleGroupItem
-                key={status}
-                value={status}
-                onClick={() => setCurrentState(status)}
-                className={cn("bg-background", isSelected(status) && meta.toggleActiveClass)}
-              >
-                <span className="sm:hidden">{meta.symbol}</span>
-                <span className="hidden sm:inline">{meta.label}（{meta.symbol}）</span>
-              </ToggleGroupItem>
-            );
-          })}
-        </ToggleGroup>
-      </div>
-      
+    <div className="w-full select-none" {...containerHandlers}>
+      <StatusToggle value={currentState} onChange={setCurrentState} />
+
       <div className="w-full overflow-x-auto pb-5" onTouchMove={handleTouchMove}>
           {data.candidates.map((candidate) => {
             const dateKey = formatJSTDate(candidate.start_time, {
@@ -156,23 +91,7 @@ function InputResponses<T extends FormWithResponses>({ control, data }: InputRes
                         <td
                           key={timeOption}
                           data-index={slotInfo.index}
-                          // マウスでのスロット開始&更新
-                          onMouseDown={(e) => {
-                            e.preventDefault();
-                            setIsDragging(true);
-                            handleSlotUpdate(slotInfo);
-                          }}
-                          // マウスでのドラッグ状態中の更新
-                          onMouseEnter={() => {
-                            if (isDragging) {
-                              handleSlotUpdate(slotInfo)
-                            }
-                          }}
-                          // スマホ用のイベント
-                          onTouchStart={() => {
-                            setIsDragging(true);
-                            handleSlotUpdate(slotInfo);
-                          }}
+                          {...cellHandlers(slotInfo.index)}
                           className={cn(
                             "border-b border-l border text-center transition-all cursor-pointer select-none touch-none",
                             meta?.inputCellClass
@@ -186,7 +105,7 @@ function InputResponses<T extends FormWithResponses>({ control, data }: InputRes
                     })}
                     <td className=" border-r border-border"></td>
                   </tr>
-                  
+
                   {/* --- 候補日同士の間隔 -- */}
                   <tr className="h-3 pointer-events-none">
                     <td colSpan={TIME_OPTIONS.length + 1} className="h-4 border-none bg-transparent" />
@@ -195,7 +114,7 @@ function InputResponses<T extends FormWithResponses>({ control, data }: InputRes
               </table>
             );
           })}
-      </div>      
+      </div>
     </div>
   )
 }
