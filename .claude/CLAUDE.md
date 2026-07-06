@@ -69,7 +69,7 @@ TanStack Query で管理する。取得は `features/event-detail/hooks/useEvent
 
 ### UIコンポーネント
 
-`components/ui/` は shadcn/ui ベースのプリミティブ。一部 `@base-ui/react` を使用（`Dialog`、`DialogClose` など）。フォームは `react-hook-form` + `zod` で統一。スタイリングは Tailwind CSS v4 + `clsx`/`tailwind-merge`（`cn()` ユーティリティ）。
+`components/ui/` は shadcn/ui ベースのプリミティブ。一部 `@base-ui/react` を使用（`Dialog`、`DialogClose` など）。フォームは `react-hook-form` + `zod` で統一し、`Controller` を合成した `TextField` / `TextareaCounterField`（`components/form/`）をfeature間で共有する。スタイリングは Tailwind CSS v4 + `clsx`/`tailwind-merge`（`cn()` ユーティリティ）。
 
 ### 環境変数
 
@@ -125,6 +125,7 @@ schedutch-v2/
 ├── hooks/                # 複数featureで使う共通hook（UseDeviceType）
 ├── components/
 │   ├── ui/               # shadcn/ui ベースの汎用プリミティブ
+│   ├── form/             # react-hook-form合成のフォーム部品（TextField / TextareaCounterField）。feature間共有
 │   ├── layout/           # Header など共通レイアウト
 │   └── providers/        # ThemeProvider / QueryProvider
 ├── lib/                  # constants(TIME_OPTIONS) / utils(toJST等)
