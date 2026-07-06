@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { MessageCircle, Pencil, Trash2, UserCircle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useDeviceType } from "@/hooks/UseDeviceType";
+import { useDeviceType } from "@/hooks/useDeviceType";
 import { Popover, PopoverContent, PopoverDescription, PopoverHeader, PopoverTitle, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";

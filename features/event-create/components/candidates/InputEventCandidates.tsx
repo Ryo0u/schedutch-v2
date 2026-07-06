@@ -11,7 +11,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import { useDeviceType } from '@/hooks/UseDeviceType';
+import { useDeviceType } from '@/hooks/useDeviceType';
 import { TIME_OPTIONS } from '@/lib/constants';
 
 
