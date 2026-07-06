@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import type { Candidate, TimeBlock, User } from "@/features/event-detail/types";
-import { extractSlots, type FilterCondition } from "../extractSlotsAlgorithm";
+import type { Candidate, User } from "@/features/event-detail/types";
+import { extractSlots, type FilterCondition, type TimeBlock } from "../extractSlotsAlgorithm";
 
 export type ExtractTab = "people" | "number";
 

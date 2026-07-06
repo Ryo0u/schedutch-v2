@@ -1,7 +1,11 @@
 import { jstHHMM, formatJSTDate } from "@/lib/datetime";
 import { SLOT_INTERVAL_MS } from "@/lib/constants";
 import { STATUS_META } from "@/features/event-detail/lib/status";
-import type { ParticipantInfo, TimeBlock, User } from "@/features/event-detail/types";
+import type { User } from "@/features/event-detail/types";
+
+export type ParticipantInfo = { name: string; status: string };
+
+export type TimeBlock = { start: number; end: number; participants: ParticipantInfo[] };
 
 // 抽出条件（アルゴリズムへの入力の内部表現）
 export type FilterCondition =
