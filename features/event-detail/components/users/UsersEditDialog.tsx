@@ -14,6 +14,7 @@ import InputResponses from '../form/InputResponses';
 import { toast } from 'sonner';
 import type { Candidate, User } from '@/features/event-detail/types';
 import { useUpdateUser } from '@/features/event-detail/hooks/useEventMutations';
+import { toResponseInputs } from '@/features/event-detail/lib/responses';
 
 interface UsersEditDialogProps {
   eventId: string;
@@ -66,11 +67,7 @@ function UsersEditDialog({ eventId, data, password, open, onOpenChange }: UsersE
     setIsSubmitting(true);
 
     try {
-      const formattedResponses = values.responses.map(r => ({
-        candidate_id: r.candidate_id,
-        time: r.time.toISOString(),
-        status: r.status,
-      }));
+      const formattedResponses = toResponseInputs(values.responses);
 
       await updateUser.mutateAsync({
         userId: data.user.id,

@@ -10,10 +10,10 @@ import InputResponses from '../form/InputResponses';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { hashPassword } from '@/lib/password';
-import { SLOT_INTERVAL_MS } from '@/lib/constants';
 import { Candidate } from '@/features/event-detail/types';
 import { UserFormData, UserFormSchema } from '@/features/event-detail/schema';
 import { useSaveResponses } from '@/features/event-detail/hooks/useEventMutations';
+import { buildInitialResponses, toResponseInputs } from '@/features/event-detail/lib/responses';
 
 interface ResposesFromProps {
   eventId: string;
@@ -40,39 +40,18 @@ function ResponsesForm({ eventId, data, open, onOpenChange }: ResposesFromProps)
   // responsesの初期化
   useEffect(() => {
     if (open && data.candidates) {
-      const initResponses: UserFormData["responses"] = [];
-
-      // UTC instant 上の30分刻みでループし、ブラウザTZに依存しない
-      data.candidates.forEach((candidate) => {
-        let currentMs = new Date(candidate.start_time).getTime();
-        const endMs = new Date(candidate.end_time).getTime();
-
-        while (currentMs < endMs) {
-          initResponses.push({
-            candidate_id: candidate.id,
-            time: new Date(currentMs),
-            status: "ok",
-          });
-          currentMs += SLOT_INTERVAL_MS;
-        }
-      })
-      
       form.reset({
-      ...form.getValues(),
-      responses: initResponses,
-    });
+        ...form.getValues(),
+        responses: buildInitialResponses(data.candidates),
+      });
     }
   }, [open, data.candidates])
-  
+
   const onSubmit = async (values: UserFormData) => {
     try {
       const hashedPassword = await hashPassword(values.password);
-      
-      const formattedResponses = values.responses.map(res => ({
-        candidate_id: res.candidate_id,
-        time: res.time.toISOString(),
-        status: res.status
-      }));
+
+      const formattedResponses = toResponseInputs(values.responses);
 
       await saveResponses.mutateAsync({
         eventId,
