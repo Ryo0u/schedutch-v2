@@ -1,5 +1,5 @@
 import { useEvent } from "@/features/event-detail/hooks/useEvent";
-import { formatJSTDate } from "@/lib/utils";
+import { formatJSTDate } from "@/lib/datetime";
 
 interface EventInfoProps {
   eventId: string;

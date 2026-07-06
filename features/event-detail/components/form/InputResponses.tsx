@@ -2,7 +2,8 @@ import { Control, FieldValues, useFieldArray } from "react-hook-form";
 import { TIME_OPTIONS } from "@/lib/constants";
 import { useState } from "react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { cn, jstHHMM, formatJSTDate } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { jstHHMM, formatJSTDate } from "@/lib/datetime";
 import type { Candidate } from "@/features/event-detail/types";
 
 type SlotInfo = {

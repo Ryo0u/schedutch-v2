@@ -1,5 +1,6 @@
 import { useMemo } from "react";
-import { cn, jstHHMM, formatJSTDate, jstWallTimeToISO } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { jstHHMM, formatJSTDate, jstWallTimeToISO } from "@/lib/datetime";
 import type { Candidate, TimeBlock, User } from "@/features/event-detail/types";
 
 interface CandidateSectionProps {
