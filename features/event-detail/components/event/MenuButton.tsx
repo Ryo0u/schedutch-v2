@@ -6,7 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
 import { useState } from "react"
 import EventEditDialog from "./EventEditDialog"
 import EventDeleteDialog from "./EventDeleteDialog"
-import UsersDeleteDialog from "../users/UsersDeleteDialog"
+import SelectUserDeleteDialog from "../users/SelectUserDeleteDialog"
 import EventShareDialog from "./EventShareDialog"
 import { useEvent } from "@/features/event-detail/hooks/useEvent";
 
@@ -67,7 +67,7 @@ function MenuButton({ eventId }: MenuProps) {
         <EventDeleteDialog data={data} open={isOpen} onOpenChange={setIsOpen} />
       )}
       {actionType === "usersDelete" && (
-        <UsersDeleteDialog eventId={eventId} data={data} open={isOpen} onOpenChange={setIsOpen} />
+        <SelectUserDeleteDialog eventId={eventId} data={data} open={isOpen} onOpenChange={setIsOpen} />
       )}
     
     </>
