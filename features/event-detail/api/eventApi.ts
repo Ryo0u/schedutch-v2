@@ -1,4 +1,5 @@
 import { supabase } from "@/utils/supabase/client";
+import type { Json } from "@/lib/database.types";
 import type { EventData, ResponseStatus } from "@/features/event-detail/types";
 
 /** パスワード不一致を表す SQLSTATE。RPC 側の RAISE EXCEPTION ... USING ERRCODE = 'PWD01' と対応する */
@@ -32,11 +33,11 @@ export async function verifyUserPassword(userId: string, password: string): Prom
     p_password: password,
   });
   if (error) throw error;
-  return data as boolean;
+  return data;
 }
 
-/** 保存用に整形済みの回答（time は ISO 文字列） */
-export interface ResponseInput {
+/** 保存用に整形済みの回答（time は ISO 文字列）。RPC への jsonb 引数として渡すため Json 互換を強制する */
+export interface ResponseInput extends Record<string, Json> {
   candidate_id: string;
   time: string;
   status: ResponseStatus | string;
@@ -83,7 +84,8 @@ export async function saveUserResponses(input: SaveUserResponsesInput): Promise<
   });
 
   if (error) throw error;
-  return data as string;
+  // save_user_responses は json_build_object('user_id', ...) を返す
+  return (data as { user_id: string }).user_id;
 }
 
 export interface UpdateUserWithResponsesInput {

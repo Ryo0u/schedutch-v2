@@ -1,7 +1,8 @@
 import { supabase } from "@/utils/supabase/client";
+import type { Json } from "@/lib/database.types";
 
-/** RPC 用に整形済みの候補日（time は ISO 文字列） */
-export interface CandidateInput {
+/** RPC 用に整形済みの候補日（time は ISO 文字列）。RPC への jsonb 引数として渡すため Json 互換を強制する */
+export interface CandidateInput extends Record<string, Json> {
   start_time: string;
   end_time: string;
   index_number: number;
@@ -24,5 +25,5 @@ export async function createEvent(input: CreateEventInput): Promise<string> {
   });
 
   if (error) throw error;
-  return data as string;
+  return data;
 }
