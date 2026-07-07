@@ -24,7 +24,7 @@ Next.js 16 App Router + React 19 + TypeScript。バックエンドは Supabase�
 | `/new` | イベント作成フォーム（Server Component。`CreateEventContainer` を描画） |
 | `/event/[id]` | イベント閲覧・回答ページ |
 
-`/new/page.tsx`・`/event/[id]/page.tsx` はいずれも薄い Server Component で、client 境界のオーケストレーションを担う `Container` コンポーネント（`CreateEventContainer` / `EventContainer`）を描画するだけ。`CreateEventContainer`（Client Component）は `useForm` + `formSchema` とフォーム全体のレイアウトを内包し、静的なヒーロー部分は presentational な `NewHero` に切り出している。`EventContainer`（Client Component）は `useEvent`（TanStack Query）で結合クエリを取得し、loading/エラーのガードと全体レイアウトのみを担う。各セクションコンポーネント（`EventInfo` / `MenuButton` / `JoinButton` / `UsersInfo` / `ResponsesInfo` / `ExtractResponses`）は `data` を prop で受け取らず、`eventId` を受けて自身で `useEvent` する（TanStack Query のキャッシュ共有により再フェッチは起きない）。Supabase への実アクセスは `features/event-detail/api/` に集約している。フォームの型・zod スキーマは各 feature 直下の `schema.ts`（`features/event-detail/schema.ts` / `features/event-create/schema.ts`）に集約する。
+`/new/page.tsx`・`/event/[id]/page.tsx` はいずれも薄い Server Component で、client 境界のオーケストレーションを担う `Container` コンポーネント（`CreateEventContainer` / `EventContainer`）を描画するだけ。`CreateEventContainer`（Client Component）は `useForm` + `formSchema` とフォーム全体のレイアウトを内包し、静的なヒーロー部分は presentational な `NewHero` に切り出している。`EventContainer`（Client Component）は `useEvent`（TanStack Query）で結合クエリを取得し、loading/エラーのガードと全体レイアウトのみを担う。各セクションコンポーネント（`EventInfo` / `MenuButton` / `JoinButton` / `UsersInfo` / `ResponsesInfo` / `ExtractPanel`）は `data` を prop で受け取らず、`eventId` を受けて自身で `useEvent` する（TanStack Query のキャッシュ共有により再フェッチは起きない）。Supabase への実アクセスは `features/event-detail/api/` に集約している。フォームの型・zod スキーマは各 feature 直下の `schema.ts`（`features/event-detail/schema.ts` / `features/event-create/schema.ts`）に集約する。
 
 ```ts
 // features/event-detail/api/eventApi.ts の取得クエリ（1回のクエリで全データを取得）
@@ -105,10 +105,10 @@ schedutch-v2/
 │   ├── event-detail/     # 閲覧・回答機能（/event/[id]）
 │   │   ├── components/   # 直下: EventContainer(親) / EventSkeleton
 │   │   │   ├── event/        # EventInfo, MenuButton, EventEditDialog, EventDeleteDialog, EventShareDialog
-│   │   │   ├── users/        # UsersInfo, UsersEditDialog, UsersEditPasswordDialog, SelectUserDeleteDialog（一覧から選んで削除）, UserDeleteDialog（対象確定済みの削除）
+│   │   │   ├── users/        # UsersInfo, UserEditDialog, UserEditPasswordDialog, UserDeletePickerDialog（一覧から選んで削除）, UserDeleteDialog（対象確定済みの削除）
 │   │   │   ├── responses/    # ResponsesDialog, ResponsesInfo, JoinButton
-│   │   │   ├── extract/      # ExtractResponses
-│   │   │   ├── form/         # InputResponses, InputUserInfo（users/responses共有）
+│   │   │   ├── extract/      # ExtractPanel
+│   │   │   ├── form/         # ResponsesFields, UserInfoFields（users/responses共有）
 │   │   │   └── shared/       # DeleteDialogShell（削除ダイアログ共通骨格。presentational）
 │   │   ├── api/          # Supabase アクセス（eventApi.ts / errors.ts）
 │   │   ├── hooks/        # TanStack Query hook（useEvent / useEventMutations）＋ usePasswordConfirm / useResetOnOpen（ダイアログopen時のreset定型）
@@ -117,13 +117,13 @@ schedutch-v2/
 │   │   ├── types.ts      # EventData など固有の型
 │   │   └── index.ts      # barrel（公開面。app からはここ経由で import）
 │   └── event-create/     # 作成機能（/new）
-│       ├── components/   # 直下: CreateEventContainer(親) / NewHero / CreateEvent / InputEventInfo / CreatedDialog
-│       │   └── candidates/   # InputEventCandidates, CandidatesList, EmptyList
+│       ├── components/   # 直下: CreateEventContainer(親) / NewHero / EventCreateActions / EventInfoFields / EventCreatedDialog
+│       │   └── candidates/   # CandidatesFields, CandidateList, EmptyList
 │       ├── api/          # Supabase アクセス（eventApi.ts）
 │       ├── schema.ts     # 作成フォームの型・zodスキーマ
 │       ├── hooks/        # useCreateEvent
 │       └── index.ts      # barrel
-├── hooks/                # 複数featureで使う共通hook（UseDeviceType）
+├── hooks/                # 複数featureで使う共通hook（useDeviceType）
 ├── components/
 │   ├── ui/               # shadcn/ui ベースの汎用プリミティブ
 │   ├── form/             # react-hook-form合成のフォーム部品（TextField / TextareaCounterField）。feature間共有
@@ -204,7 +204,11 @@ Conventional Commits に従う。プレフィックスは英語、本文（説�
 
 - 変数・関数は camelCase、型・コンポーネントは PascalCase。
 - コンポーネントファイルは PascalCase（例: `EventContainer.tsx`）。hook は `useXxx.ts`（camelCase）。
-- 新規ファイルにタイポ・表記ゆれを持ち込まない（既存の `hooks/UseDeviceType.tsx` は表記ゆれ。当該ファイルを触る際に是正してよい）。
+- **コンポーネントは名詞句**で `[ドメイン][操作/状態][UI種別]` の順に命名する（例: `EventEditDialog`, `UserDeletePickerDialog`）。動詞始まり（`InputXxx` / `CreateXxx` / `SelectXxx`）は使わない。
+- UI種別サフィックスの語彙: `Container` / `Dialog` / `Fields`（フォームの入力フィールド群）/ `List` / `Section` / `Panel` / `Button` / `Actions`（ボタン群）/ `Skeleton` / `Info`（表示セクション）。
+- 単複: 単一エンティティを扱うものは単数（`UserEditDialog`）、コレクション全体を表示するものは複数（`UsersInfo`, `ResponsesInfo`）。ただし `List` サフィックスはコレクションが自明なので単数 + List（`CandidateList`）。
+- 関数は動詞始まり camelCase（api は CRUD 動詞: get/create/save/update/delete/verify、lib は to/format/build 等）。定数は UPPER_SNAKE、zod スキーマは `xxxSchema`。
+- 新規ファイルにタイポ・表記ゆれを持ち込まない。
 
 ### ドキュメント更新
 
