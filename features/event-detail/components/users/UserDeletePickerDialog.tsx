@@ -20,7 +20,7 @@ interface DialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-function SelectUserDeleteDialog({ eventId, data, open, onOpenChange }: DialogProps) {
+function UserDeletePickerDialog({ eventId, data, open, onOpenChange }: DialogProps) {
   const [ password, setPassword ] = useState("");
   const [ userId, setUserId ] = useState("");
   const deleteUser = useDeleteUser(eventId);
@@ -98,4 +98,4 @@ function SelectUserDeleteDialog({ eventId, data, open, onOpenChange }: DialogPro
   )
 }
 
-export default SelectUserDeleteDialog
+export default UserDeletePickerDialog

@@ -8,7 +8,7 @@ type DraggableField = {
 };
 
 /**
- * InputResponsesのドラッグ塗り入力を集約する。
+ * ResponsesFieldsのドラッグ塗り入力を集約する。
  * PC（mouse）とスマホ（touch）どちらも内部の単一 applyToSlot(index) 経由で更新する。
  */
 export function useResponseDrag<T extends DraggableField>(

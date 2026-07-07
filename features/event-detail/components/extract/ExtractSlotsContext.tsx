@@ -8,7 +8,7 @@ type ExtractSlotsContextValue = ReturnType<typeof useExtractSlots>;
 
 const ExtractSlotsContext = createContext<ExtractSlotsContextValue | null>(null);
 
-// ExtractResponses(抽出UI)と ResponsesInfo(表)は兄弟のため、抽出状態を Context で共有する
+// ExtractPanel(抽出UI)と ResponsesInfo(表)は兄弟のため、抽出状態を Context で共有する
 export function ExtractSlotsProvider({ eventId, children }: { eventId: string; children: ReactNode }) {
   const { data } = useEvent(eventId);
   const extract = useExtractSlots({

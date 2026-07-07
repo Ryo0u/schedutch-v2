@@ -42,7 +42,7 @@ export function toResponseInputs(responses: ResponseFormValue[]): ResponseInput[
   }));
 }
 
-/** 回答フィールド配列を「candidate_id-HHmm」キーのマップに変換する（InputResponsesのセル検索用） */
+/** 回答フィールド配列を「candidate_id-HHmm」キーのマップに変換する（ResponsesFieldsのセル検索用） */
 export function buildResponseSlotMap<T extends { candidate_id: string; time: Date }>(
   fields: T[]
 ): Record<string, T & { index: number }> {

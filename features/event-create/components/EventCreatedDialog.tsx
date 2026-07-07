@@ -4,13 +4,13 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useRouter } from 'next/navigation';
 
-interface CreatedDialogProps {
+interface EventCreatedDialogProps {
   open: boolean;
   onChangeOpen: (open: boolean) => void;
   eventId: string | null;
 }
 
-function CreatedDialog({ open, onChangeOpen, eventId}: CreatedDialogProps) {
+function EventCreatedDialog({ open, onChangeOpen, eventId}: EventCreatedDialogProps) {
   const router = useRouter();
   const [copied, setCopied] = useState(false);
   
@@ -53,4 +53,4 @@ function CreatedDialog({ open, onChangeOpen, eventId}: CreatedDialogProps) {
   )
 }
 
-export default CreatedDialog
+export default EventCreatedDialog

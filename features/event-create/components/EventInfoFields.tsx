@@ -12,11 +12,11 @@ import { Separator } from '@/components/ui/separator';
 import TextField from '@/components/form/TextField';
 import TextareaCounterField from '@/components/form/TextareaCounterField';
 
-interface InputEventProps {
+interface EventInfoFieldsProps {
   control: Control<FormData>;
 }
 
-const InputEventInfo = ({ control }: InputEventProps) => {
+const EventInfoFields = ({ control }: EventInfoFieldsProps) => {
   return (
     <div>
       <Card className="shadow-md shadow-primary/10 ring-primary/20">
@@ -65,4 +65,4 @@ const InputEventInfo = ({ control }: InputEventProps) => {
   );
 };
 
-export default InputEventInfo;
+export default EventInfoFields;

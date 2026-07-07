@@ -8,7 +8,7 @@ interface InputUserProps {
   control: Control<UserFormData>;
 }
 
-function InputUserInfo({ control }: InputUserProps) {
+function UserInfoFields({ control }: InputUserProps) {
   return (
     <FieldGroup>
       <div className="flex flex-col gap-3 sm:flex-row">
@@ -21,4 +21,4 @@ function InputUserInfo({ control }: InputUserProps) {
   );
 }
 
-export default InputUserInfo;
+export default UserInfoFields;
