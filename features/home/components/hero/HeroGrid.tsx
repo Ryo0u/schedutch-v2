@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
+import { usePrefersReducedMotion } from '@/features/home/hooks/usePrefersReducedMotion';
 
 const CELL_W = 1.5;
 const GAP = 0.25;
@@ -49,36 +50,33 @@ function Cell({
 }
 
 export default function HeroGrid() {
-  const [phase, setPhase] = useState(0);
-  const [typed, setTyped] = useState('');
-  const reducedMotion = useRef(false);
+  const [animatedPhase, setAnimatedPhase] = useState(0);
+  const [animatedText, setAnimatedText] = useState('');
+  const prefersReducedMotion = usePrefersReducedMotion();
+  // reduced-motion 時はアニメーションを走らせず、最初から完了状態を表示する
+  const phase = prefersReducedMotion ? 2 : animatedPhase;
+  const typed = prefersReducedMotion ? RESULT_TEXT : animatedText;
 
   useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    reducedMotion.current = mq.matches;
-    if (mq.matches) {
-      setPhase(2);
-      setTyped(RESULT_TEXT);
-      return;
-    }
-    const t1 = setTimeout(() => setPhase(1), 2300);
-    const t2 = setTimeout(() => setPhase(2), 3100);
+    if (prefersReducedMotion) return;
+    const t1 = setTimeout(() => setAnimatedPhase(1), 2300);
+    const t2 = setTimeout(() => setAnimatedPhase(2), 3100);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
     };
-  }, []);
+  }, [prefersReducedMotion]);
 
   useEffect(() => {
-    if (phase !== 2 || reducedMotion.current) return;
+    if (phase !== 2 || prefersReducedMotion) return;
     let i = 0;
     const iv = setInterval(() => {
       i += 1;
-      setTyped(RESULT_TEXT.slice(0, i));
+      setAnimatedText(RESULT_TEXT.slice(0, i));
       if (i >= RESULT_TEXT.length) clearInterval(iv);
     }, 28);
     return () => clearInterval(iv);
-  }, [phase]);
+  }, [phase, prefersReducedMotion]);
 
   return (
     <div className="card-pop w-full p-4 sm:p-6">

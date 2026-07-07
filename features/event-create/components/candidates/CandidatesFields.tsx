@@ -48,7 +48,7 @@ const CandidatesFields = ({ control }: CandidatesFieldsProps) => {
 		
 		// 選択した候補日リスト
 		const datesList: Date[] = [];
-		let current = new Date(selectedDates.from);
+		const current = new Date(selectedDates.from);
 		const end = new Date(selectedDates.to);
 
 		while (current <= end) {
