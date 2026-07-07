@@ -1,14 +1,11 @@
 "use client"
 
-import { useState } from "react";
-import { MessageCircle, Pencil, Trash2, UserCircle } from "lucide-react";
+import { Pencil, Trash2, UserCircle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useDeviceType } from "@/hooks/useDeviceType";
-import { Popover, PopoverContent, PopoverDescription, PopoverHeader, PopoverTitle, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import type { User } from "@/features/event-detail/types";
 import { useEvent } from "@/features/event-detail/hooks/useEvent";
+import { useUserDialogFlow } from "@/features/event-detail/hooks/useUserDialogFlow";
+import UserComment from "./UserComment";
 import UsersEditPasswordDialog from "./UsersEditPasswordDialog";
 import UsersEditDialog from "./UsersEditDialog";
 import UserDeleteDialog from "./UserDeleteDialog";
@@ -17,97 +14,10 @@ interface UsersInfoProps {
   eventId: string;
 }
 
-
-// デバイスによってコメントの表示方法を変更
-function UserComment({ comment }: { comment: string }) {
-  const device = useDeviceType();
-  
-  if (!comment) return null;
-  
-  if (device === "mobile") {
-    return (
-      <Popover>
-        <PopoverTrigger
-         render={<Button variant="ghost"><MessageCircle className="h-4 w-4 text-accent-foreground"/></Button>}
-        />
-        <PopoverContent align="start">
-          <PopoverHeader>
-            <PopoverTitle>コメント</PopoverTitle>
-            <PopoverDescription>{comment}</PopoverDescription>
-          </PopoverHeader>
-        </PopoverContent>
-      </Popover>
-    )
-  }
-  else {
-    return (
-      <span className="text-accent-foreground text-xs">{comment}</span>
-    )
-  }
-}
-
 function UsersInfo({ eventId }: UsersInfoProps) {
   const { data } = useEvent(eventId);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [confirmedPassword, setConfirmedPassword] = useState("");
-  const [passwordOpen, setPasswordOpen] = useState(false);
-  const [editOpen, setEditOpen] = useState(false);
-  const [deletingUser, setDeletingUser] = useState<User | null>(null);
-  const [deleteOpen, setDeleteOpen] = useState(false);
+  const { confirmPassword, editUser, deleteUser, startEdit, startDelete } = useUserDialogFlow();
 
-  const handleEditClick = (user: User) => {
-    setEditingUser(user);
-    setPasswordOpen(true);
-  };
-
-  // onOpenChange はユーザーがキャンセルした時だけ呼ばれる（成功時は onConfirm 経由で親が閉じる）
-  const handlePasswordOpenChange = (open: boolean) => {
-    setPasswordOpen(open);
-    if (!open) setEditingUser(null);
-  };
-
-  // 検証済みの平文パスワードを保持し、編集ダイアログでの再検証に渡す
-  const handlePasswordConfirm = (password: string) => {
-    setConfirmedPassword(password);
-    setPasswordOpen(false);
-    setEditOpen(true);
-  };
-
-  const handleEditOpenChange = (open: boolean) => {
-    setEditOpen(open);
-    if (!open) {
-      setEditingUser(null);
-      setConfirmedPassword("");
-    }
-  };
-
-  const handleDeleteClick = (user: User) => {
-    setDeletingUser(user);
-    setDeleteOpen(true);
-  };
-
-  const handleDeleteOpenChange = (open: boolean) => {
-    setDeleteOpen(open);
-    if (!open) setDeletingUser(null);
-  };
-
-  const getUserColor = (name: string) => {
-    const colors = [
-      "bg-red-50 text-red-500 hover:bg-red-500",
-      "bg-orange-50 text-orange-500 hover:bg-orange-500",
-      "bg-amber-50 text-amber-500 hover:bg-amber-500",
-      "bg-emerald-50 text-emerald-500 hover:bg-emerald-500",
-      "bg-blue-50 text-blue-500 hover:bg-blue-500",
-      "bg-indigo-50 text-indigo-500 hover:bg-indigo-500",
-      "bg-violet-50 text-violet-500 hover:bg-violet-500",
-      "bg-rose-50 text-rose-500 hover:bg-rose-500",
-    ];
-    
-    // 文字列の文字コードの合計からインデックスを計算
-    const charCodeSum = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return colors[charCodeSum % colors.length];
-  };
-  
   if (!data) return null;
 
   // 参加者がまだいない場合の表示
@@ -140,10 +50,7 @@ function UsersInfo({ eventId }: UsersInfoProps) {
               className="group flex justify-between items-center p-2 transition-all hover:bg-muted/40"
             >
               <div className="flex gap-4 items-center min-w-0">
-                <div className={cn(
-                  "p-2 rounded-full transition-colors shadow-sm",
-                  getUserColor(user.name)
-                )}>
+                <div className="p-2 rounded-full bg-muted text-muted-foreground shadow-sm">
                   <UserCircle className="h-5 w-5" />
                 </div>
 
@@ -159,14 +66,14 @@ function UsersInfo({ eventId }: UsersInfoProps) {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleEditClick(user)}
+                  onClick={() => startEdit(user)}
                 >
                   <Pencil className="h-4 w-4" />
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleDeleteClick(user)}
+                  onClick={() => startDelete(user)}
                 >
                   <Trash2 className="h-4 w-4 text-destructive" />
                 </Button>
@@ -176,30 +83,30 @@ function UsersInfo({ eventId }: UsersInfoProps) {
         </div>
       </CardContent>
 
-      {editingUser && (
+      {confirmPassword.user && (
         <>
           <UsersEditPasswordDialog
-            data={{ user: editingUser }}
-            open={passwordOpen}
-            onOpenChange={handlePasswordOpenChange}
-            onConfirm={handlePasswordConfirm}
+            data={{ user: confirmPassword.user }}
+            open={confirmPassword.open}
+            onOpenChange={confirmPassword.onOpenChange}
+            onConfirm={confirmPassword.onConfirm}
           />
           <UsersEditDialog
             eventId={eventId}
-            data={{ user: editingUser, candidates: data.candidates }}
-            password={confirmedPassword}
-            open={editOpen}
-            onOpenChange={handleEditOpenChange}
+            data={{ user: confirmPassword.user, candidates: data.candidates }}
+            password={editUser.password}
+            open={editUser.open}
+            onOpenChange={editUser.onOpenChange}
           />
         </>
       )}
 
-      {deletingUser && (
+      {deleteUser.user && (
         <UserDeleteDialog
           eventId={eventId}
-          data={{ user: deletingUser }}
-          open={deleteOpen}
-          onOpenChange={handleDeleteOpenChange}
+          data={{ user: deleteUser.user }}
+          open={deleteUser.open}
+          onOpenChange={deleteUser.onOpenChange}
         />
       )}
     </Card>
