@@ -1,4 +1,4 @@
-import { jstHHMM, formatJSTDate } from "@/lib/datetime";
+import { formatJSTTime, formatJSTDate } from "@/lib/datetime";
 import { SLOT_INTERVAL_MS } from "@/lib/constants";
 import { STATUS_META } from "@/features/event-detail/lib/status";
 import type { User } from "@/features/event-detail/types";
@@ -119,8 +119,8 @@ const formatExtractTimes = (blocks: TimeBlock[]): string[] => {
   Object.entries(grouped).forEach(([date, daysBlocks]) => {
     result.push(date);
     daysBlocks.forEach(block => {
-      const start = jstHHMM(block.start);
-      const end = jstHHMM(block.end + SLOT_INTERVAL_MS);
+      const start = formatJSTTime(block.start);
+      const end = formatJSTTime(block.end + SLOT_INTERVAL_MS);
       // 表示時に maybe の人には symbol を付ける
       const names = block.participants.map(p => p.status === 'maybe' ? `${p.name}(${STATUS_META.maybe.symbol})` : p.name).join(', ');
       result.push(`${start} - ${end} : ${names}`);

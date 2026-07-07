@@ -1,5 +1,5 @@
 import { SLOT_INTERVAL_MS } from "@/lib/constants";
-import { jstHHMM } from "@/lib/datetime";
+import { formatJSTTime } from "@/lib/datetime";
 import type { ResponseInput } from "@/features/event-detail/api/eventApi";
 import type { Candidate } from "@/features/event-detail/types";
 
@@ -48,7 +48,7 @@ export function buildResponseSlotMap<T extends { candidate_id: string; time: Dat
 ): Record<string, T & { index: number }> {
   return fields.reduce(
     (acc, field, index) => {
-      const hhmm = jstHHMM(field.time);
+      const hhmm = formatJSTTime(field.time);
       acc[`${field.candidate_id}-${hhmm}`] = { ...field, index };
       return acc;
     },

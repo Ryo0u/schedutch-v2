@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { TIME_OPTIONS } from "@/lib/constants";
-import { jstHHMM } from "@/lib/datetime";
+import { formatJSTTime } from "@/lib/datetime";
 import { RESPONSE_STATUSES, STATUS_META } from "@/features/event-detail/lib/status";
 import { useEvent } from "@/features/event-detail/hooks/useEvent";
 import { useExtractSlotsContext } from "../extract/ExtractSlotsContext";
@@ -18,10 +18,10 @@ function ResponsesInfo({ eventId }: ResponsesInfoProps) {
 
   // 全候補の時間範囲の和集合で表示列を絞る
   const globalStart = data.candidates
-    .map((c) => jstHHMM(c.start_time))
+    .map((c) => formatJSTTime(c.start_time))
     .reduce((a, b) => (a < b ? a : b), "23:59");
   const globalEnd = data.candidates
-    .map((c) => jstHHMM(c.end_time))
+    .map((c) => formatJSTTime(c.end_time))
     .reduce((a, b) => (a > b ? a : b), "00:00");
   const displayedTimes = TIME_OPTIONS.filter((t) => t >= globalStart && t < globalEnd);
 
