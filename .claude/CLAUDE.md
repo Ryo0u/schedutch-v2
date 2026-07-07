@@ -99,6 +99,7 @@ schedutch-v2/
 │   │   │   ├── extract/       # ExtractSection
 │   │   │   ├── features/      # FeaturesSection
 │   │   │   └── cta/           # CtaSection
+│   │   ├── hooks/         # usePrefersReducedMotion（LPアニメーションのreduced-motion購読）
 │   │   ├── constants.ts   # 各セクションの表示用データ（STEPS/FEATURES/CONDITIONS等）
 │   │   ├── home.css       # LP専用スタイル（card-pop/marker/sticker等。app/page.tsxでimport）
 │   │   └── index.ts       # barrel

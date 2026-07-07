@@ -1,35 +1,34 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useSyncExternalStore } from "react"
 
 export type DeviceType = "mobile" | "tablet" | "desktop"
 
+const MOBILE_QUERY = "(max-width: 639px)"
+const TABLET_QUERY = "(min-width: 640px) and (max-width: 1023px)"
+
+function subscribe(onStoreChange: () => void) {
+  const mobileMql = window.matchMedia(MOBILE_QUERY)
+  const tabletMql = window.matchMedia(TABLET_QUERY)
+
+  mobileMql.addEventListener("change", onStoreChange)
+  tabletMql.addEventListener("change", onStoreChange)
+
+  return () => {
+    mobileMql.removeEventListener("change", onStoreChange)
+    tabletMql.removeEventListener("change", onStoreChange)
+  }
+}
+
+function getSnapshot(): DeviceType {
+  if (window.matchMedia(MOBILE_QUERY).matches) return "mobile"
+  if (window.matchMedia(TABLET_QUERY).matches) return "tablet"
+  return "desktop"
+}
+
+// SSR時は desktop 扱い。クライアントで実測値に置き換わる
+const getServerSnapshot = (): DeviceType => "desktop"
+
 export function useDeviceType() {
-  const [device, setDevice] = useState<DeviceType>("desktop")
-
-  useEffect(() => {
-    const mobileMql = window.matchMedia("(max-width: 639px)")
-    const tabletMql = window.matchMedia("(min-width: 640px) and (max-width: 1023px)")
-
-    const getDeviceType = (): DeviceType => {
-      if (mobileMql.matches) return "mobile"
-      if (tabletMql.matches) return "tablet"
-      return "desktop"
-    }
-
-    // 初回実行
-    setDevice(getDeviceType())
-
-    const handler = () => setDevice(getDeviceType())
-
-    mobileMql.addEventListener("change", handler)
-    tabletMql.addEventListener("change", handler)
-
-    return () => {
-      mobileMql.removeEventListener("change", handler)
-      tabletMql.removeEventListener("change", handler)
-    }
-  }, [])
-
-  return device
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { usePrefersReducedMotion } from '@/features/home/hooks/usePrefersReducedMotion';
 
 interface ScrollRevealProps {
   children: React.ReactNode;
@@ -10,20 +11,19 @@ interface ScrollRevealProps {
 
 export default function ScrollReveal({ children, delay = 0, className }: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
+  const [intersected, setIntersected] = useState(false);
+  const prefersReducedMotion = usePrefersReducedMotion();
+  // reduced-motion 時はスクロール位置に関わらず最初から表示する
+  const visible = intersected || prefersReducedMotion;
 
   useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    if (mq.matches) {
-      setVisible(true);
-      return;
-    }
+    if (prefersReducedMotion) return;
     const el = ref.current;
     if (!el) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry?.isIntersecting) {
-          setVisible(true);
+          setIntersected(true);
           observer.disconnect();
         }
       },
@@ -31,7 +31,7 @@ export default function ScrollReveal({ children, delay = 0, className }: ScrollR
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [prefersReducedMotion]);
 
   return (
     <div
