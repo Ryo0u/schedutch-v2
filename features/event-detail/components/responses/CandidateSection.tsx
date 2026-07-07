@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { formatJSTTime, formatJSTDate, jstWallTimeToISO } from "@/lib/datetime";
 import { STATUS_META } from "@/features/event-detail/lib/status";
-import type { TimeBlock } from "@/features/event-detail/components/extract/extractSlotsAlgorithm";
+import type { TimeBlock } from "@/features/event-detail/lib/extractSlots";
 import type { Candidate, ResponseStatus, User } from "@/features/event-detail/types";
 
 interface CandidateSectionProps {
