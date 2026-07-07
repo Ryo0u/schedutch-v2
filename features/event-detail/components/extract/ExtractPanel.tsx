@@ -9,7 +9,7 @@ import ParticipantSelector from "./ParticipantSelector";
 import ExtractFilters from "./ExtractFilters";
 import ExtractResultPanel from "./ExtractResultPanel";
 
-function ExtractResponses({ eventId }: { eventId: string }) {
+function ExtractPanel({ eventId }: { eventId: string }) {
   const { data } = useEvent(eventId);
   const extract = useExtractSlotsContext();
 
@@ -84,4 +84,4 @@ function ExtractResponses({ eventId }: { eventId: string }) {
   )
 }
 
-export default ExtractResponses
+export default ExtractPanel

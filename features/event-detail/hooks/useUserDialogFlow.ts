@@ -5,7 +5,7 @@ import type { User } from "@/features/event-detail/types";
  * UsersInfo の行から開始する、本人によるセルフサービスの編集・削除フロー。
  *
  * 「参加者を削除する」導線はもう1つ、幹事用メニュー（MenuButton →
- * SelectUserDeleteDialog）が一覧から選んで削除する形で別途存在する。
+ * UserDeletePickerDialog）が一覧から選んで削除する形で別途存在する。
  * こちらは本人が自分のパスワードで自分の行から編集・削除する専用のフローで、
  * 両者はUXの前提（本人 or 一覧から選ぶ幹事）が異なるため意図的に分離されている。
  *

@@ -9,14 +9,14 @@ import { Button } from '@/components/ui/button';
 import { FieldGroup } from '@/components/ui/field';
 import TextField from '@/components/form/TextField';
 import TextareaCounterField from '@/components/form/TextareaCounterField';
-import InputResponses from '../form/InputResponses';
+import ResponsesFields from '../form/ResponsesFields';
 import { toast } from 'sonner';
 import type { Candidate, User } from '@/features/event-detail/types';
 import { useUpdateUser } from '@/features/event-detail/hooks/useEventMutations';
 import { toResponseInputs } from '@/features/event-detail/lib/responses';
 import { UserEditFormSchema, type UserEditFormData } from '@/features/event-detail/schema';
 
-interface UsersEditDialogProps {
+interface UserEditDialogProps {
   eventId: string;
   data: {
     user: Pick<User, "id" | "name" | "comment" | "responses">;
@@ -28,7 +28,7 @@ interface UsersEditDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-function UsersEditDialog({ eventId, data, password, open, onOpenChange }: UsersEditDialogProps) {
+function UserEditDialog({ eventId, data, password, open, onOpenChange }: UserEditDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const updateUser = useUpdateUser(eventId);
 
@@ -97,7 +97,7 @@ function UsersEditDialog({ eventId, data, password, open, onOpenChange }: UsersE
           </FieldGroup>
 
           <Separator />
-          <InputResponses control={form.control} data={data} />
+          <ResponsesFields control={form.control} data={data} />
         </form>
 
         <DialogFooter className="m-3">
@@ -113,4 +113,4 @@ function UsersEditDialog({ eventId, data, password, open, onOpenChange }: UsersE
   );
 }
 
-export default UsersEditDialog;
+export default UserEditDialog;

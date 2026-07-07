@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
-import { jstHHMM, formatJSTDate, jstWallTimeToISO } from "@/lib/datetime";
+import { formatJSTTime, formatJSTDate, jstWallTimeToISO } from "@/lib/datetime";
 import { STATUS_META } from "@/features/event-detail/lib/status";
 import type { TimeBlock } from "@/features/event-detail/components/extract/extractSlotsAlgorithm";
 import type { Candidate, ResponseStatus, User } from "@/features/event-detail/types";
@@ -15,8 +15,8 @@ interface CandidateSectionProps {
 type HighlightFlags = { inBlock: boolean; isStart: boolean; isEnd: boolean };
 
 export default function CandidateSection({ candidate, users, displayedTimes, extractedBlocks }: CandidateSectionProps) {
-  const startHHMM = jstHHMM(candidate.start_time);
-  const endHHMM = jstHHMM(candidate.end_time);
+  const startHHMM = formatJSTTime(candidate.start_time);
+  const endHHMM = formatJSTTime(candidate.end_time);
   const dateLabel = formatJSTDate(candidate.start_time, {
     month: "short",
     day: "numeric",
@@ -78,7 +78,7 @@ export default function CandidateSection({ candidate, users, displayedTimes, ext
       {/* ユーザー行 */}
       {users.map((user, userIndex) => {
         const responseMap = user.responses.reduce((acc, res) => {
-          acc[`${res.candidate_id}-${jstHHMM(res.time)}`] = res.status;
+          acc[`${res.candidate_id}-${formatJSTTime(res.time)}`] = res.status;
           return acc;
         }, {} as Record<string, string>);
 

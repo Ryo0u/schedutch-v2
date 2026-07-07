@@ -5,9 +5,9 @@ export const RESPONSE_STATUSES: ResponseStatus[] = ["ok", "maybe", "ng"];
 interface StatusMeta {
   symbol: string;
   label: string;
-  /** InputResponses.tsx のトグルボタン選択中スタイル */
+  /** ResponsesFields.tsx のトグルボタン選択中スタイル */
   toggleActiveClass: string;
-  /** InputResponses.tsx の回答入力セルの背景色 */
+  /** ResponsesFields.tsx の回答入力セルの背景色 */
   inputCellClass: string;
   /** CandidateSection.tsx の回答表示セルの背景色 */
   candidateCellClass: string;

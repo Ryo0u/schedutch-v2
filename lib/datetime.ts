@@ -10,7 +10,7 @@ export function toJST(utcDateInput: DateInput): Date {
 }
 
 /** JST での "HH:MM" 文字列を返す */
-export function jstHHMM(input: DateInput): string {
+export function formatJSTTime(input: DateInput): string {
   const ms = input instanceof Date ? input.getTime() : new Date(input).getTime();
   const jst = new Date(ms + JST_OFFSET_MS);
   const h = String(jst.getUTCHours()).padStart(2, "0");

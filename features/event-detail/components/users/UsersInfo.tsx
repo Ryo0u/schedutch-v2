@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { useEvent } from "@/features/event-detail/hooks/useEvent";
 import { useUserDialogFlow } from "@/features/event-detail/hooks/useUserDialogFlow";
 import UserComment from "./UserComment";
-import UsersEditPasswordDialog from "./UsersEditPasswordDialog";
-import UsersEditDialog from "./UsersEditDialog";
+import UserEditPasswordDialog from "./UserEditPasswordDialog";
+import UserEditDialog from "./UserEditDialog";
 import UserDeleteDialog from "./UserDeleteDialog";
 
 interface UsersInfoProps {
@@ -85,13 +85,13 @@ function UsersInfo({ eventId }: UsersInfoProps) {
 
       {confirmPassword.user && (
         <>
-          <UsersEditPasswordDialog
+          <UserEditPasswordDialog
             data={{ user: confirmPassword.user }}
             open={confirmPassword.open}
             onOpenChange={confirmPassword.onOpenChange}
             onConfirm={confirmPassword.onConfirm}
           />
-          <UsersEditDialog
+          <UserEditDialog
             eventId={eventId}
             data={{ user: confirmPassword.user, candidates: data.candidates }}
             password={editUser.password}

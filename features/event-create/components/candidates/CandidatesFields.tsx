@@ -15,11 +15,11 @@ import { useDeviceType } from '@/hooks/useDeviceType';
 import { TIME_OPTIONS } from '@/lib/constants';
 
 
-interface InputEventProps {
+interface CandidatesFieldsProps {
 	control: Control<FormData>;
 }
 
-const InputEventCandidates = ({ control }: InputEventProps) => {
+const CandidatesFields = ({ control }: CandidatesFieldsProps) => {
 	const { append } = useFieldArray({ control, name: "candidates" });
 	
 	// ローカルに選択している日時を一時保存
@@ -185,4 +185,4 @@ const InputEventCandidates = ({ control }: InputEventProps) => {
   )
 }
 
-export default InputEventCandidates
+export default CandidatesFields

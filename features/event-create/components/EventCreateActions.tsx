@@ -5,17 +5,17 @@ import { UseFormReturn } from 'react-hook-form';
 import { FormData } from '@/features/event-create/schema';
 import { toast } from "sonner"
 import { useState } from 'react';
-import CreatedDialog from './CreatedDialog';
+import EventCreatedDialog from './EventCreatedDialog';
 import { Spinner } from '@/components/ui/spinner';
 import { jstWallTimeToISO } from '@/lib/datetime';
 import { hashPassword } from '@/lib/password';
 import { useCreateEvent } from '@/features/event-create/hooks/useCreateEvent';
 
-interface CreateEventActionProps {
+interface EventCreateActionsProps {
   form: UseFormReturn<FormData>;
 }
 
-function CreateEvent({ form }: CreateEventActionProps) {
+function EventCreateActions({ form }: EventCreateActionsProps) {
   const { isSubmitting } = form.formState;
   const [showDialog, setShowDialog] = useState(false);
   const [createdEventId, setCreatedEventId] = useState<string | null>(null);
@@ -76,7 +76,7 @@ function CreateEvent({ form }: CreateEventActionProps) {
         </div>
       </div>
         
-      <CreatedDialog
+      <EventCreatedDialog
         open={showDialog}
         onChangeOpen={setShowDialog}
         eventId={createdEventId}
@@ -85,4 +85,4 @@ function CreateEvent({ form }: CreateEventActionProps) {
   )
 }
 
-export default CreateEvent
+export default EventCreateActions

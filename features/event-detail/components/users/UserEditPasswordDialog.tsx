@@ -11,7 +11,7 @@ import { usePasswordConfirm } from "@/features/event-detail/hooks/usePasswordCon
 import { verifyUserPassword } from "@/features/event-detail/api/eventApi";
 import { createPasswordMismatchError } from "@/features/event-detail/api/errors";
 
-interface UsersEditPasswordDialogProps {
+interface UserEditPasswordDialogProps {
   data: {
     user: Pick<User, "id" | "name">;
   };
@@ -21,7 +21,7 @@ interface UsersEditPasswordDialogProps {
   onConfirm: (password: string) => void;
 }
 
-function UsersEditPasswordDialog({ data, open, onOpenChange, onConfirm }: UsersEditPasswordDialogProps) {
+function UserEditPasswordDialog({ data, open, onOpenChange, onConfirm }: UserEditPasswordDialogProps) {
   const [password, setPassword] = useState("");
   const { isSubmitting, errorMsg, setErrorMsg, run } = usePasswordConfirm();
 
@@ -80,4 +80,4 @@ function UsersEditPasswordDialog({ data, open, onOpenChange, onConfirm }: UsersE
   );
 }
 
-export default UsersEditPasswordDialog;
+export default UserEditPasswordDialog;

@@ -12,11 +12,11 @@ import { Item, ItemActions, ItemContent, ItemGroup, ItemTitle } from '@/componen
 import EmptyList from './EmptyList';
 import { TIME_OPTIONS } from "@/lib/constants";
 
-interface InputEventProps {
+interface CandidateListProps {
 	control: Control<FormData>;
 }
 
-function CandidatesList({ control }: InputEventProps) {	
+function CandidateList({ control }: CandidateListProps) {	
 	const { remove } = useFieldArray({ control, name: "candidates" });
 	const { errors } = useFormState({ control });
 	const watchedFields = useWatch({ control, name: "candidates" });
@@ -139,4 +139,4 @@ function CandidatesList({ control }: InputEventProps) {
   )
 }
 
-export default CandidatesList
+export default CandidateList

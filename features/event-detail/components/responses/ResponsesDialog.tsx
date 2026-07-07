@@ -4,9 +4,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import InputUserInfo from '../form/InputUserInfo';
+import UserInfoFields from '../form/UserInfoFields';
 import { Separator } from '@/components/ui/separator';
-import InputResponses from '../form/InputResponses';
+import ResponsesFields from '../form/ResponsesFields';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { hashPassword } from '@/lib/password';
@@ -85,9 +85,9 @@ function ResponsesDialog({ eventId, data, open, onOpenChange }: ResponsesDialogP
           onSubmit={form.handleSubmit(onSubmit)} 
           className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-6"
         >
-          <InputUserInfo control={form.control} />
+          <UserInfoFields control={form.control} />
           <Separator/>
-          <InputResponses control={form.control} data={data} />
+          <ResponsesFields control={form.control} data={data} />
         </form>
         
         <DialogFooter className='m-3'>

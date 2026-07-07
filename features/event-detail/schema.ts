@@ -29,7 +29,7 @@ export const UserFormSchema = z.object({
     ),
 });
 
-/** UsersEditDialog: パスワードは事前検証済みのため編集フォームに含めない */
+/** UserEditDialog: パスワードは事前検証済みのため編集フォームに含めない */
 export const UserEditFormSchema = UserFormSchema.omit({ password: true });
 export type UserEditFormData = z.infer<typeof UserEditFormSchema>;
 

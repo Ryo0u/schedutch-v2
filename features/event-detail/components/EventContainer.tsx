@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import EventSkeleton from "@/features/event-detail/components/EventSkeleton";
 import { useEvent } from "@/features/event-detail/hooks/useEvent";
 import ResponsesInfo from "./responses/ResponsesInfo";
-import ExtractResponses from "./extract/ExtractResponses";
+import ExtractPanel from "./extract/ExtractPanel";
 import { ExtractSlotsProvider } from "./extract/ExtractSlotsContext";
 import EventSideNav from "./sidebar/EventSideNav";
 
@@ -49,7 +49,7 @@ export default function EventContainer({ eventId }: { eventId: string }) {
         </section>
 
         <section id="extract-responses" className="mb-8 scroll-mt-20">
-          <ExtractResponses eventId={eventId}/>
+          <ExtractPanel eventId={eventId}/>
         </section>
       </ExtractSlotsProvider>
     </div>

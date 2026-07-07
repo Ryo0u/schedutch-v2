@@ -13,14 +13,14 @@ type FormWithResponses = FieldValues & {
   responses: { candidate_id: string; time: Date; status: string }[];
 };
 
-interface InputResponsesProps<T extends FormWithResponses> {
+interface ResponsesFieldsProps<T extends FormWithResponses> {
   control: Control<T>;
   data: {
     candidates: Pick<Candidate, "id" | "start_time" | "end_time">[];
   };
 }
 
-function InputResponses<T extends FormWithResponses>({ control, data }: InputResponsesProps<T>) {
+function ResponsesFields<T extends FormWithResponses>({ control, data }: ResponsesFieldsProps<T>) {
   const { fields, update } = useFieldArray({
     control: control as Control<FormWithResponses>,
     name: "responses",
@@ -119,4 +119,4 @@ function InputResponses<T extends FormWithResponses>({ control, data }: InputRes
   )
 }
 
-export default InputResponses
+export default ResponsesFields
