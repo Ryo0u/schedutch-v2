@@ -14,6 +14,7 @@ import { Candidate } from '@/features/event-detail/types';
 import { UserFormData, UserFormSchema } from '@/features/event-detail/schema';
 import { useSaveResponses } from '@/features/event-detail/hooks/useEventMutations';
 import { buildInitialResponses, toResponseInputs } from '@/features/event-detail/lib/responses';
+import { toast } from 'sonner';
 
 interface ResponsesDialogProps {
   eventId: string;
@@ -64,8 +65,8 @@ function ResponsesDialog({ eventId, data, open, onOpenChange }: ResponsesDialogP
       onOpenChange(false);
       form.reset();
     } catch (error) {
-      console.error('Failed to creat user:', error);
-      alert("保存に失敗しました。")
+      console.error('Failed to create user:', error);
+      toast.error('回答の保存に失敗しました。', {position: 'top-center'})
     }
   }
   

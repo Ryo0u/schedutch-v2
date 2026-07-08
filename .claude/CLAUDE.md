@@ -201,6 +201,13 @@ Conventional Commits に従う。プレフィックスは英語、本文（説�
 - 型の置き場: feature 固有なら `features/{feature}/types.ts`、複数 feature で共有するもののみ `lib/`。
 - 時刻は UTC 保存・表示時に `toJST()` で変換。時刻選択肢は `TIME_OPTIONS` を共通使用する。
 
+### エラーハンドリング
+
+mutation の catch 節では、ユーザー影響の有無で通知先を分ける。
+
+- **ユーザー影響あり**（保存・削除など操作結果を伝える必要がある場合）: `sonner` の `toast.error(...)` でユーザーに通知する。`alert()` は使わない。
+- **詳細情報**（デバッグ用のエラーオブジェクト等）: `console.error(...)` に出力する（`console.log` は使わない）。
+
 ### 命名・ファイル
 
 - 変数・関数は camelCase、型・コンポーネントは PascalCase。

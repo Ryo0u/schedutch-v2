@@ -43,7 +43,7 @@ function UserDeletePickerDialog({ eventId, data, open, onOpenChange }: DialogPro
         onOpenChange(false);
       }
     } catch (error) {
-      console.log("failed to delete user", error)
+      console.error("failed to delete user", error)
       toast.error("参加者の削除に失敗しました", {position: 'top-center'})
       onOpenChange(false);
     }
