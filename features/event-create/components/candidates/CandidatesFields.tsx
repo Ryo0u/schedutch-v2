@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { TIME_OPTIONS } from '@/lib/constants';
+import { buildNewCandidateDates } from '@/features/event-create/lib/candidateDates';
 
 
 interface CandidatesFieldsProps {
@@ -45,24 +46,10 @@ const CandidatesFields = ({ control }: CandidatesFieldsProps) => {
 	
 	const handleAddCandidates = () => {
 		if (!selectedDates?.from || !selectedDates?.to) return;
-		
-		// 選択した候補日リスト
-		const datesList: Date[] = [];
-		const current = new Date(selectedDates.from);
-		const end = new Date(selectedDates.to);
 
-		while (current <= end) {
-			datesList.push(new Date(current));
-			current.setDate(current.getDate() + 1)
-		}
-		
-		// 既存の候補日リスト
-		const existingDateStrings = new Set(
-			watchedFields.map(item => new Date(item.date).toDateString())
-		)
-		
-		datesList
-			.filter(date => !existingDateStrings.has(date.toDateString()))
+		const existingDates = watchedFields.map(item => new Date(item.date));
+
+		buildNewCandidateDates(selectedDates, existingDates)
 			.forEach(date => {
 				append({
 					date: date,
@@ -70,7 +57,7 @@ const CandidatesFields = ({ control }: CandidatesFieldsProps) => {
 					endTime: endTime,
 				});
 			});
-		
+
 		// 日付選択リセット
 		setSelectedDates(undefined)
 	}
