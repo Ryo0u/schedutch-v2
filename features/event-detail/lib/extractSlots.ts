@@ -24,11 +24,21 @@ interface ExtractSlotsParams {
   participantsFilter: (user: ExtractUser) => boolean;
 }
 
-const isUserAvailable = (user: ExtractUser, time: number, includeMaybe: boolean) => {
-  const res = user.responses.find(r => new Date(r.time).getTime() === time);
-  if (!res) return false;
-  if (res.status === 'ok') return true;
-  if (includeMaybe && res.status === 'maybe') return true;
+// userId -> (time -> status)。線形探索を避けるための事前索引
+type ResponseMaps = Map<string, Map<number, string>>;
+
+const buildResponseMaps = (users: ExtractUser[]): ResponseMaps => {
+  return new Map(users.map(u => [
+    u.id,
+    new Map(u.responses.map(r => [new Date(r.time).getTime(), r.status])),
+  ]));
+};
+
+const isUserAvailable = (responseMaps: ResponseMaps, userId: string, time: number, includeMaybe: boolean) => {
+  const status = responseMaps.get(userId)?.get(time);
+  if (!status) return false;
+  if (status === 'ok') return true;
+  if (includeMaybe && status === 'maybe') return true;
   return false;
 };
 
@@ -44,17 +54,15 @@ const checkSlotConditions = (
   time: number,
   conditions: FilterCondition[],
   users: ExtractUser[],
+  responseMaps: ResponseMaps,
   includeMaybe: boolean,
 ): boolean => {
   return conditions.every(condition => {
     switch (condition.type) {
       case 'PARTICIPANTS':
-        return condition.userIds.every(uid => {
-          const user = users.find(u => u.id === uid);
-          return user ? isUserAvailable(user, time, includeMaybe) : false;
-        });
+        return condition.userIds.every(uid => isUserAvailable(responseMaps, uid, time, includeMaybe));
       case 'HEADCOUNTS': {
-        const count = users.filter(u => isUserAvailable(u, time, includeMaybe)).length;
+        const count = users.filter(u => isUserAvailable(responseMaps, u.id, time, includeMaybe)).length;
         return condition.counts.includes(count);
       }
       case 'DATERANGE':
@@ -69,16 +77,17 @@ const checkSlotConditions = (
 const createMergedBlocks = (
   times: number[],
   users: ExtractUser[],
+  responseMaps: ResponseMaps,
   includeMaybe: boolean,
   participantsFilter: (user: ExtractUser) => boolean,
 ): TimeBlock[] => {
   return times.reduce((acc: TimeBlock[], time) => {
     // この時間の参加者リストを作成
     const currentParticipants = users
-      .filter(u => isUserAvailable(u, time, includeMaybe) && participantsFilter(u))
+      .filter(u => isUserAvailable(responseMaps, u.id, time, includeMaybe) && participantsFilter(u))
       .map(u => ({
         name: u.name,
-        status: u.responses.find(r => new Date(r.time).getTime() === time)?.status ?? "ok"
+        status: responseMaps.get(u.id)?.get(time) ?? "ok"
       }));
 
     const lastBlock = acc[acc.length - 1];
@@ -136,13 +145,15 @@ export function extractSlots({ users, includeMaybe, conditions, participantsFilt
   blocks: TimeBlock[];
   formatted: string[];
 } {
+  const responseMaps = buildResponseMaps(users);
+
   // 全タイムスタンプの取得
   const allTimes = Array.from(new Set(
     users.flatMap(u => u.responses.map(r => new Date(r.time).getTime()))
   )).sort((a, b) => a - b);
 
-  const filteredTimes = allTimes.filter(t => checkSlotConditions(t, conditions, users, includeMaybe));
-  const mergedBlocks = createMergedBlocks(filteredTimes, users, includeMaybe, participantsFilter);
+  const filteredTimes = allTimes.filter(t => checkSlotConditions(t, conditions, users, responseMaps, includeMaybe));
+  const mergedBlocks = createMergedBlocks(filteredTimes, users, responseMaps, includeMaybe, participantsFilter);
   const finalBlocks = mergedBlocks.filter(b => checkBlockConditions(b, conditions));
 
   return { blocks: finalBlocks, formatted: formatExtractTimes(finalBlocks) };
