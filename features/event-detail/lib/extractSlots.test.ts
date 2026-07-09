@@ -47,7 +47,7 @@ describe("extractSlots", () => {
     expect(blocks[0]).toEqual({
       start: slot(0),
       end: slot(2),
-      participants: [{ name: "太郎", status: "ok" }],
+      participants: [{ id: "u1", name: "太郎", status: "ok" }],
     });
   });
 
@@ -103,7 +103,7 @@ describe("extractSlots", () => {
         conditions: [{ type: "PARTICIPANTS", userIds: ["u1"] }],
       });
       expect(blocks).toHaveLength(2);
-      expect(blocks[1]?.participants).toEqual([{ name: "太郎", status: "maybe" }]);
+      expect(blocks[1]?.participants).toEqual([{ id: "u1", name: "太郎", status: "maybe" }]);
     });
   });
 
@@ -191,7 +191,25 @@ describe("extractSlots", () => {
     });
 
     expect(blocks).toHaveLength(1);
-    expect(blocks[0]?.participants).toEqual([{ name: "太郎", status: "ok" }]);
+    expect(blocks[0]?.participants).toEqual([{ id: "u1", name: "太郎", status: "ok" }]);
+  });
+
+  it("同姓同名でも別ユーザーが入れ替わるコマは塊を結合しない", () => {
+    // slot(0)はu1のみ、slot(1)はu2のみ参加可能（名前はどちらも「太郎」）
+    const u1 = makeUser("u1", "太郎", [
+      { time: slotISO(0), status: "ok" },
+      { time: slotISO(1), status: "ng" },
+    ]);
+    const u2 = makeUser("u2", "太郎", [
+      { time: slotISO(0), status: "ng" },
+      { time: slotISO(1), status: "ok" },
+    ]);
+
+    const { blocks } = run([u1, u2]);
+
+    expect(blocks).toHaveLength(2);
+    expect(blocks[0]?.participants).toEqual([{ id: "u1", name: "太郎", status: "ok" }]);
+    expect(blocks[1]?.participants).toEqual([{ id: "u2", name: "太郎", status: "ok" }]);
   });
 
   it("回答が空なら空の結果を返す", () => {
