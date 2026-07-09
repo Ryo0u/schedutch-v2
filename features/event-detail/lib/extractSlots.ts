@@ -3,7 +3,7 @@ import { SLOT_INTERVAL_MS } from "@/lib/constants";
 import { STATUS_META } from "@/features/event-detail/lib/status";
 import type { User } from "@/features/event-detail/types";
 
-export type ParticipantInfo = { name: string; status: string };
+export type ParticipantInfo = { id: string; name: string; status: string };
 
 export type TimeBlock = { start: number; end: number; participants: ParticipantInfo[] };
 
@@ -44,9 +44,9 @@ const isUserAvailable = (responseMaps: ResponseMaps, userId: string, time: numbe
 
 const areParticipantsEqual = (p1: ParticipantInfo[], p2: ParticipantInfo[]) => {
   if (p1.length !== p2.length) return false;
-  const s1 = [...p1].sort((a, b) => a.name.localeCompare(b.name));
-  const s2 = [...p2].sort((a, b) => a.name.localeCompare(b.name));
-  return s1.every((val, index) => val.name === s2[index]?.name && val.status === s2[index]?.status);
+  const s1 = [...p1].sort((a, b) => a.id.localeCompare(b.id));
+  const s2 = [...p2].sort((a, b) => a.id.localeCompare(b.id));
+  return s1.every((val, index) => val.id === s2[index]?.id && val.status === s2[index]?.status);
 };
 
 // 一コマ単位のルールを適応
@@ -86,6 +86,7 @@ const createMergedBlocks = (
     const currentParticipants = users
       .filter(u => isUserAvailable(responseMaps, u.id, time, includeMaybe) && participantsFilter(u))
       .map(u => ({
+        id: u.id,
         name: u.name,
         status: responseMaps.get(u.id)?.get(time) ?? "ok"
       }));
