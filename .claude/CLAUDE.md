@@ -9,9 +9,13 @@ npm run dev       # 開発サーバー起動 (localhost:3000)
 npm run build     # プロダクションビルド
 npm run lint      # ESLint
 npm run prettier  # Prettierによるフォーマット
+npm run test      # Vitest（ユニットテスト）
+npm run test:watch # Vitest watchモード
 ```
 
-テストは未導入。
+### テスト
+
+Vitest によるユニットテストを導入済み。対象は純粋関数（`lib/` / `features/{feature}/lib/`）と zod スキーマ（`schema.ts`）。テストファイルは対象と同居させる（`xxx.ts` の隣に `xxx.test.ts`）。テストデータの時刻は UTC ISO 文字列で固定し、実行環境の TZ に依存させない。hooks・コンポーネントのテストは未導入（必要になったら jsdom / Testing Library を追加する）。CI（GitHub Actions）で PR 時に lint + test を実行する。
 
 ## アーキテクチャ概要
 
