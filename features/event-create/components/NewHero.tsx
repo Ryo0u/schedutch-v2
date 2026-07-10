@@ -1,10 +1,10 @@
-export default function NewHero() {
-  const steps = [
-    { n: 1, label: '基本情報を入力', sub: 'イベント名・パスワード' },
-    { n: 2, label: '候補日を選択', sub: '日付と時間帯を追加' },
-    { n: 3, label: 'URL を共有', sub: '参加者に送るだけ' },
-  ];
+const STEPS = [
+  { n: 1, label: '基本情報を入力', sub: 'イベント名・パスワード' },
+  { n: 2, label: '候補日を選択', sub: '日付と時間帯を追加' },
+  { n: 3, label: 'URL を共有', sub: '参加者に送るだけ' },
+];
 
+export default function NewHero() {
   return (
     <div className="mb-6 space-y-5 px-1 pt-2">
       {/* Title */}
@@ -25,7 +25,7 @@ export default function NewHero() {
           className="absolute left-3.5 right-3.5 top-3.5 h-px bg-linear-to-r from-primary/60 via-violet-400/40 to-violet-400/20"
           aria-hidden="true"
         />
-        {steps.map((step) => (
+        {STEPS.map((step) => (
           <div key={step.n} className="relative flex flex-1 flex-col items-center">
             <div className="relative z-10 flex h-7 w-7 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">
               {step.n}

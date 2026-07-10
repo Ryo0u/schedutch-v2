@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Candidate, User } from "@/features/event-detail/types";
 import { extractSlots, type FilterCondition, type TimeBlock } from "@/features/event-detail/lib/extractSlots";
+import { toJSTDateString } from "@/lib/datetime";
 
 export type ExtractTab = "people" | "number";
 
@@ -30,11 +31,7 @@ export function useExtractSlots({ candidates, users }: UseExtractSlotsArgs) {
 
   const availableDates = useMemo(() => {
     // JST の "YYYY-MM-DD" で一意な日付リストを作成（ブラウザTZ非依存）
-    const dates = candidates.map(c =>
-      new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Tokyo" }).format(
-        new Date(c.start_time)
-      )
-    );
+    const dates = candidates.map(c => toJSTDateString(c.start_time));
     return Array.from(new Set(dates)).sort();
   }, [candidates]);
 

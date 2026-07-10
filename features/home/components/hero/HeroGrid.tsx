@@ -11,18 +11,18 @@ const GRID_LEFT = NAME_W + GAP;
 
 const SLOT_LABELS = ['15', '16', '17', '18', '19', '20'];
 
-const MEMBERS = [
-  { name: 'Aさん', cells: 'oooxxooooooo' },
-  { name: 'Bさん', cells: 'xxoottooooxx' },
-  { name: 'Cさん', cells: 'oooooooooooo' },
+type CellStatus = 'o' | 't' | 'x';
+
+const MEMBERS: { name: string; cells: CellStatus[] }[] = [
+  { name: 'Aさん', cells: ['o', 'o', 'o', 'x', 'x', 'o', 'o', 'o', 'o', 'o', 'o', 'o'] },
+  { name: 'Bさん', cells: ['x', 'x', 'o', 'o', 't', 't', 'o', 'o', 'o', 'o', 'x', 'x'] },
+  { name: 'Cさん', cells: ['o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o'] },
 ];
 
 const HL_START = 6;
 const HL_END = 9;
 
 const RESULT_TEXT = '7/3  18:00 - 20:00 : Aさん, Bさん, Cさん';
-
-type CellStatus = 'o' | 't' | 'x';
 
 function Cell({
   status,
@@ -120,7 +120,7 @@ export default function HeroGrid() {
                   {m.name}
                 </div>
                 <div className="flex gap-1">
-                  {(m.cells.split('') as CellStatus[]).map((s, col) => (
+                  {m.cells.map((s, col) => (
                     <Cell
                       key={col}
                       status={s}
