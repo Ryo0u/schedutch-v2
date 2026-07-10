@@ -46,7 +46,7 @@ function ResponsesDialog({ eventId, data, open, onOpenChange }: ResponsesDialogP
         responses: buildInitialResponses(data.candidates),
       });
     }
-  }, [open, data.candidates])
+  }, [open, data.candidates, form])
 
   const onSubmit = async (values: UserFormData) => {
     try {
