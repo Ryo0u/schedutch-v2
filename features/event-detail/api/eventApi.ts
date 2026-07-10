@@ -1,6 +1,7 @@
 import { supabase } from "@/utils/supabase/client";
 import type { Json } from "@/lib/database.types";
 import type { EventData, ResponseStatus } from "@/features/event-detail/types";
+import { createEventNotFoundError } from "@/features/event-detail/api/errors";
 
 /** 編集ダイアログを開く前の事前検証。ユーザー本人のパスワードが正しいかを返す */
 export async function verifyUserPassword(userId: string, password: string): Promise<boolean> {
@@ -37,7 +38,7 @@ export async function getEvent(eventId: string): Promise<EventData> {
     .single();
 
   if (error) throw error;
-  if (!data) throw new Error("イベントが見つかりませんでした");
+  if (!data) throw createEventNotFoundError();
   return data as EventData;
 }
 

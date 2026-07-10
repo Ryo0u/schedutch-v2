@@ -1,5 +1,6 @@
 "use client"
 
+import { notFound } from "next/navigation";
 import EventInfo from "@/features/event-detail/components/event/EventInfo";
 import JoinButton from "@/features/event-detail/components/responses/JoinButton";
 import MenuButton from "@/features/event-detail/components/event/MenuButton";
@@ -7,20 +8,28 @@ import UsersInfo from "@/features/event-detail/components/users/UsersInfo";
 import { Separator } from "@/components/ui/separator";
 import EventSkeleton from "@/features/event-detail/components/EventSkeleton";
 import { useEvent } from "@/features/event-detail/hooks/useEvent";
+import { isEventNotFoundError } from "@/features/event-detail/api/errors";
 import ResponsesInfo from "./responses/ResponsesInfo";
 import ExtractPanel from "./extract/ExtractPanel";
 import { ExtractSlotsProvider } from "./extract/ExtractSlotsContext";
 import EventSideNav from "./sidebar/EventSideNav";
 
 export default function EventContainer({ eventId }: { eventId: string }) {
-  const { data, isLoading } = useEvent(eventId);
+  const { data, isLoading, isError, error } = useEvent(eventId);
 
   if (isLoading) {
     return <EventSkeleton />;
   }
 
+  if (isError) {
+    if (isEventNotFoundError(error)) {
+      notFound();
+    }
+    throw error;
+  }
+
   if (!data) {
-    return <div className="flex justify-center items-center min-h-64 text-muted-foreground">イベント情報を読み込めませんでした。</div>;
+    notFound();
   }
 
   return (
