@@ -41,7 +41,7 @@ function EventCreatedDialog({ open, onChangeOpen, eventId}: EventCreatedDialogPr
         </div>
         
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={(onChangeOpen) => onChangeOpen}>
+          <AlertDialogCancel>
             <X/>閉じる
           </AlertDialogCancel>
           <AlertDialogAction onClick={() => router.push(`/event/${eventId}`)}>

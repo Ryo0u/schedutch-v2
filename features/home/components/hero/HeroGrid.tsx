@@ -14,7 +14,7 @@ const SLOT_LABELS = ['15', '16', '17', '18', '19', '20'];
 const MEMBERS = [
   { name: 'Aさん', cells: 'oooxxooooooo' },
   { name: 'Bさん', cells: 'xxoottooooxx' },
-  { name: 'Cさん', cells: 'ooooooooooто'.replace('т', 't') },
+  { name: 'Cさん', cells: 'oooooooooooo' },
 ];
 
 const HL_START = 6;
