@@ -49,7 +49,7 @@ function UserEditDialog({ eventId, data, password, open, onOpenChange }: UserEdi
         })),
       });
     }
-  }, [open]);
+  }, [open, data.user.name, data.user.comment, data.user.responses, form]);
 
   const onSubmit = async (values: UserEditFormData) => {
     setIsSubmitting(true);

@@ -36,7 +36,7 @@ function EventEditDialog({ eventId, open, onOpenChange, data }: DialogProps) {
     if (open) {
       form.reset({ title: data.title, comment: data.comment ?? "", password: "" });
     }
-  }, [open]);
+  }, [open, data.title, data.comment, form]);
 
   const onSubmit = async (values: EventEditFormData) => {
     setIsSubmitting(true);
