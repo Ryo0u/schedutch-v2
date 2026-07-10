@@ -1,16 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { toJST, formatJSTTime, formatJSTDate, jstWallTimeToISO } from "./datetime";
+import { toJSTDateString, formatJSTTime, formatJSTDate, jstWallTimeToISO } from "./datetime";
 
-describe("toJST", () => {
-  it("UTC日時文字列を+9時間したDateに変換する", () => {
-    const jst = toJST("2024-03-15T00:00:00.000Z");
-    expect(jst.toISOString()).toBe("2024-03-15T09:00:00.000Z");
-  });
-
-  it("Date・Unixミリ秒の入力も受け付ける", () => {
-    const instant = new Date("2024-03-15T00:00:00.000Z");
-    expect(toJST(instant).getTime()).toBe(instant.getTime() + 9 * 60 * 60 * 1000);
-    expect(toJST(instant.getTime()).getTime()).toBe(toJST(instant).getTime());
+describe("toJSTDateString", () => {
+  it('UTC日時をJSTの"YYYY-MM-DD"にする（ブラウザTZ非依存）', () => {
+    expect(toJSTDateString("2024-03-15T15:00:00.000Z")).toBe("2024-03-16");
+    expect(toJSTDateString("2024-03-15T14:59:00.000Z")).toBe("2024-03-15");
   });
 });
 

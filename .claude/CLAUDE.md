@@ -65,7 +65,7 @@ supabase.from('events').select(`*, candidates (*), users (*, responses (*))`)
 
 ### 時刻の扱い
 
-Supabase は UTC で保存する。表示時は `lib/utils.ts` の `toJST()` で JST に変換する。時刻選択肢は `lib/constants.ts` の `TIME_OPTIONS`（00:00〜23:30、30分刻み）を共通で使用する。
+Supabase は UTC で保存する。表示時は `lib/datetime.ts` の `formatJSTTime()` / `formatJSTDate()` / `jstWallTimeToISO()` / `toJSTDateString()` で JST に変換する。時刻選択肢は `lib/constants.ts` の `TIME_OPTIONS`（00:00〜23:30、30分刻み）を共通で使用する。
 
 ### データ更新パターン
 
@@ -134,7 +134,7 @@ schedutch-v2/
 │   ├── form/             # react-hook-form合成のフォーム部品（TextField / TextareaCounterField）。feature間共有
 │   ├── layout/           # Header など共通レイアウト
 │   └── providers/        # ThemeProvider / QueryProvider
-├── lib/                  # constants(TIME_OPTIONS) / utils(toJST等)
+├── lib/                  # constants(TIME_OPTIONS) / datetime(JST変換) / utils(cn等)
 ├── utils/supabase/       # Supabase クライアント（シングルトン）
 └── supabase/             # supabase CLI（config.toml / migrations: スキーマ・RLS・RPC）
 ```
@@ -203,7 +203,7 @@ Conventional Commits に従う。プレフィックスは英語、本文（説�
 - **パスワード検証はサーバー（RPC 内 `crypt()`）側で行う**。クライアントで `bcrypt.compare` しない。編集フローは、事前検証（`verify_user_password`）→ 検証済み平文を編集ダイアログへ引き回し → 更新 RPC が再検証、という流れ。RPC がパスワード不一致で投げた例外は `isPasswordError()`（`features/event-detail/api/eventApi.ts`）で判定してエラー表示にマッピングする。
 - パスワードは作成時に**クライアントで `bcryptjs` によりハッシュ化してから**保存する（生パスワードを保存しない）。照合は上記の通り DB 側。`password_digest` はクライアントに配信しない（型にも持たせない）。
 - 型の置き場: feature 固有なら `features/{feature}/types.ts`、複数 feature で共有するもののみ `lib/`。
-- 時刻は UTC 保存・表示時に `toJST()` で変換。時刻選択肢は `TIME_OPTIONS` を共通使用する。
+- 時刻は UTC 保存・表示時に `lib/datetime.ts` の JST 変換関数で変換。時刻選択肢は `TIME_OPTIONS` を共通使用する。
 
 ### エラーハンドリング
 
