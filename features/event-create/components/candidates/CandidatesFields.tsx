@@ -107,7 +107,7 @@ const CandidatesFields = ({ control }: CandidatesFieldsProps) => {
 											<Field>
 												<FieldLabel htmlFor="time-from">開始</FieldLabel>
 												<Select value={startTime} onValueChange={(val) => setStartTime(val ?? "")}>
-													<SelectTrigger>
+													<SelectTrigger id="time-from">
 														<SelectValue />
 													</SelectTrigger>
 													
@@ -125,9 +125,9 @@ const CandidatesFields = ({ control }: CandidatesFieldsProps) => {
 											</Field>
 
 											<Field>
-												<FieldLabel htmlFor="time-from">終了</FieldLabel>
+												<FieldLabel htmlFor="time-to">終了</FieldLabel>
 												<Select value={endTime} onValueChange={(val) => setEndTime(val ?? "")}>
-													<SelectTrigger>
+													<SelectTrigger id="time-to">
 														<SelectValue />
 													</SelectTrigger>
 													
