@@ -21,6 +21,11 @@ export function formatJSTDate(
   return d.toLocaleDateString("ja-JP", { ...opts, timeZone: "Asia/Tokyo" });
 }
 
+/** JST での "8月1日(金)" 形式の候補日ラベルを返す（ブラウザTZ非依存） */
+export function formatJSTCandidateDateLabel(input: DateInput): string {
+  return formatJSTDate(input, { month: "short", day: "numeric", weekday: "short" });
+}
+
 /** UTC日時をJSTの "YYYY-MM-DD" 文字列で返す（ブラウザTZ非依存） */
 export function toJSTDateString(input: DateInput): string {
   const d = input instanceof Date ? input : new Date(input);
