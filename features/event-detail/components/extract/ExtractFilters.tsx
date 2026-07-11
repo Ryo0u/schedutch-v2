@@ -6,7 +6,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
-const DurationOption = [
+const DURATION_OPTIONS = [
   { label: "制限なし", value: "0" },
   { label: "1時間以上", value: "60" },
   { label: "2時間以上", value: "120" },
@@ -82,7 +82,7 @@ function ExtractFilters({
                   <SelectValue placeholder="時間を選択" />
                 </SelectTrigger>
                 <SelectContent>
-                  {DurationOption.map((option) => (
+                  {DURATION_OPTIONS.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
                     </SelectItem>
