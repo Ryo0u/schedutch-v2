@@ -39,7 +39,6 @@ function EventDeleteDialog({ open, onOpenChange, data }: DialogProps) {
     } catch (error) {
       console.error("failed to delete event", error)
       toast.error("イベントの削除に失敗しました", {position: 'top-center'})
-      onOpenChange(false);
     }
   }
 
