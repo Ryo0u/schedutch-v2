@@ -7,3 +7,5 @@ export const TIME_OPTIONS = Array.from({ length: 48 }).map((_, i) => {
 
 // 予定候補・回答の時間刻み幅（30分）
 export const SLOT_INTERVAL_MS = 30 * 60 * 1000;
+
+export const MS_PER_MINUTE = 60 * 1000;

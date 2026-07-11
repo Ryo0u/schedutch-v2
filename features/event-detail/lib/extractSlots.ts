@@ -1,5 +1,5 @@
 import { formatJSTTime, formatJSTDate } from "@/lib/datetime";
-import { SLOT_INTERVAL_MS } from "@/lib/constants";
+import { SLOT_INTERVAL_MS, MS_PER_MINUTE } from "@/lib/constants";
 import { STATUS_META } from "@/features/event-detail/lib/status";
 import type { User } from "@/features/event-detail/types";
 
@@ -108,7 +108,7 @@ const checkBlockConditions = (block: TimeBlock, conditions: FilterCondition[]) =
     switch (cond.type) {
       case 'DURATION': {
         const durationMs = (block.end + SLOT_INTERVAL_MS) - block.start;
-        return durationMs >= cond.minMinutes * 60 * 1000;
+        return durationMs >= cond.minMinutes * MS_PER_MINUTE;
       }
       default:
         return true;
