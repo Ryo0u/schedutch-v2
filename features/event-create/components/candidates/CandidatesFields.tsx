@@ -34,7 +34,7 @@ const CandidatesFields = ({ control }: CandidatesFieldsProps) => {
 	const watchedFields = useWatch({ control, name: "candidates" });
 	
 	const device = useDeviceType()
-	const calendarColum = (device: "mobile" | "tablet" | "desktop") => {
+	const calendarColumns = (device: "mobile" | "tablet" | "desktop") => {
 		if (device === 'desktop') return 2
 		else return 1
 	}
@@ -98,7 +98,7 @@ const CandidatesFields = ({ control }: CandidatesFieldsProps) => {
 												selected={selectedDates}
 												onSelect={setSelectedDates}
 												disabled={disabledDates}
-												numberOfMonths={calendarColum(device)}
+												numberOfMonths={calendarColumns(device)}
 												className="h-full lg:h-80"
 											/>
 										</Field>
