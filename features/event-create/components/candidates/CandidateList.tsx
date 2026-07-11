@@ -17,13 +17,13 @@ interface CandidateListProps {
 }
 
 function CandidateList({ control }: CandidateListProps) {	
-	const { remove } = useFieldArray({ control, name: "candidates" });
+	const { fields, remove } = useFieldArray({ control, name: "candidates" });
 	const { errors } = useFormState({ control });
 	const watchedFields = useWatch({ control, name: "candidates" });
-	
+
 	const sortedFields = [...watchedFields]
 		.filter(item => item && item.date)
-		.map((item, originalIndex) => ({ ...item, originalIndex })) //元のインデックスを保持し処理を正常に行えるようにする
+		.map((item, originalIndex) => ({ ...item, originalIndex, fieldId: fields[originalIndex]?.id ?? originalIndex })) //元のインデックスを保持し処理を正常に行えるようにする
 		.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 	
   return (
@@ -53,8 +53,8 @@ function CandidateList({ control }: CandidateListProps) {
 										const hasError = !!errors.candidates?.[actualIndex];
 										
 										return (
-											<Item 
-												key={actualIndex}
+											<Item
+												key={item.fieldId}
 												variant="outline"
 												className="items-center justify-between max-w-sm w-full mb-3"
 											>

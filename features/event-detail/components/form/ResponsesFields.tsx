@@ -2,7 +2,7 @@ import { Control, FieldValues, useFieldArray } from "react-hook-form";
 import { useState } from "react";
 import { TIME_OPTIONS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-import { formatJSTDate } from "@/lib/datetime";
+import { formatJSTCandidateDateLabel } from "@/lib/datetime";
 import { STATUS_META } from "@/features/event-detail/lib/status";
 import { buildResponseSlotMap } from "@/features/event-detail/lib/responses";
 import { useResponseDrag } from "@/features/event-detail/hooks/useResponseDrag";
@@ -41,11 +41,7 @@ function ResponsesFields<T extends FormWithResponses>({ control, data }: Respons
 
       <div className="w-full overflow-x-auto pb-5" onTouchMove={handleTouchMove}>
           {data.candidates.map((candidate) => {
-            const dateKey = formatJSTDate(candidate.start_time, {
-              month: "short",
-              day: "numeric",
-              weekday: "short",
-            });
+            const dateKey = formatJSTCandidateDateLabel(candidate.start_time);
 
             return (
               <table className="min-w-max" key={candidate.id}>

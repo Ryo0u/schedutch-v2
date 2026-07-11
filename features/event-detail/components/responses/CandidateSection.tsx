@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
-import { formatJSTTime, formatJSTDate, jstWallTimeToISO } from "@/lib/datetime";
+import { formatJSTTime, formatJSTCandidateDateLabel, jstWallTimeToISO } from "@/lib/datetime";
 import { STATUS_META } from "@/features/event-detail/lib/status";
 import type { TimeBlock } from "@/features/event-detail/lib/extractSlots";
 import type { Candidate, ResponseStatus, User } from "@/features/event-detail/types";
@@ -17,11 +17,7 @@ type HighlightFlags = { inBlock: boolean; isStart: boolean; isEnd: boolean };
 export default function CandidateSection({ candidate, users, displayedTimes, extractedBlocks }: CandidateSectionProps) {
   const startHHMM = formatJSTTime(candidate.start_time);
   const endHHMM = formatJSTTime(candidate.end_time);
-  const dateLabel = formatJSTDate(candidate.start_time, {
-    month: "short",
-    day: "numeric",
-    weekday: "short",
-  });
+  const dateLabel = formatJSTCandidateDateLabel(candidate.start_time);
 
   // 各時刻スロットが抽出結果ブロックの範囲内かどうかのフラグを事前計算
   // (block.end は最終スロットの開始時刻なので範囲判定は <= でよい)

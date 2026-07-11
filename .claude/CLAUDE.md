@@ -65,7 +65,7 @@ supabase.from('events').select(`*, candidates (*), users (*, responses (*))`)
 
 ### 時刻の扱い
 
-Supabase は UTC で保存する。表示時は `lib/datetime.ts` の `formatJSTTime()` / `formatJSTDate()` / `jstWallTimeToISO()` / `toJSTDateString()` で JST に変換する。時刻選択肢は `lib/constants.ts` の `TIME_OPTIONS`（00:00〜23:30、30分刻み）を共通で使用する。
+Supabase は UTC で保存する。表示時は `lib/datetime.ts` の `formatJSTTime()` / `formatJSTDate()` / `formatJSTCandidateDateLabel()`（候補日ラベル用の `formatJSTDate` ラッパー）/ `jstWallTimeToISO()` / `toJSTDateString()` で JST に変換する。時刻選択肢は `lib/constants.ts` の `TIME_OPTIONS`（00:00〜23:30、30分刻み）を共通で使用する。
 
 ### データ更新パターン
 

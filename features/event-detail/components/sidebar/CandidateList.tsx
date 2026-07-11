@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { formatJSTDate } from "@/lib/datetime"
+import { formatJSTCandidateDateLabel } from "@/lib/datetime"
 import type { Candidate } from "@/features/event-detail/types"
 
 interface CandidateListProps {
@@ -15,11 +15,7 @@ export default function CandidateList({ candidates, activeId, onClickCandidate }
     <div className="mt-4 flex flex-col gap-3 pl-8 max-h-120 overflow-y-auto">
       {candidates.map((candidate) => {
         const candidateId = `candidate-${candidate.id}`
-        const dateLabel = formatJSTDate(candidate.start_time, {
-          month: "short",
-          day: "numeric",
-          weekday: "short",
-        })
+        const dateLabel = formatJSTCandidateDateLabel(candidate.start_time)
         return (
           <button
             key={candidateId}
