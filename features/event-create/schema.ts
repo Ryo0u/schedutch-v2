@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import { titleSchema, passwordSchema, commentSchema } from '@/lib/validation';
 
 export type FormData = {
   title: string;
@@ -12,16 +13,9 @@ export type FormData = {
 };
 
 export const formSchema = z.object({
-  title:
-    z.string()
-     .min(1, 'タイトルを入力してください')
-     .max(10, 'タイトルを10文字以内で入力してください'),
-  password:
-    z.string()
-     .min(3, 'パスワードを3文字以上で入力してください')
-     .max(12, 'パスワードを12字以内で入力してください'),
-  comment:
-    z.string().max(30, 'コメントは30文字以内で入力してください'),
+  title: titleSchema,
+  password: passwordSchema,
+  comment: commentSchema,
   candidates:
     z.array(
       z.object({
