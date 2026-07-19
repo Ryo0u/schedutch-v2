@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { useUpdateEvent } from "@/features/event-detail/hooks/useEventMutations";
 import { isPasswordError } from "@/features/event-detail/api/errors";
 import { EventEditFormSchema, type EventEditFormData } from "@/features/event-detail/schema";
+import { COMMENT_MAX_LENGTH } from "@/lib/validation";
 
 interface DialogProps {
   eventId: string;
@@ -79,7 +80,7 @@ function EventEditDialog({ eventId, open, onOpenChange, data }: DialogProps) {
 
           <FieldGroup className="mb-5">
             <TextField control={form.control} name="title" label="タイトル" required />
-            <TextareaCounterField control={form.control} name="comment" label="コメント" rows={4} maxLength={30} />
+            <TextareaCounterField control={form.control} name="comment" label="コメント" rows={4} maxLength={COMMENT_MAX_LENGTH} />
             <TextField control={form.control} name="password" label="編集用パスワード" required placeholder="......." />
           </FieldGroup>
 
