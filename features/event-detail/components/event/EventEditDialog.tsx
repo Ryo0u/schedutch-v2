@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -25,7 +25,6 @@ interface DialogProps {
 }
 
 function EventEditDialog({ eventId, open, onOpenChange, data }: DialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const updateEvent = useUpdateEvent(eventId);
 
   const form = useForm<EventEditFormData>({
@@ -40,8 +39,6 @@ function EventEditDialog({ eventId, open, onOpenChange, data }: DialogProps) {
   }, [open, data.title, data.comment, form]);
 
   const onSubmit = async (values: EventEditFormData) => {
-    setIsSubmitting(true);
-
     try {
       await updateEvent.mutateAsync({
         eventId: data.id,
@@ -60,8 +57,6 @@ function EventEditDialog({ eventId, open, onOpenChange, data }: DialogProps) {
         toast.error("更新に失敗しました", { position: "top-center" });
       }
     }
-
-    setIsSubmitting(false);
   };
 
   return (
@@ -86,7 +81,7 @@ function EventEditDialog({ eventId, open, onOpenChange, data }: DialogProps) {
 
           <DialogFooter>
             <DialogClose render={<Button type="button" variant="outline">キャンセル</Button>}></DialogClose>
-            <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "保存中..." : "保存する"}</Button>
+            <Button type="submit" disabled={updateEvent.isPending}>{updateEvent.isPending ? "保存中..." : "保存する"}</Button>
           </DialogFooter>
         </form>
       </DialogContent>
