@@ -8,12 +8,11 @@ import { type DateRange } from "react-day-picker"
 import { addDays } from "date-fns"
 import { ja } from "date-fns/locale"
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { useDeviceType } from '@/hooks/useDeviceType';
-import { TIME_OPTIONS } from '@/lib/constants';
 import { buildNewCandidateDates } from '@/features/event-create/lib/candidateDates';
+import TimeSelect from './TimeSelect';
 
 
 interface CandidatesFieldsProps {
@@ -106,42 +105,12 @@ const CandidatesFields = ({ control }: CandidatesFieldsProps) => {
 										<div className='flex gap-4'>
 											<Field>
 												<FieldLabel htmlFor="time-from">開始</FieldLabel>
-												<Select value={startTime} onValueChange={(val) => setStartTime(val ?? "")}>
-													<SelectTrigger id="time-from">
-														<SelectValue />
-													</SelectTrigger>
-													
-													<SelectContent>
-														<SelectGroup>
-															<SelectLabel>開始時間</SelectLabel>
-															{TIME_OPTIONS.map((time) => (
-																<SelectItem key={`from-${time}`} value={time}>
-																	{time}
-																</SelectItem>
-															))}
-														</SelectGroup>
-													</SelectContent>
-												</Select>
+												<TimeSelect id="time-from" value={startTime} onValueChange={setStartTime} groupLabel="開始時間" />
 											</Field>
 
 											<Field>
 												<FieldLabel htmlFor="time-to">終了</FieldLabel>
-												<Select value={endTime} onValueChange={(val) => setEndTime(val ?? "")}>
-													<SelectTrigger id="time-to">
-														<SelectValue />
-													</SelectTrigger>
-													
-													<SelectContent>
-														<SelectGroup>
-															<SelectLabel>終了時間</SelectLabel>
-															{TIME_OPTIONS.map((time) => (
-																<SelectItem key={`to-${time}`} value={time}>
-																	{time}
-																</SelectItem>
-															))}
-														</SelectGroup>
-													</SelectContent>
-												</Select>
+												<TimeSelect id="time-to" value={endTime} onValueChange={setEndTime} groupLabel="終了時間" />
 											</Field>
 										</div>
 										
