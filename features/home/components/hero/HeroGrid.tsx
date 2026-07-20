@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { usePrefersReducedMotion } from '@/features/home/hooks/usePrefersReducedMotion';
+import { COMPARISON_TIME_LABELS, HERO_MEMBERS, HERO_RESULT_TEXT, type CellStatus } from '@/features/home/constants';
 
 const CELL_W = 1.5;
 const GAP = 0.25;
@@ -9,20 +10,8 @@ const PITCH = CELL_W + GAP;
 const NAME_W = 3.5;
 const GRID_LEFT = NAME_W + GAP;
 
-const SLOT_LABELS = ['15', '16', '17', '18', '19', '20'];
-
-type CellStatus = 'o' | 't' | 'x';
-
-const MEMBERS: { name: string; cells: CellStatus[] }[] = [
-  { name: 'Aさん', cells: ['o', 'o', 'o', 'x', 'x', 'o', 'o', 'o', 'o', 'o', 'o', 'o'] },
-  { name: 'Bさん', cells: ['x', 'x', 'o', 'o', 't', 't', 'o', 'o', 'o', 'o', 'x', 'x'] },
-  { name: 'Cさん', cells: ['o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o'] },
-];
-
 const HL_START = 6;
 const HL_END = 9;
-
-const RESULT_TEXT = '7/3  18:00 - 20:00 : Aさん, Bさん, Cさん';
 
 function Cell({
   status,
@@ -55,7 +44,7 @@ export default function HeroGrid() {
   const prefersReducedMotion = usePrefersReducedMotion();
   // reduced-motion 時はアニメーションを走らせず、最初から完了状態を表示する
   const phase = prefersReducedMotion ? 2 : animatedPhase;
-  const typed = prefersReducedMotion ? RESULT_TEXT : animatedText;
+  const typed = prefersReducedMotion ? HERO_RESULT_TEXT : animatedText;
 
   useEffect(() => {
     if (prefersReducedMotion) return;
@@ -72,8 +61,8 @@ export default function HeroGrid() {
     let i = 0;
     const iv = setInterval(() => {
       i += 1;
-      setAnimatedText(RESULT_TEXT.slice(0, i));
-      if (i >= RESULT_TEXT.length) clearInterval(iv);
+      setAnimatedText(HERO_RESULT_TEXT.slice(0, i));
+      if (i >= HERO_RESULT_TEXT.length) clearInterval(iv);
     }, 28);
     return () => clearInterval(iv);
   }, [phase, prefersReducedMotion]);
@@ -106,7 +95,7 @@ export default function HeroGrid() {
             className="mb-1 flex font-mono text-muted-foreground"
             style={{ paddingLeft: `${GRID_LEFT}rem`, fontSize: '10px' }}
           >
-            {SLOT_LABELS.map((h) => (
+            {COMPARISON_TIME_LABELS.map((h) => (
               <div key={h} style={{ width: `${PITCH * 2}rem` }}>
                 {h}:00
               </div>
@@ -114,7 +103,7 @@ export default function HeroGrid() {
           </div>
 
           <div className="relative">
-            {MEMBERS.map((m, row) => (
+            {HERO_MEMBERS.map((m, row) => (
               <div key={m.name} className="mb-1 flex items-center gap-1">
                 <div className="w-14 shrink-0 truncate text-right text-xs font-medium text-foreground/70">
                   {m.name}

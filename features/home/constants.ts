@@ -43,6 +43,14 @@ export const COMPARISON_ROWS: { name: string; cells: CellStatus[] }[] = [
 
 export const COMPARISON_TIME_LABELS = ['15', '16', '17', '18', '19', '20'];
 
+export const HERO_MEMBERS: { name: string; cells: CellStatus[] }[] = [
+  { name: 'Aさん', cells: ['o', 'o', 'o', 'x', 'x', 'o', 'o', 'o', 'o', 'o', 'o', 'o'] },
+  { name: 'Bさん', cells: ['x', 'x', 'o', 'o', 't', 't', 'o', 'o', 'o', 'o', 'x', 'x'] },
+  { name: 'Cさん', cells: ['o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o'] },
+];
+
+export const HERO_RESULT_TEXT = '7/3  18:00 - 20:00 : Aさん, Bさん, Cさん';
+
 export const CONDITIONS = [
   'AさんとBさんが両方参加できる枠',
   '3人以上集まれる枠',
