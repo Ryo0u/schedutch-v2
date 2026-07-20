@@ -2,17 +2,6 @@ import * as z from 'zod';
 import { titleSchema, passwordSchema, commentSchema } from '@/lib/validation';
 import { nameSchema } from './lib/validation';
 
-export type UserFormData = {
-  name: string;
-  comment: string;
-  password: string;
-  responses: {
-    candidate_id: string;
-    time: Date;
-    status: string;
-  }[];
-};
-
 export const UserFormSchema = z.object({
   name: nameSchema,
   comment: commentSchema,
@@ -26,6 +15,7 @@ export const UserFormSchema = z.object({
       })
     ),
 });
+export type UserFormData = z.infer<typeof UserFormSchema>;
 
 /** UserEditDialog: パスワードは事前検証済みのため編集フォームに含めない */
 export const UserEditFormSchema = UserFormSchema.omit({ password: true });

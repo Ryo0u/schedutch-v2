@@ -1,17 +1,6 @@
 import * as z from 'zod';
 import { titleSchema, passwordSchema, commentSchema } from '@/lib/validation';
 
-export type FormData = {
-  title: string;
-  password: string;
-  comment: string;
-  candidates: {
-    date: Date;
-    startTime: string;
-    endTime: string;
-  }[];
-};
-
 export const formSchema = z.object({
   title: titleSchema,
   password: passwordSchema,
@@ -40,3 +29,5 @@ export const formSchema = z.object({
       });
     }),
 });
+
+export type EventCreateFormData = z.infer<typeof formSchema>;

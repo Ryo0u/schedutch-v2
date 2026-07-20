@@ -1,4 +1,4 @@
-import { FormData } from '@/features/event-create/schema';
+import { EventCreateFormData } from '@/features/event-create/schema';
 import { Control } from 'react-hook-form';
 import { COMMENT_MAX_LENGTH } from '@/lib/validation';
 import {
@@ -14,7 +14,7 @@ import TextField from '@/components/form/TextField';
 import TextareaCounterField from '@/components/form/TextareaCounterField';
 
 interface EventInfoFieldsProps {
-  control: Control<FormData>;
+  control: Control<EventCreateFormData>;
 }
 
 const EventInfoFields = ({ control }: EventInfoFieldsProps) => {

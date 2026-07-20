@@ -2,8 +2,7 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { formSchema } from '@/features/event-create/schema';
+import { formSchema, type EventCreateFormData } from '@/features/event-create/schema';
 import NewHero from './NewHero';
 import EventInfoFields from './EventInfoFields';
 import CandidatesFields from './candidates/CandidatesFields';
@@ -11,7 +10,7 @@ import CandidateList from './candidates/CandidateList';
 import EventCreateActions from './EventCreateActions';
 
 export default function CreateEventContainer() {
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<EventCreateFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: '',
