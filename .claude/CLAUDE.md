@@ -96,13 +96,13 @@ schedutch-v2/
 │   └── event/[id]/page.tsx  # イベント閲覧・回答（EventContainer を描画）
 ├── features/
 │   ├── home/              # トップページ（LP）
-│   │   ├── components/    # 直下: MobileCtaBar / ScrollReveal（複数セクション横断）
-│   │   │   ├── hero/          # HeroSection, HeroGrid
-│   │   │   ├── steps/         # StepsSection, StepCard
-│   │   │   ├── comparison/    # ComparisonSection, LegacyToolCard, PreviewCard
-│   │   │   ├── extract/       # ExtractSection
-│   │   │   ├── features/      # FeaturesSection
-│   │   │   └── cta/           # CtaSection
+│   │   ├── components/    # 直下: 複数セクション横断のCTAバー・スクロール演出
+│   │   │   ├── hero/          # ファーストビュー
+│   │   │   ├── steps/         # 利用手順セクション
+│   │   │   ├── comparison/    # 既存ツールとの比較セクション
+│   │   │   ├── extract/       # 抽出機能の訴求セクション
+│   │   │   ├── features/      # 機能紹介セクション
+│   │   │   └── cta/           # 行動喚起セクション
 │   │   ├── hooks/         # usePrefersReducedMotion（LPアニメーションのreduced-motion購読）
 │   │   ├── constants.ts   # 各セクションの表示用データ（STEPS/FEATURES/CONDITIONS等）
 │   │   ├── home.css       # LP専用スタイル（card-pop/marker/sticker等。app/page.tsxでimport）
@@ -123,8 +123,8 @@ schedutch-v2/
 │   │   ├── types.ts      # EventData など固有の型
 │   │   └── index.ts      # barrel（公開面。app からはここ経由で import）
 │   └── event-create/     # 作成機能（/new）
-│       ├── components/   # 直下: CreateEventContainer(親) / NewHero / EventCreateActions / EventInfoFields / EventCreatedDialog
-│       │   └── candidates/   # CandidatesFields, CandidateList, EmptyList
+│       ├── components/   # 直下: フォームコンテナ(親) / ヒーロー / 送信アクション / 入力フィールド / 作成完了ダイアログ
+│       │   └── candidates/   # 候補日入力欄
 │       ├── api/          # Supabase アクセス（eventApi.ts）
 │       ├── schema.ts     # 作成フォームの型・zodスキーマ
 │       ├── hooks/        # useCreateEvent
