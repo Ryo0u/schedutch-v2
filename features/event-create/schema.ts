@@ -1,7 +1,7 @@
 import * as z from 'zod';
 import { titleSchema, passwordSchema, commentSchema } from '@/lib/validation';
 
-export const formSchema = z.object({
+export const eventCreateFormSchema = z.object({
   title: titleSchema,
   password: passwordSchema,
   comment: commentSchema,
@@ -30,4 +30,4 @@ export const formSchema = z.object({
     }),
 });
 
-export type EventCreateFormData = z.infer<typeof formSchema>;
+export type EventCreateFormData = z.infer<typeof eventCreateFormSchema>;

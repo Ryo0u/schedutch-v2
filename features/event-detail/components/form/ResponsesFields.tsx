@@ -8,9 +8,10 @@ import { buildResponseSlotMap } from "@/features/event-detail/lib/responses";
 import { useResponseDrag } from "@/features/event-detail/hooks/useResponseDrag";
 import StatusToggle from "./StatusToggle";
 import type { Candidate, ResponseStatus } from "@/features/event-detail/types";
+import type { ResponseFormValue } from "@/features/event-detail/schema";
 
 type FormWithResponses = FieldValues & {
-  responses: { candidate_id: string; time: Date; status: string }[];
+  responses: ResponseFormValue[];
 };
 
 interface ResponsesFieldsProps<T extends FormWithResponses> {
@@ -81,7 +82,7 @@ function ResponsesFields<T extends FormWithResponses>({ control, data }: Respons
                         return <td key={timeOption} className="bg-muted border-b border-border" />;
                       }
 
-                      const meta = STATUS_META[slotInfo.status as ResponseStatus];
+                      const meta = STATUS_META[slotInfo.status];
 
                       return (
                         <td

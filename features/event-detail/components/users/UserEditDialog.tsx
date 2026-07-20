@@ -14,7 +14,7 @@ import { toast } from 'sonner';
 import type { Candidate, User } from '@/features/event-detail/types';
 import { useUpdateUser } from '@/features/event-detail/hooks/useEventMutations';
 import { toResponseInputs } from '@/features/event-detail/lib/responses';
-import { UserEditFormSchema, type UserEditFormData } from '@/features/event-detail/schema';
+import { userEditFormSchema, type UserEditFormData } from '@/features/event-detail/schema';
 import { COMMENT_MAX_LENGTH } from '@/lib/validation';
 
 interface UserEditDialogProps {
@@ -33,7 +33,7 @@ function UserEditDialog({ eventId, data, password, open, onOpenChange }: UserEdi
   const updateUser = useUpdateUser(eventId);
 
   const form = useForm<UserEditFormData>({
-    resolver: zodResolver(UserEditFormSchema),
+    resolver: zodResolver(userEditFormSchema),
     defaultValues: { name: "", comment: "", responses: [] },
   });
 
