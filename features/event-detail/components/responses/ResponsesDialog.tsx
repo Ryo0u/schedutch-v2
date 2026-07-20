@@ -10,7 +10,7 @@ import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { hashPassword } from '@/lib/password';
 import { Candidate } from '@/features/event-detail/types';
-import { UserFormData, UserFormSchema } from '@/features/event-detail/schema';
+import { UserFormData, userFormSchema } from '@/features/event-detail/schema';
 import { useSaveResponses } from '@/features/event-detail/hooks/useEventMutations';
 import { buildInitialResponses, toResponseInputs } from '@/features/event-detail/lib/responses';
 import { toast } from 'sonner';
@@ -26,7 +26,7 @@ interface ResponsesDialogProps {
 
 function ResponsesDialog({ eventId, data, open, onOpenChange }: ResponsesDialogProps) {
   const form = useForm<UserFormData>({
-    resolver: zodResolver(UserFormSchema),
+    resolver: zodResolver(userFormSchema),
     defaultValues: {
       name: "",
       comment: "",

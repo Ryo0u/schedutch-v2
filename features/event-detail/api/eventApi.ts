@@ -17,7 +17,7 @@ export async function verifyUserPassword(userId: string, password: string): Prom
 export interface ResponseInput extends Record<string, Json> {
   candidate_id: string;
   time: string;
-  status: ResponseStatus | string;
+  status: ResponseStatus;
 }
 
 /**

@@ -2,7 +2,7 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { formSchema, type EventCreateFormData } from '@/features/event-create/schema';
+import { eventCreateFormSchema, type EventCreateFormData } from '@/features/event-create/schema';
 import NewHero from './NewHero';
 import EventInfoFields from './EventInfoFields';
 import CandidatesFields from './candidates/CandidatesFields';
@@ -11,7 +11,7 @@ import EventCreateActions from './EventCreateActions';
 
 export default function CreateEventContainer() {
   const form = useForm<EventCreateFormData>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(eventCreateFormSchema),
     defaultValues: {
       title: '',
       password: '',

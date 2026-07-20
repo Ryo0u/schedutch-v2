@@ -10,7 +10,7 @@ import { Edit } from "lucide-react";
 import { toast } from "sonner";
 import { useUpdateEvent } from "@/features/event-detail/hooks/useEventMutations";
 import { isPasswordError } from "@/features/event-detail/api/errors";
-import { EventEditFormSchema, type EventEditFormData } from "@/features/event-detail/schema";
+import { eventEditFormSchema, type EventEditFormData } from "@/features/event-detail/schema";
 import { COMMENT_MAX_LENGTH } from "@/lib/validation";
 
 interface DialogProps {
@@ -28,7 +28,7 @@ function EventEditDialog({ eventId, open, onOpenChange, data }: DialogProps) {
   const updateEvent = useUpdateEvent(eventId);
 
   const form = useForm<EventEditFormData>({
-    resolver: zodResolver(EventEditFormSchema),
+    resolver: zodResolver(eventEditFormSchema),
     defaultValues: { title: "", comment: "", password: "" },
   });
 

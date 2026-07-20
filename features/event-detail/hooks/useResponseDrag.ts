@@ -1,11 +1,8 @@
 import { useCallback, useState } from "react";
 import type { ResponseStatus } from "@/features/event-detail/types";
+import type { ResponseFormValue } from "@/features/event-detail/schema";
 
-type DraggableField = {
-  candidate_id: string;
-  time: Date;
-  status: string;
-};
+type DraggableField = ResponseFormValue;
 
 /**
  * ResponsesFieldsのドラッグ塗り入力を集約する。

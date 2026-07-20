@@ -2,12 +2,7 @@ import { SLOT_INTERVAL_MS } from "@/lib/constants";
 import { formatJSTTime } from "@/lib/datetime";
 import type { ResponseInput } from "@/features/event-detail/api/eventApi";
 import type { Candidate } from "@/features/event-detail/types";
-
-export type ResponseFormValue = {
-  candidate_id: string;
-  time: Date;
-  status: string;
-};
+import type { ResponseFormValue } from "@/features/event-detail/schema";
 
 /** 候補日の範囲をSLOT_INTERVAL_MS刻みで初期化する（未回答は"ok"扱い） */
 export function buildInitialResponses(
