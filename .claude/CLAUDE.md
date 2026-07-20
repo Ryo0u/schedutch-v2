@@ -96,24 +96,25 @@ schedutch-v2/
 │   └── event/[id]/page.tsx  # イベント閲覧・回答（EventContainer を描画）
 ├── features/
 │   ├── home/              # トップページ（LP）
-│   │   ├── components/    # 直下: LpFooter / MobileCtaBar / ScrollReveal（複数セクション横断）
-│   │   │   ├── hero/          # HeroSection, HeroGrid
-│   │   │   ├── steps/         # StepsSection, StepCard, BrowserFrame
-│   │   │   ├── comparison/    # ComparisonSection, LegacyToolCard, PreviewCard
-│   │   │   ├── extract/       # ExtractSection
-│   │   │   ├── features/      # FeaturesSection
-│   │   │   └── cta/           # CtaSection
+│   │   ├── components/    # 直下: 複数セクション横断のCTAバー・スクロール演出
+│   │   │   ├── hero/          # ファーストビュー
+│   │   │   ├── steps/         # 利用手順セクション
+│   │   │   ├── comparison/    # 既存ツールとの比較セクション
+│   │   │   ├── extract/       # 抽出機能の訴求セクション
+│   │   │   ├── features/      # 機能紹介セクション
+│   │   │   └── cta/           # 行動喚起セクション
 │   │   ├── hooks/         # usePrefersReducedMotion（LPアニメーションのreduced-motion購読）
 │   │   ├── constants.ts   # 各セクションの表示用データ（STEPS/FEATURES/CONDITIONS等）
 │   │   ├── home.css       # LP専用スタイル（card-pop/marker/sticker等。app/page.tsxでimport）
 │   │   └── index.ts       # barrel
 │   ├── event-detail/     # 閲覧・回答機能（/event/[id]）
 │   │   ├── components/   # 直下: EventContainer(親) / EventSkeleton
-│   │   │   ├── event/        # EventInfo, MenuButton, EventEditDialog, EventDeleteDialog, EventShareDialog
-│   │   │   ├── users/        # UsersInfo, UserEditDialog, UserEditPasswordDialog, UserDeletePickerDialog（一覧から選んで削除）, UserDeleteDialog（対象確定済みの削除）
-│   │   │   ├── responses/    # ResponsesDialog, ResponsesInfo, JoinButton
-│   │   │   ├── extract/      # ExtractPanel
-│   │   │   ├── form/         # ResponsesFields, UserInfoFields（users/responses共有）
+│   │   │   ├── event/        # イベント情報の表示・編集・削除・共有ダイアログ
+│   │   │   ├── users/        # 参加者一覧の表示・編集・削除ダイアログ群
+│   │   │   ├── responses/    # 回答の登録ダイアログ・表示
+│   │   │   ├── extract/      # 予定抽出パネル（フィルタ・結果表示・状態管理用Context・hooks を含む）
+│   │   │   ├── sidebar/      # イベントページのサイドナビ（＋ hooks）
+│   │   │   ├── form/         # users/responses で共有するフォーム部品
 │   │   │   └── shared/       # DeleteDialogShell（削除ダイアログ共通骨格。presentational）
 │   │   ├── api/          # Supabase アクセス（eventApi.ts / errors.ts）
 │   │   ├── hooks/        # TanStack Query hook（useEvent / useEventMutations）＋ usePasswordConfirm / useResetOnOpen（ダイアログopen時のreset定型）
@@ -122,8 +123,8 @@ schedutch-v2/
 │   │   ├── types.ts      # EventData など固有の型
 │   │   └── index.ts      # barrel（公開面。app からはここ経由で import）
 │   └── event-create/     # 作成機能（/new）
-│       ├── components/   # 直下: CreateEventContainer(親) / NewHero / EventCreateActions / EventInfoFields / EventCreatedDialog
-│       │   └── candidates/   # CandidatesFields, CandidateList, EmptyList
+│       ├── components/   # 直下: フォームコンテナ(親) / ヒーロー / 送信アクション / 入力フィールド / 作成完了ダイアログ
+│       │   └── candidates/   # 候補日入力欄
 │       ├── api/          # Supabase アクセス（eventApi.ts）
 │       ├── schema.ts     # 作成フォームの型・zodスキーマ
 │       ├── hooks/        # useCreateEvent
@@ -139,7 +140,7 @@ schedutch-v2/
 └── supabase/             # supabase CLI（config.toml / migrations: スキーマ・RLS・RPC）
 ```
 
-feature 固有の Supabase アクセスは `features/{feature}/api/`、それを包む query/mutation hook は `features/{feature}/hooks/` に置く。トップの `hooks/` は複数 feature で共有する hook 専用。
+feature 固有の Supabase アクセスは `features/{feature}/api/`、それを包む query/mutation hook は `features/{feature}/hooks/` に置く。トップの `hooks/` は複数 feature で共有する hook 専用。特定のコンポーネント群専用の hook（例: `extract/hooks/useExtractSlots`、`sidebar/hooks/useNavScroll`）は、その `components/` サブディレクトリ配下に `hooks/` を切って同居させてよい。
 
 feature 間の直接 import は禁止。共有したくなったものは `lib/` か `components/ui/` に昇格させる。
 
