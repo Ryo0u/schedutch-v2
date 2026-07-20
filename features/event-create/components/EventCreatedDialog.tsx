@@ -1,8 +1,8 @@
 import { Check, Copy, ExternalLink, X } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import { useRouter } from 'next/navigation';
+import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 
 interface EventCreatedDialogProps {
   open: boolean;
@@ -12,17 +12,10 @@ interface EventCreatedDialogProps {
 
 function EventCreatedDialog({ open, onChangeOpen, eventId}: EventCreatedDialogProps) {
   const router = useRouter();
-  const [copied, setCopied] = useState(false);
-  
+  const { copied, copy } = useCopyToClipboard();
+
   const eventUrl = eventId ? `${window.location.origin}/event/${eventId}` : "";
-    
-  const handleCopy = () => {
-    if (!eventUrl) return;
-    navigator.clipboard.writeText(eventUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1000);
-  };
-  
+
   return (
     <AlertDialog open={open} onOpenChange={onChangeOpen}>
       <AlertDialogContent>
@@ -35,7 +28,7 @@ function EventCreatedDialog({ open, onChangeOpen, eventId}: EventCreatedDialogPr
         
         <div className="flex items-center space-x-2 bg-muted p-3 rounded-lg border overflow-x-auto">
           <code className="text-xs flex-1 truncate">{eventUrl}</code>
-          <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={handleCopy}>
+          <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => copy(eventUrl)}>
             {copied ? <Check/> : <Copy/>}
           </Button>
         </div>

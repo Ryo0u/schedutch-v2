@@ -129,7 +129,7 @@ schedutch-v2/
 │       ├── schema.ts     # 作成フォームの型・zodスキーマ
 │       ├── hooks/        # useCreateEvent
 │       └── index.ts      # barrel
-├── hooks/                # 複数featureで使う共通hook（useDeviceType）
+├── hooks/                # 複数featureで使う共通hook（useDeviceType / useCopyToClipboard）
 ├── components/
 │   ├── ui/               # shadcn/ui ベースの汎用プリミティブ
 │   ├── form/             # react-hook-form合成のフォーム部品（TextField / TextareaCounterField）。feature間共有

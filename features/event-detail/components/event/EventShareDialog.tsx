@@ -1,9 +1,9 @@
-import { useState } from "react";
 import { Check, Copy, Share2 } from "lucide-react"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Field } from "@/components/ui/field"
 import { Button } from "@/components/ui/button"
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group";
+import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 
 interface DialogProps {
   open: boolean;
@@ -11,16 +11,10 @@ interface DialogProps {
 }
 
 function EventShareDialog({ open, onOpenChange }: DialogProps) {
-  const [copied, setCopied] = useState(false);
-  
+  const { copied, copy } = useCopyToClipboard();
+
   const eventUrl = typeof window !== "undefined" ? window.location.href : "";
-  
-  const handleCopy = () => {
-    navigator.clipboard.writeText(eventUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1000);
-  }
-  
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -47,7 +41,7 @@ function EventShareDialog({ open, onOpenChange }: DialogProps) {
                 type="button"
                 variant="ghost"
                 size="icon-sm"
-                onClick={handleCopy}
+                onClick={() => copy(eventUrl)}
                 className="h-full px-3"
               >
                 {copied ? (
