@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -30,7 +30,6 @@ interface UserEditDialogProps {
 }
 
 function UserEditDialog({ eventId, data, password, open, onOpenChange }: UserEditDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const updateUser = useUpdateUser(eventId);
 
   const form = useForm<UserEditFormData>({
@@ -53,8 +52,6 @@ function UserEditDialog({ eventId, data, password, open, onOpenChange }: UserEdi
   }, [open, data.user.name, data.user.comment, data.user.responses, form]);
 
   const onSubmit = async (values: UserEditFormData) => {
-    setIsSubmitting(true);
-
     try {
       const formattedResponses = toResponseInputs(values.responses);
 
@@ -72,8 +69,6 @@ function UserEditDialog({ eventId, data, password, open, onOpenChange }: UserEdi
       console.error('Failed to update user:', error);
       toast.error("更新に失敗しました", { position: 'top-center' });
     }
-
-    setIsSubmitting(false);
   };
 
   return (
@@ -105,8 +100,8 @@ function UserEditDialog({ eventId, data, password, open, onOpenChange }: UserEdi
           <DialogClose render={
             <Button size="lg" variant="ghost" type="button" onClick={() => form.reset()}>キャンセル</Button>
           }/>
-          <Button size="lg" type="submit" onClick={form.handleSubmit(onSubmit)} disabled={isSubmitting}>
-            {isSubmitting ? "保存中..." : "保存する"}
+          <Button size="lg" type="submit" onClick={form.handleSubmit(onSubmit)} disabled={updateUser.isPending}>
+            {updateUser.isPending ? "保存中..." : "保存する"}
           </Button>
         </DialogFooter>
       </DialogContent>
