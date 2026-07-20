@@ -3,14 +3,13 @@ import { Control, Controller, useFieldArray, useFormState, useWatch } from 'reac
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Field, FieldContent, FieldGroup, FieldLabel } from '@/components/ui/field';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Trash2 } from 'lucide-react'; 
+import { Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { Item, ItemActions, ItemContent, ItemGroup, ItemTitle } from '@/components/ui/item';
 import EmptyList from './EmptyList';
-import { TIME_OPTIONS } from "@/lib/constants";
+import TimeSelect from './TimeSelect';
 
 interface CandidateListProps {
 	control: Control<FormData>;
@@ -83,36 +82,18 @@ function CandidateList({ control }: CandidateListProps) {
 															render={({ field }) => (
 																<Field className='flex flex-row sm:flex-col' data-invalid={hasError}>
 																	<FieldLabel className='text-xs'>開始</FieldLabel>
-																	<Select value={field.value} onValueChange={field.onChange}>
-																		<SelectTrigger aria-invalid={hasError}>
-																			<SelectValue/>
-																		</SelectTrigger>
-																		<SelectContent>
-																			{TIME_OPTIONS.map((time) => (
-																				<SelectItem key={`from-${time}`} value={time}>{time}</SelectItem>
-																			))}
-																		</SelectContent>
-																	</Select>
+																	<TimeSelect value={field.value} onValueChange={field.onChange} ariaInvalid={hasError} />
 																</Field>
 															)}
 														/>
-														
+
 														<Controller
 															name={`candidates.${actualIndex}.endTime`}
 															control={control}
 															render={({ field }) => (
 																<Field className='flex flex-row sm:flex-col' data-invalid={hasError}>
 																	<FieldLabel className='text-xs'>終了</FieldLabel>
-																	<Select value={field.value} onValueChange={field.onChange}>
-																		<SelectTrigger aria-invalid={hasError}>
-																			<SelectValue/>
-																		</SelectTrigger>
-																		<SelectContent>
-																			{TIME_OPTIONS.map((time) => (
-																				<SelectItem key={`to-${time}`} value={time}>{time}</SelectItem>
-																			))}
-																		</SelectContent>
-																	</Select>
+																	<TimeSelect value={field.value} onValueChange={field.onChange} ariaInvalid={hasError} />
 																</Field>
 															)}
 														/>
