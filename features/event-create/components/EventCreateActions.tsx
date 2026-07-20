@@ -2,7 +2,7 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Eraser, Plus } from 'lucide-react';
 import { UseFormReturn } from 'react-hook-form';
-import { FormData } from '@/features/event-create/schema';
+import { EventCreateFormData } from '@/features/event-create/schema';
 import { toast } from "sonner"
 import { useState } from 'react';
 import EventCreatedDialog from './EventCreatedDialog';
@@ -12,7 +12,7 @@ import { hashPassword } from '@/lib/password';
 import { useCreateEvent } from '@/features/event-create/hooks/useCreateEvent';
 
 interface EventCreateActionsProps {
-  form: UseFormReturn<FormData>;
+  form: UseFormReturn<EventCreateFormData>;
 }
 
 function EventCreateActions({ form }: EventCreateActionsProps) {
@@ -21,7 +21,7 @@ function EventCreateActions({ form }: EventCreateActionsProps) {
   const [createdEventId, setCreatedEventId] = useState<string | null>(null);
   const createEvent = useCreateEvent();
 	
-  const onSubmit = async (values: FormData) => {
+  const onSubmit = async (values: EventCreateFormData) => {
       try {
         const hashedPassword = await hashPassword(values.password);
 

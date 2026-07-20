@@ -2,7 +2,6 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import UserInfoFields from '../form/UserInfoFields';
 import { Separator } from '@/components/ui/separator';
@@ -26,7 +25,7 @@ interface ResponsesDialogProps {
 }
 
 function ResponsesDialog({ eventId, data, open, onOpenChange }: ResponsesDialogProps) {
-  const form = useForm<z.infer<typeof UserFormSchema>>({
+  const form = useForm<UserFormData>({
     resolver: zodResolver(UserFormSchema),
     defaultValues: {
       name: "",

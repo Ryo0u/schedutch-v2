@@ -1,4 +1,4 @@
-import { FormData } from '@/features/event-create/schema';
+import { EventCreateFormData } from '@/features/event-create/schema';
 import { Control, Controller, useFieldArray, useFormState, useWatch } from 'react-hook-form';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
@@ -13,7 +13,7 @@ import EmptyList from './EmptyList';
 import { TIME_OPTIONS } from "@/lib/constants";
 
 interface CandidateListProps {
-	control: Control<FormData>;
+	control: Control<EventCreateFormData>;
 }
 
 function CandidateList({ control }: CandidateListProps) {	

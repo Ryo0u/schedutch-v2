@@ -1,4 +1,4 @@
-import { FormData } from '@/features/event-create/schema';
+import { EventCreateFormData } from '@/features/event-create/schema';
 import { Control, Controller, useFieldArray, useWatch } from 'react-hook-form';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
@@ -17,7 +17,7 @@ import { buildNewCandidateDates } from '@/features/event-create/lib/candidateDat
 
 
 interface CandidatesFieldsProps {
-	control: Control<FormData>;
+	control: Control<EventCreateFormData>;
 }
 
 const CandidatesFields = ({ control }: CandidatesFieldsProps) => {
