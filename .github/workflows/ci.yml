@@ -7,7 +7,7 @@ on:
     branches: [develop, main]
 
 jobs:
-  lint-and-build:
+  lint-test-build:
     runs-on: ubuntu-latest
     env:
       # ビルド検証用のダミー値。
