@@ -66,6 +66,7 @@ function UsersInfo({ eventId }: UsersInfoProps) {
                 <Button
                   variant="ghost"
                   size="sm"
+                  aria-label={`${user.name}を編集`}
                   onClick={() => startEdit(user)}
                 >
                   <Pencil className="h-4 w-4" />
@@ -73,6 +74,7 @@ function UsersInfo({ eventId }: UsersInfoProps) {
                 <Button
                   variant="ghost"
                   size="sm"
+                  aria-label={`${user.name}を削除`}
                   onClick={() => startDelete(user)}
                 >
                   <Trash2 className="h-4 w-4 text-destructive" />
