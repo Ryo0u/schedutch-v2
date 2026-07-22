@@ -28,7 +28,7 @@ function EventCreatedDialog({ open, onChangeOpen, eventId}: EventCreatedDialogPr
         
         <div className="flex items-center space-x-2 bg-muted p-3 rounded-lg border overflow-x-auto">
           <code className="text-xs flex-1 truncate">{eventUrl}</code>
-          <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => copy(eventUrl)}>
+          <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" aria-label="イベントURLをコピー" onClick={() => copy(eventUrl)}>
             {copied ? <Check/> : <Copy/>}
           </Button>
         </div>

@@ -17,7 +17,7 @@ function ExtractResultPanel({ slots }: ExtractResultPanelProps) {
       />
         <InputGroupAddon align="block-start" className="border-b flex justify-between">
           <InputGroupText>抽出結果</InputGroupText>
-          <InputGroupButton variant="ghost" size="icon-xs" onClick={() => navigator.clipboard.writeText(text)}>
+          <InputGroupButton variant="ghost" size="icon-xs" aria-label="抽出結果をコピー" onClick={() => navigator.clipboard.writeText(text)}>
             <CopyIcon/>
           </InputGroupButton>
         </InputGroupAddon>

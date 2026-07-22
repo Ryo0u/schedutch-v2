@@ -41,6 +41,7 @@ function EventShareDialog({ open, onOpenChange }: DialogProps) {
                 type="button"
                 variant="ghost"
                 size="icon-sm"
+                aria-label="イベントURLをコピー"
                 onClick={() => copy(eventUrl)}
                 className="h-full px-3"
               >

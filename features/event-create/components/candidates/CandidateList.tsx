@@ -66,6 +66,7 @@ function CandidateList({ control }: CandidateListProps) {
 														variant="ghost"
 														size="icon"
 														className="h-7 w-7 text-destructive hover:bg-destructive/10"
+														aria-label={`${format(new Date(item.date), 'MM/dd (eee)', { locale: ja })}の候補日を削除`}
 														onClick={() => remove(actualIndex)}
 													>
 														<Trash2 className="h-4 w-4" />
