@@ -118,7 +118,7 @@ schedutch-v2/
 │   │   │   └── shared/       # DeleteDialogShell（削除ダイアログ共通骨格。presentational）
 │   │   ├── api/          # Supabase アクセス（eventApi.ts / errors.ts）
 │   │   ├── hooks/        # TanStack Query hook（useEvent / useEventMutations）＋ usePasswordConfirm / useResetOnClose（ダイアログclose時のreset定型）
-│   │   ├── lib/          # pure関数（status.ts: 回答ステータス表示定義 / responses.ts: 回答データ整形 / validation.ts: feature固有バリデーション（nameSchema） / extractSlots.ts: 予定抽出アルゴリズム）
+│   │   ├── lib/          # pure関数（status.ts: 回答ステータス表示定義 / responses.ts: 回答データ整形 / validation.ts: feature固有バリデーション（nameSchema） / extractSlots.ts: 予定抽出アルゴリズム / anchors.ts: セクションID・候補日アンカーの単一定義）
 │   │   ├── schema.ts     # 回答フォームの型・zodスキーマ
 │   │   ├── types.ts      # EventData など固有の型
 │   │   └── index.ts      # barrel（公開面。app からはここ経由で import）

@@ -4,6 +4,7 @@ import { formatJSTTime, formatJSTCandidateDateLabel, jstWallTimeToISO } from "@/
 import { STATUS_META } from "@/features/event-detail/lib/status";
 import type { TimeBlock } from "@/features/event-detail/lib/extractSlots";
 import type { Candidate, ResponseStatus, User } from "@/features/event-detail/types";
+import { candidateAnchorId } from "@/features/event-detail/lib/anchors";
 
 interface CandidateSectionProps {
   candidate: Candidate;
@@ -37,7 +38,7 @@ export default function CandidateSection({ candidate, users, displayedTimes, ext
   }, [extractedBlocks, candidate.start_time, displayedTimes]);
 
   return (
-    <tbody id={`candidate-${candidate.id}`} className="scroll-mt-24">
+    <tbody id={candidateAnchorId(candidate.id)} className="scroll-mt-24">
       <tr>
         <th rowSpan={2} className="sticky left-0 z-30 border bg-primary/80 p-1 sm:p-2 text-[10px] sm:text-xs text-center text-primary-foreground min-w-10 sm:min-w-24">
           {dateLabel}

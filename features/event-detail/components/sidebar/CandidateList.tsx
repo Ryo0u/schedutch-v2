@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils"
 import { formatJSTCandidateDateLabel } from "@/lib/datetime"
 import type { Candidate } from "@/features/event-detail/types"
+import { candidateAnchorId } from "@/features/event-detail/lib/anchors"
 
 interface CandidateListProps {
   candidates: Candidate[]
@@ -14,7 +15,7 @@ export default function CandidateList({ candidates, activeId, onClickCandidate }
   return (
     <div className="mt-4 flex flex-col gap-3 pl-8 max-h-120 overflow-y-auto">
       {candidates.map((candidate) => {
-        const candidateId = `candidate-${candidate.id}`
+        const candidateId = candidateAnchorId(candidate.id)
         const dateLabel = formatJSTCandidateDateLabel(candidate.start_time)
         return (
           <button

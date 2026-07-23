@@ -13,6 +13,7 @@ import ResponsesInfo from "./responses/ResponsesInfo";
 import ExtractPanel from "./extract/ExtractPanel";
 import { ExtractSlotsProvider } from "./extract/ExtractSlotsContext";
 import EventSideNav from "./sidebar/EventSideNav";
+import { SECTION_IDS } from "@/features/event-detail/lib/anchors";
 
 export default function EventContainer({ eventId }: { eventId: string }) {
   const { data, isLoading, isError, error } = useEvent(eventId);
@@ -38,7 +39,7 @@ export default function EventContainer({ eventId }: { eventId: string }) {
         <EventSideNav eventId={eventId} />
       </aside>
 
-      <section id="event-info" className="flex flex-col sm:flex-row justify-between sm:items-end gap-8 mt-5 mb-8 scroll-mt-20">
+      <section id={SECTION_IDS.eventInfo} className="flex flex-col sm:flex-row justify-between sm:items-end gap-8 mt-5 mb-8 scroll-mt-20">
         <EventInfo eventId={eventId}/>
         <div className="flex items-center gap-3">
           <MenuButton eventId={eventId}/>
@@ -48,16 +49,16 @@ export default function EventContainer({ eventId }: { eventId: string }) {
 
       <Separator/>
 
-      <section id="users-info" className="mt-5 mb-8 scroll-mt-20">
+      <section id={SECTION_IDS.usersInfo} className="mt-5 mb-8 scroll-mt-20">
         <UsersInfo eventId={eventId}/>
       </section>
 
       <ExtractSlotsProvider eventId={eventId}>
-        <section id="responses-info" className="mb-8 scroll-mt-20">
+        <section id={SECTION_IDS.responsesInfo} className="mb-8 scroll-mt-20">
           <ResponsesInfo eventId={eventId}/>
         </section>
 
-        <section id="extract-responses" className="mb-8 scroll-mt-20">
+        <section id={SECTION_IDS.extractResponses} className="mb-8 scroll-mt-20">
           <ExtractPanel eventId={eventId}/>
         </section>
       </ExtractSlotsProvider>
