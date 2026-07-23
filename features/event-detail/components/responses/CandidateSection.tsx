@@ -5,6 +5,7 @@ import { STATUS_META } from "@/features/event-detail/lib/status";
 import type { TimeBlock } from "@/features/event-detail/lib/extractSlots";
 import type { Candidate, ResponseStatus, User } from "@/features/event-detail/types";
 import { candidateAnchorId } from "@/features/event-detail/lib/anchors";
+import { responseSlotKey } from "@/features/event-detail/lib/responses";
 
 interface CandidateSectionProps {
   candidate: Candidate;
@@ -75,7 +76,7 @@ export default function CandidateSection({ candidate, users, displayedTimes, ext
       {/* ユーザー行 */}
       {users.map((user, userIndex) => {
         const responseMap = user.responses.reduce((acc, res) => {
-          acc[`${res.candidate_id}-${formatJSTTime(res.time)}`] = res.status;
+          acc[responseSlotKey(res.candidate_id, formatJSTTime(res.time))] = res.status;
           return acc;
         }, {} as Record<string, ResponseStatus>);
 
@@ -91,7 +92,7 @@ export default function CandidateSection({ candidate, users, displayedTimes, ext
             </td>
 
             {displayedTimes.map((time) => {
-              const status = responseMap[`${candidate.id}-${time}`];
+              const status = responseMap[responseSlotKey(candidate.id, time)];
               const meta = status ? STATUS_META[status] : undefined;
               const highlight = highlightMap.get(time);
               const isExtracting = extractedBlocks.length > 0;

@@ -37,14 +37,18 @@ export function toResponseInputs(responses: ResponseFormValue[]): ResponseInput[
   }));
 }
 
+/** 「candidate_id-HHmm」形式の回答スロットキーを生成する */
+export function responseSlotKey(candidateId: string, hhmm: string): string {
+  return `${candidateId}-${hhmm}`;
+}
+
 /** 回答フィールド配列を「candidate_id-HHmm」キーのマップに変換する（ResponsesFieldsのセル検索用） */
 export function buildResponseSlotMap<T extends { candidate_id: string; time: Date }>(
   fields: T[]
 ): Record<string, T & { index: number }> {
   return fields.reduce(
     (acc, field, index) => {
-      const hhmm = formatJSTTime(field.time);
-      acc[`${field.candidate_id}-${hhmm}`] = { ...field, index };
+      acc[responseSlotKey(field.candidate_id, formatJSTTime(field.time))] = { ...field, index };
       return acc;
     },
     {} as Record<string, T & { index: number }>
