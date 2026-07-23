@@ -76,7 +76,7 @@ export default function CandidateSection({ candidate, users, displayedTimes, ext
         const responseMap = user.responses.reduce((acc, res) => {
           acc[`${res.candidate_id}-${formatJSTTime(res.time)}`] = res.status;
           return acc;
-        }, {} as Record<string, string>);
+        }, {} as Record<string, ResponseStatus>);
 
         const isFirstRow = userIndex === 0;
         const isLastRow = userIndex === users.length - 1;
@@ -90,7 +90,7 @@ export default function CandidateSection({ candidate, users, displayedTimes, ext
             </td>
 
             {displayedTimes.map((time) => {
-              const status = responseMap[`${candidate.id}-${time}`] as ResponseStatus | undefined;
+              const status = responseMap[`${candidate.id}-${time}`];
               const meta = status ? STATUS_META[status] : undefined;
               const highlight = highlightMap.get(time);
               const isExtracting = extractedBlocks.length > 0;
