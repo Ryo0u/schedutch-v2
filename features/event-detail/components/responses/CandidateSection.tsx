@@ -4,6 +4,8 @@ import { formatJSTTime, formatJSTCandidateDateLabel, jstWallTimeToISO } from "@/
 import { STATUS_META } from "@/features/event-detail/lib/status";
 import type { TimeBlock } from "@/features/event-detail/lib/extractSlots";
 import type { Candidate, ResponseStatus, User } from "@/features/event-detail/types";
+import { candidateAnchorId } from "@/features/event-detail/lib/anchors";
+import { responseSlotKey } from "@/features/event-detail/lib/responses";
 
 interface CandidateSectionProps {
   candidate: Candidate;
@@ -37,7 +39,7 @@ export default function CandidateSection({ candidate, users, displayedTimes, ext
   }, [extractedBlocks, candidate.start_time, displayedTimes]);
 
   return (
-    <tbody id={`candidate-${candidate.id}`} className="scroll-mt-24">
+    <tbody id={candidateAnchorId(candidate.id)} className="scroll-mt-24">
       <tr>
         <th rowSpan={2} className="sticky left-0 z-30 border bg-primary/80 p-1 sm:p-2 text-[10px] sm:text-xs text-center text-primary-foreground min-w-10 sm:min-w-24">
           {dateLabel}
@@ -74,9 +76,9 @@ export default function CandidateSection({ candidate, users, displayedTimes, ext
       {/* ユーザー行 */}
       {users.map((user, userIndex) => {
         const responseMap = user.responses.reduce((acc, res) => {
-          acc[`${res.candidate_id}-${formatJSTTime(res.time)}`] = res.status;
+          acc[responseSlotKey(res.candidate_id, formatJSTTime(res.time))] = res.status;
           return acc;
-        }, {} as Record<string, string>);
+        }, {} as Record<string, ResponseStatus>);
 
         const isFirstRow = userIndex === 0;
         const isLastRow = userIndex === users.length - 1;
@@ -90,7 +92,7 @@ export default function CandidateSection({ candidate, users, displayedTimes, ext
             </td>
 
             {displayedTimes.map((time) => {
-              const status = responseMap[`${candidate.id}-${time}`] as ResponseStatus | undefined;
+              const status = responseMap[responseSlotKey(candidate.id, time)];
               const meta = status ? STATUS_META[status] : undefined;
               const highlight = highlightMap.get(time);
               const isExtracting = extractedBlocks.length > 0;

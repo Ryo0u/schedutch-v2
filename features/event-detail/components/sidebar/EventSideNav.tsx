@@ -6,12 +6,13 @@ import { cn } from "@/lib/utils"
 import { useEvent } from "@/features/event-detail/hooks/useEvent"
 import { useNavScroll } from "./hooks/useNavScroll"
 import CandidateList from "./CandidateList"
+import { SECTION_IDS, candidateAnchorId } from "@/features/event-detail/lib/anchors"
 
 const MAIN_NAV = [
-  { id: "event-info", label: "イベント情報" },
-  { id: "users-info", label: "参加者" },
-  { id: "responses-info", label: "予定一覧" },
-  { id: "extract-responses", label: "集計・抽出" },
+  { id: SECTION_IDS.eventInfo, label: "イベント情報" },
+  { id: SECTION_IDS.usersInfo, label: "参加者" },
+  { id: SECTION_IDS.responsesInfo, label: "予定一覧" },
+  { id: SECTION_IDS.extractResponses, label: "集計・抽出" },
 ]
 
 export default function EventSideNav({ eventId }: { eventId: string }) {
@@ -19,9 +20,9 @@ export default function EventSideNav({ eventId }: { eventId: string }) {
   const { activeId } = useNavScroll(data?.candidates)
   const [isResponsesOpen, setIsResponsesOpen] = useState(false)
 
-  const candidateIds = data?.candidates.map((c) => `candidate-${c.id}`) ?? []
+  const candidateIds = data?.candidates.map((c) => candidateAnchorId(c.id)) ?? []
   const isResponsesActive =
-    activeId === "responses-info" || candidateIds.includes(activeId)
+    activeId === SECTION_IDS.responsesInfo || candidateIds.includes(activeId)
 
   const handleClick = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" })
@@ -30,7 +31,7 @@ export default function EventSideNav({ eventId }: { eventId: string }) {
   return (
     <nav className="fixed top-24 left-6 w-44 py-2 flex flex-col">
       {MAIN_NAV.map(({ id, label }) => {
-        const isActive = activeId === id || (id === "responses-info" && isResponsesActive)
+        const isActive = activeId === id || (id === SECTION_IDS.responsesInfo && isResponsesActive)
         return (
           <div
             key={id}
@@ -41,7 +42,7 @@ export default function EventSideNav({ eventId }: { eventId: string }) {
           >
             <div className={cn(
               "flex items-center",
-              id === "responses-info" && "justify-between gap-1"
+              id === SECTION_IDS.responsesInfo && "justify-between gap-1"
             )}>
               <button
                 onClick={() => handleClick(id)}
@@ -53,7 +54,7 @@ export default function EventSideNav({ eventId }: { eventId: string }) {
                 {label}
               </button>
 
-              {id === "responses-info" && (
+              {id === SECTION_IDS.responsesInfo && (
                 <button
                   onClick={() => setIsResponsesOpen((prev) => !prev)}
                   className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
@@ -63,7 +64,7 @@ export default function EventSideNav({ eventId }: { eventId: string }) {
               )}
             </div>
 
-            {id === "responses-info" && isResponsesOpen && data && (
+            {id === SECTION_IDS.responsesInfo && isResponsesOpen && data && (
               <CandidateList
                 candidates={data.candidates}
                 activeId={activeId}

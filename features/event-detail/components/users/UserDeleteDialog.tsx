@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import type { User } from "@/features/event-detail/types";
 import { useDeleteUser } from "@/features/event-detail/hooks/useEventMutations";
 import { usePasswordConfirm } from "@/features/event-detail/hooks/usePasswordConfirm";
-import { useResetOnOpen } from "@/features/event-detail/hooks/useResetOnOpen";
+import { useResetOnClose } from "@/features/event-detail/hooks/useResetOnClose";
 import DeleteDialogShell from "@/features/event-detail/components/shared/DeleteDialogShell";
 
 interface UserDeleteDialogProps {
@@ -24,7 +24,7 @@ function UserDeleteDialog({ eventId, data, open, onOpenChange }: UserDeleteDialo
   const deleteUser = useDeleteUser(eventId);
   const { isSubmitting, errorMsg, setErrorMsg, run } = usePasswordConfirm();
 
-  useResetOnOpen(open, () => {
+  useResetOnClose(open, () => {
     setPassword("");
     setErrorMsg(null);
   });

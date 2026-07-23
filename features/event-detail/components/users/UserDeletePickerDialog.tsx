@@ -5,7 +5,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
 import { useDeleteUser } from "@/features/event-detail/hooks/useEventMutations";
 import { usePasswordConfirm } from "@/features/event-detail/hooks/usePasswordConfirm";
-import { useResetOnOpen } from "@/features/event-detail/hooks/useResetOnOpen";
+import { useResetOnClose } from "@/features/event-detail/hooks/useResetOnClose";
 import DeleteDialogShell from "@/features/event-detail/components/shared/DeleteDialogShell";
 
 interface DialogProps {
@@ -26,7 +26,7 @@ function UserDeletePickerDialog({ eventId, data, open, onOpenChange }: DialogPro
   const deleteUser = useDeleteUser(eventId);
   const { isSubmitting, errorMsg, setErrorMsg, run } = usePasswordConfirm();
 
-  useResetOnOpen(open, () => {
+  useResetOnClose(open, () => {
     setPassword("");
     setUserId("");
     setErrorMsg(null);
