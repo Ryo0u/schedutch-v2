@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useRouter } from 'next/navigation';
 import { useDeleteEvent } from "@/features/event-detail/hooks/useEventMutations";
 import { usePasswordConfirm } from "@/features/event-detail/hooks/usePasswordConfirm";
-import { useResetOnOpen } from "@/features/event-detail/hooks/useResetOnOpen";
+import { useResetOnClose } from "@/features/event-detail/hooks/useResetOnClose";
 import DeleteDialogShell from "@/features/event-detail/components/shared/DeleteDialogShell";
 
 interface DialogProps {
@@ -22,7 +22,7 @@ function EventDeleteDialog({ open, onOpenChange, data }: DialogProps) {
   const deleteEvent = useDeleteEvent();
   const { isSubmitting, errorMsg, setErrorMsg, run } = usePasswordConfirm();
 
-  useResetOnOpen(open, () => {
+  useResetOnClose(open, () => {
     setPassword("");
     setErrorMsg(null);
   });
