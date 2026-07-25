@@ -81,20 +81,23 @@ function ResponsesDialog({ eventId, data, open, onOpenChange }: ResponsesDialogP
 
         <Separator className="shrink-0" />
 
-        <form 
-          onSubmit={form.handleSubmit(onSubmit)} 
+        <form
+          id="responses-form"
+          onSubmit={form.handleSubmit(onSubmit)}
           className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-6"
         >
           <UserInfoFields control={form.control} />
           <Separator/>
           <ResponsesFields control={form.control} data={data} />
         </form>
-        
+
         <DialogFooter className='m-3'>
           <DialogClose render={
             <Button size="lg" variant="ghost" type='button' onClick={() => form.reset()}>キャンセル</Button>
           }/>
-          <Button size="lg" variant="default" type='submit' onClick={form.handleSubmit(onSubmit)}>登録する</Button>
+          <Button size="lg" variant="default" type='submit' form="responses-form" disabled={saveResponses.isPending}>
+            {saveResponses.isPending ? "登録中..." : "登録する"}
+          </Button>
         </DialogFooter>
         
       </DialogContent>
