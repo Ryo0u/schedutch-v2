@@ -11,7 +11,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { useDeviceType } from '@/hooks/useDeviceType';
-import { buildNewCandidateDates } from '@/features/event-create/lib/candidateDates';
+import { buildNewCandidateDates, startOfToday } from '@/features/event-create/lib/candidateDates';
 import TimeSelect from './TimeSelect';
 
 
@@ -26,8 +26,8 @@ const CandidatesFields = ({ control }: CandidatesFieldsProps) => {
 	const [startTime, setStartTime] = useState<string>("06:00")
 	const [endTime, setEndTime] = useState<string>("21:00")
 	const [selectedDates, setSelectedDates] = useState<DateRange | undefined>({
-    from: new Date(),
-    to: addDays(new Date(), 5),
+    from: startOfToday(),
+    to: addDays(startOfToday(), 5),
   })
 	
 	const watchedFields = useWatch({ control, name: "candidates" });

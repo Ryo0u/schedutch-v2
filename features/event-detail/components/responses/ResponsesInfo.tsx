@@ -16,14 +16,15 @@ function ResponsesInfo({ eventId }: ResponsesInfoProps) {
   const { extractedBlocks, isHighlightEnabled } = useExtractSlotsContext();
   if (!data) return null;
 
-  // 全候補の時間範囲の和集合で表示列を絞る
-  const globalStart = data.candidates
-    .map((c) => formatJSTTime(c.start_time))
-    .reduce((a, b) => (a < b ? a : b), "23:59");
-  const globalEnd = data.candidates
-    .map((c) => formatJSTTime(c.end_time))
-    .reduce((a, b) => (a > b ? a : b), "00:00");
-  const displayedTimes = TIME_OPTIONS.filter((t) => t >= globalStart && t < globalEnd);
+  // 全候補の時間範囲の和集合で表示列を絞る（min/maxはミリ秒で算出し、末尾でJST文字列化する）
+  let displayedTimes: string[] = [];
+  if (data.candidates.length > 0) {
+    const startMs = Math.min(...data.candidates.map((c) => new Date(c.start_time).getTime()));
+    const endMs = Math.max(...data.candidates.map((c) => new Date(c.end_time).getTime()));
+    const globalStart = formatJSTTime(startMs);
+    const globalEnd = formatJSTTime(endMs);
+    displayedTimes = TIME_OPTIONS.filter((t) => t >= globalStart && t < globalEnd);
+  }
 
   return (
     <Card className="shadow-md shadow-primary/10 ring-primary/20">
