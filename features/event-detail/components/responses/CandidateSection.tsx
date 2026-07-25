@@ -21,6 +21,21 @@ export default function CandidateSection({ candidate, users, displayedTimes, ext
   const endHHMM = formatJSTTime(candidate.end_time);
   const dateLabel = formatJSTCandidateDateLabel(candidate.start_time);
 
+  // ユーザーごとの回答を候補日・時刻のキーで引けるよう事前計算
+  const userResponseMaps = useMemo(() => {
+    const maps = new Map<string, Record<string, ResponseStatus>>();
+    for (const user of users) {
+      maps.set(
+        user.id,
+        user.responses.reduce((acc, res) => {
+          acc[responseSlotKey(res.candidate_id, formatJSTTime(res.time))] = res.status;
+          return acc;
+        }, {} as Record<string, ResponseStatus>)
+      );
+    }
+    return maps;
+  }, [users]);
+
   // 各時刻スロットが抽出結果ブロックの範囲内かどうかのフラグを事前計算
   // (block.end は最終スロットの開始時刻なので範囲判定は <= でよい)
   const highlightMap = useMemo(() => {
@@ -75,10 +90,7 @@ export default function CandidateSection({ candidate, users, displayedTimes, ext
 
       {/* ユーザー行 */}
       {users.map((user, userIndex) => {
-        const responseMap = user.responses.reduce((acc, res) => {
-          acc[responseSlotKey(res.candidate_id, formatJSTTime(res.time))] = res.status;
-          return acc;
-        }, {} as Record<string, ResponseStatus>);
+        const responseMap = userResponseMaps.get(user.id) ?? {};
 
         const isFirstRow = userIndex === 0;
         const isLastRow = userIndex === users.length - 1;
