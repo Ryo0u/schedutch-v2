@@ -11,14 +11,22 @@ interface StatusToggleProps {
 function StatusToggle({ value, onChange }: StatusToggleProps) {
   return (
     <div className="sticky right-0 top-0 z-40 mb-2 flex justify-end">
-      <ToggleGroup size="sm" spacing={2} variant="outline">
+      <ToggleGroup
+        size="sm"
+        spacing={2}
+        variant="outline"
+        value={[value]}
+        onValueChange={(groupValue) => {
+          const next = groupValue[0] as ResponseStatus | undefined;
+          if (next) onChange(next);
+        }}
+      >
         {RESPONSE_STATUSES.map((status) => {
           const meta = STATUS_META[status];
           return (
             <ToggleGroupItem
               key={status}
               value={status}
-              onClick={() => onChange(status)}
               className={cn("bg-background", value === status && meta.toggleActiveClass)}
             >
               <span className="sm:hidden">{meta.symbol}</span>
