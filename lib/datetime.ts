@@ -46,3 +46,13 @@ export function jstWallTimeToISO(date: Date, hhmm: string): string {
   // JST壁時計 → UTC: h-9 は負になり得るが Date.UTC が正しく前日にロールバックする
   return new Date(Date.UTC(year!, month! - 1, day!, h - 9, m)).toISOString();
 }
+
+/** JST の "YYYY-MM-DD" 文字列から、その日の JST 0時0分0秒の UTC ミリ秒を返す */
+export function jstDateStringToStartOfDayMs(dateStr: string): number {
+  return new Date(`${dateStr}T00:00:00+09:00`).getTime();
+}
+
+/** JST の "YYYY-MM-DD" 文字列から、その日の JST 23時59分59.999秒の UTC ミリ秒を返す */
+export function jstDateStringToEndOfDayMs(dateStr: string): number {
+  return new Date(`${dateStr}T23:59:59.999+09:00`).getTime();
+}

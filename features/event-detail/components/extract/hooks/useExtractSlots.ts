@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Candidate, User } from "@/features/event-detail/types";
 import { extractSlots, type FilterCondition, type TimeBlock } from "@/features/event-detail/lib/extractSlots";
-import { toJSTDateString } from "@/lib/datetime";
+import { toJSTDateString, jstDateStringToStartOfDayMs, jstDateStringToEndOfDayMs } from "@/lib/datetime";
 
 export type ExtractTab = "people" | "number";
 
@@ -34,6 +34,17 @@ export function useExtractSlots({ candidates, users }: UseExtractSlotsArgs) {
     const dates = candidates.map(c => toJSTDateString(c.start_time));
     return Array.from(new Set(dates)).sort();
   }, [candidates]);
+
+  // 回答の追加・編集でcandidates/usersが更新されたら、古い抽出結果を破棄する
+  // （レンダー中に前回値と比較して更新する。Reactの推奨パターンでeffectは使わない）
+  const [prevCandidates, setPrevCandidates] = useState(candidates);
+  const [prevUsers, setPrevUsers] = useState(users);
+  if (candidates !== prevCandidates || users !== prevUsers) {
+    setPrevCandidates(candidates);
+    setPrevUsers(users);
+    setAvailableSlots([]);
+    setExtractedBlocks([]);
+  }
 
   const handleTabChange = (value: ExtractTab) => {
     setActiveTab(value);
@@ -90,6 +101,7 @@ export function useExtractSlots({ candidates, users }: UseExtractSlotsArgs) {
   };
 
   const handleReset = () => {
+    setActiveTab("people");
     setSelectedUserIds(new Set());
     setSelectedHeadcounts(new Set());
     setAvailableSlots([]);
@@ -99,6 +111,7 @@ export function useExtractSlots({ candidates, users }: UseExtractSlotsArgs) {
     setMinDuration(0);
     setIsDateRangeEnabled(false);
     setDateRange(["", ""]);
+    setIsHighlightEnabled(true);
   };
 
   const handleExtractSlots = () => {
@@ -117,13 +130,11 @@ export function useExtractSlots({ candidates, users }: UseExtractSlotsArgs) {
     if (isDateRangeEnabled) {
       const fallbackStart = availableDates[0] ?? "1970-01-01";
       const startDate = dateRange[0] || fallbackStart;
-      // JST 0時 → UTC = "YYYY-MM-DDT00:00:00+09:00"
-      const start = new Date(`${startDate}T00:00:00+09:00`).getTime();
+      const start = jstDateStringToStartOfDayMs(startDate);
 
       const fallbackEnd = availableDates[availableDates.length - 1] ?? "9999-12-31";
       const endDate = dateRange[1] || fallbackEnd;
-      // JST 23:59:59.999 → UTC
-      const end = new Date(`${endDate}T23:59:59.999+09:00`).getTime();
+      const end = jstDateStringToEndOfDayMs(endDate);
 
       conditions.push({ type: 'DATERANGE', start, end });
     }
