@@ -84,6 +84,7 @@ function UserEditDialog({ eventId, data, password, open, onOpenChange }: UserEdi
         <Separator className="shrink-0" />
 
         <form
+          id="user-edit-form"
           onSubmit={form.handleSubmit(onSubmit)}
           className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-6"
         >
@@ -100,7 +101,7 @@ function UserEditDialog({ eventId, data, password, open, onOpenChange }: UserEdi
           <DialogClose render={
             <Button size="lg" variant="ghost" type="button" onClick={() => form.reset()}>キャンセル</Button>
           }/>
-          <Button size="lg" type="submit" onClick={form.handleSubmit(onSubmit)} disabled={updateUser.isPending}>
+          <Button size="lg" type="submit" form="user-edit-form" disabled={updateUser.isPending}>
             {updateUser.isPending ? "保存中..." : "保存する"}
           </Button>
         </DialogFooter>
