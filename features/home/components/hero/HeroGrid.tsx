@@ -71,7 +71,7 @@ export default function HeroGrid() {
     <div className="card-pop w-full p-4 sm:p-6">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <span className="rounded-md bg-primary px-3 py-1 text-sm font-bold text-primary-foreground">
-          4月1日(月)
+          7月3日(金)
         </span>
         <div className="flex items-center gap-3 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
