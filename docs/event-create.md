@@ -27,7 +27,7 @@
 
 1. パスワードを `hashPassword`（`lib/password.ts`）で bcrypt ハッシュ化する。
    - `pgcrypto` の `crypt()` が `$2b$` を解釈できないため、プレフィックスを `$2a$` に正規化する。
-2. 各候補の日付 + 時刻を `jstWallTimeToISO`（`lib/utils.ts`）で JST 壁時計 → UTC の ISO 文字列に変換し、配列 index を `index_number` として付与する。
+2. 各候補の日付 + 時刻を `jstWallTimeToISO`（`lib/datetime.ts`）で JST 壁時計 → UTC の ISO 文字列に変換し、配列 index を `index_number` として付与する。
 3. `useCreateEvent` hook 経由で RPC `create_event_with_candidates` を呼ぶ（イベントと候補日をトランザクションで作成）。
 4. 成功: `CreatedDialog` を表示。失敗: sonner トースト「イベント作成に失敗しました」。
 
