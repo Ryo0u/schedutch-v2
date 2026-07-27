@@ -126,6 +126,7 @@ schedutch-v2/
 │       ├── components/   # 直下: フォームコンテナ(親) / ヒーロー / 送信アクション / 入力フィールド / 作成完了ダイアログ
 │       │   └── candidates/   # 候補日入力欄
 │       ├── api/          # Supabase アクセス（eventApi.ts）
+│       ├── lib/          # pure関数（candidateDates.ts: 候補日の範囲展開・重複除外 / candidateErrors.ts: 候補日一覧のエラーメッセージ組み立て）
 │       ├── schema.ts     # 作成フォームの型・zodスキーマ
 │       ├── hooks/        # useCreateEvent
 │       └── index.ts      # barrel

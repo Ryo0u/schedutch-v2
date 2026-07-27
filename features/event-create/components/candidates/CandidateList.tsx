@@ -10,6 +10,7 @@ import { ja } from 'date-fns/locale';
 import { Item, ItemActions, ItemContent, ItemGroup, ItemTitle } from '@/components/ui/item';
 import EmptyList from './EmptyList';
 import TimeSelect from './TimeSelect';
+import { buildCandidateListErrorMessage } from '@/features/event-create/lib/candidateErrors';
 
 interface CandidateListProps {
 	control: Control<EventCreateFormData>;
@@ -23,7 +24,9 @@ function CandidateList({ control, fields, remove }: CandidateListProps) {
 	const sortedFields = [...fields]
 		.map((item, originalIndex) => ({ ...item, originalIndex })) //元のインデックスを保持し処理を正常に行えるようにする
 		.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-	
+
+	const errorMessage = buildCandidateListErrorMessage(errors.candidates);
+
   return (
     <div>
       <Card className="shadow-md shadow-primary/10 ring-primary/20">
@@ -108,10 +111,10 @@ function CandidateList({ control, fields, remove }: CandidateListProps) {
 					)}
 				</CardContent >
 				
-				{errors.candidates && Array.isArray(errors.candidates) && errors.candidates.some((err) => err?.message) && (
+				{errorMessage && (
 					<CardFooter>
 						<p className="text-sm text-destructive font-medium">
-							時間に不備がある候補日があります
+							{errorMessage}
 						</p>
 					</CardFooter>
 				)}
