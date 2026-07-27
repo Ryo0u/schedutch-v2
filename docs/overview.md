@@ -35,9 +35,16 @@
 - 機能単位で凝集する `features/` 構成（`home` / `event-create` / `event-detail`）。feature 間の直接 import は禁止。
 - Supabase への実アクセスは `features/{feature}/api/` に集約し、TanStack Query の hook（`features/{feature}/hooks/`）経由で使う。
 - write（作成・更新・削除）は全て SECURITY DEFINER な RPC 経由。RLS で直叩き write は封鎖している（→ [database.md](database.md)）。
-- 時刻は UTC で保存し、表示時に JST へ変換する（`lib/utils.ts` の `toJST` / `formatJSTDate` / `jstWallTimeToISO`）。時刻選択肢は `lib/constants.ts` の `TIME_OPTIONS`（00:00〜23:30、30 分刻み 48 件）を全画面で共通使用する。
+- 時刻は UTC で保存し、表示時に JST へ変換する（`lib/datetime.ts` の `formatJSTTime` / `formatJSTDate` / `formatJSTCandidateDateLabel` / `toJSTDateString` / `jstWallTimeToISO`）。時刻選択肢は `lib/constants.ts` の `TIME_OPTIONS`（00:00〜23:30、30 分刻み 48 件）を全画面で共通使用する。
 
 ディレクトリ構成・開発規約の詳細は [.claude/CLAUDE.md](../.claude/CLAUDE.md) を参照。
+
+## UI・スタイリング
+
+- `components/ui/` は shadcn/ui ベースの汎用プリミティブ。一部は `@base-ui/react` を使用する（`Dialog` / `DialogClose` など）。
+- フォームは `react-hook-form` + `zod` で統一し、`Controller` を合成した `TextField` / `TextareaCounterField`（`components/form/`）を feature 間で共有する。
+- スタイリングは Tailwind CSS v4 + `clsx` / `tailwind-merge`（`lib/utils.ts` の `cn()` ユーティリティ）。
+- サーバー状態は TanStack Query で管理し、`QueryClient` は `components/providers/QueryProvider.tsx` で提供する。
 
 ## 環境変数
 

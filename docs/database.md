@@ -79,6 +79,6 @@
 ## 時刻の扱い
 
 - DB には UTC（timestamptz）で保存する。
-- 表示時は `lib/utils.ts` の `toJST` / `jstHHMM` / `formatJSTDate` で JST に変換する（ブラウザのタイムゾーンに依存しない実装）。
+- 表示時は `lib/datetime.ts` の `formatJSTTime` / `formatJSTDate` / `formatJSTCandidateDateLabel`（候補日ラベル用の `formatJSTDate` ラッパー）/ `toJSTDateString` で JST に変換する（ブラウザのタイムゾーンに依存しない実装）。
 - 入力時（候補日の作成）は `jstWallTimeToISO(date, "HH:MM")` で JST 壁時計 → UTC の ISO 文字列に変換する。
 - 時刻の刻みは全画面共通で 30 分（`lib/constants.ts` の `TIME_OPTIONS`: 00:00〜23:30 の 48 件）。
