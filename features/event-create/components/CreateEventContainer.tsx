@@ -1,6 +1,6 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
+import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { eventCreateFormSchema, type EventCreateFormData } from '@/features/event-create/schema';
 import NewHero from './NewHero';
@@ -20,6 +20,9 @@ export default function CreateEventContainer() {
     },
   });
 
+  // 候補日の field array は同じ name で複数持つと fields が同期しないため、ここで1つだけ生成して配布する
+  const { fields, append, remove } = useFieldArray({ control: form.control, name: 'candidates' });
+
   const { isSubmitting } = form.formState;
 
   return (
@@ -32,12 +35,12 @@ export default function CreateEventContainer() {
           </section>
 
           <section className="flex-1 max-w-xl px-3">
-            <CandidatesFields control={form.control} />
+            <CandidatesFields control={form.control} fields={fields} append={append} />
           </section>
         </div>
 
         <section className='flex-row justify-center w-full max-w-6xl mx-auto px-3'>
-          <CandidateList control={form.control}/>
+          <CandidateList control={form.control} fields={fields} remove={remove}/>
         </section>
 
         <section className='max-w-6xl mx-auto px-3 mb-5'>

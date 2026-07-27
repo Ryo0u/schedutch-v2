@@ -1,5 +1,5 @@
 import { EventCreateFormData } from '@/features/event-create/schema';
-import { Control, Controller, useFieldArray, useWatch } from 'react-hook-form';
+import { Control, Controller, type FieldArrayWithId, type UseFieldArrayAppend } from 'react-hook-form';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Calendar } from '@/components/ui/calendar';
@@ -17,11 +17,12 @@ import TimeSelect from './TimeSelect';
 
 interface CandidatesFieldsProps {
 	control: Control<EventCreateFormData>;
+	fields: FieldArrayWithId<EventCreateFormData, 'candidates'>[];
+	append: UseFieldArrayAppend<EventCreateFormData, 'candidates'>;
 }
 
-const CandidatesFields = ({ control }: CandidatesFieldsProps) => {
-	const { append } = useFieldArray({ control, name: "candidates" });
-	
+const CandidatesFields = ({ control, fields, append }: CandidatesFieldsProps) => {
+
 	// ローカルに選択している日時を一時保存
 	const [startTime, setStartTime] = useState<string>("06:00")
 	const [endTime, setEndTime] = useState<string>("21:00")
@@ -30,8 +31,6 @@ const CandidatesFields = ({ control }: CandidatesFieldsProps) => {
     to: addDays(startOfToday(), 5),
   })
 	
-	const watchedFields = useWatch({ control, name: "candidates" });
-	
 	const device = useDeviceType()
 	const calendarColumns = (device: "mobile" | "tablet" | "desktop") => {
 		if (device === 'desktop') return 2
@@ -39,16 +38,12 @@ const CandidatesFields = ({ control }: CandidatesFieldsProps) => {
 	}
 	
 	// 追加された候補日はカレンダーから除外する
-	const disabledDates = watchedFields
-		.filter(item => item && item.date)
-		.map(item => new Date(item.date));
-	
+	const disabledDates = fields.map(item => new Date(item.date));
+
 	const handleAddCandidates = () => {
 		if (!selectedDates?.from || !selectedDates?.to) return;
 
-		const existingDates = watchedFields.map(item => new Date(item.date));
-
-		buildNewCandidateDates(selectedDates, existingDates)
+		buildNewCandidateDates(selectedDates, disabledDates)
 			.forEach(date => {
 				append({
 					date: date,
