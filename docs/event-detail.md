@@ -15,7 +15,7 @@
 | 予定一覧 | `components/responses/ResponsesInfo.tsx` | 全員の回答をグリッド表示 |
 | 予定抽出 | `components/extract/ExtractResponses.tsx` | 条件抽出（→ [extract.md](extract.md)） |
 
-予定一覧と予定抽出は `ExtractSlotsProvider`（Context）で包まれ、抽出結果のハイライト状態を共有する。画面幅 2xl 以上ではサイドナビ（`EventSideNav`）を表示する。
+予定一覧と予定抽出は `ExtractSlotsProvider`（Context）で包まれ、抽出結果のハイライト状態を共有する。画面幅 lg 以上ではサイドナビ（`EventSideNav`）を表示する。本文と同じ `flex` コンテナ内で `sticky` 配置され、本文の左に並ぶ。
 
 ## 回答フロー（新規参加）
 

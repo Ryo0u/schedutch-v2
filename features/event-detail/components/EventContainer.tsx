@@ -34,34 +34,36 @@ export default function EventContainer({ eventId }: { eventId: string }) {
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-3">
-      <aside className="hidden 2xl:block">
+    <div className="w-full px-3 flex gap-10">
+      <aside className="hidden lg:block w-64 shrink-0">
         <EventSideNav eventId={eventId} />
       </aside>
 
-      <section id={SECTION_IDS.eventInfo} className="flex flex-col sm:flex-row justify-between sm:items-end gap-8 mt-5 mb-8 scroll-mt-20">
-        <EventInfo eventId={eventId}/>
-        <div className="flex items-center gap-3">
-          <MenuButton eventId={eventId}/>
-          <JoinButton eventId={eventId}/>
-        </div>
-      </section>
-
-      <Separator/>
-
-      <section id={SECTION_IDS.usersInfo} className="mt-5 mb-8 scroll-mt-20">
-        <UsersInfo eventId={eventId}/>
-      </section>
-
-      <ExtractSlotsProvider eventId={eventId}>
-        <section id={SECTION_IDS.responsesInfo} className="mb-8 scroll-mt-20">
-          <ResponsesInfo eventId={eventId}/>
+      <div className="flex-1 min-w-0 max-w-6xl">
+        <section id={SECTION_IDS.eventInfo} className="flex flex-col sm:flex-row justify-between sm:items-end gap-8 mt-5 mb-8 scroll-mt-20">
+          <EventInfo eventId={eventId}/>
+          <div className="flex items-center gap-3">
+            <MenuButton eventId={eventId}/>
+            <JoinButton eventId={eventId}/>
+          </div>
         </section>
 
-        <section id={SECTION_IDS.extractResponses} className="mb-8 scroll-mt-20">
-          <ExtractPanel eventId={eventId}/>
+        <Separator/>
+
+        <section id={SECTION_IDS.usersInfo} className="mt-5 mb-8 scroll-mt-20">
+          <UsersInfo eventId={eventId}/>
         </section>
-      </ExtractSlotsProvider>
+
+        <ExtractSlotsProvider eventId={eventId}>
+          <section id={SECTION_IDS.responsesInfo} className="mb-8 scroll-mt-20">
+            <ResponsesInfo eventId={eventId}/>
+          </section>
+
+          <section id={SECTION_IDS.extractResponses} className="mb-8 scroll-mt-20">
+            <ExtractPanel eventId={eventId}/>
+          </section>
+        </ExtractSlotsProvider>
+      </div>
     </div>
   );
 }

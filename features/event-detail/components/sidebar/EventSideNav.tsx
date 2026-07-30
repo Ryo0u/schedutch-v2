@@ -29,7 +29,7 @@ export default function EventSideNav({ eventId }: { eventId: string }) {
   }
 
   return (
-    <nav className="fixed top-24 left-6 w-44 py-2 flex flex-col">
+    <nav className="sticky top-24 w-full py-2 flex flex-col">
       {MAIN_NAV.map(({ id, label }) => {
         const isActive = activeId === id || (id === SECTION_IDS.responsesInfo && isResponsesActive)
         return (
