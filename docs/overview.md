@@ -53,4 +53,29 @@ NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 ```
 
-`.env.local` に記載。Supabase クライアントは `utils/supabase/client.ts` でシングルトンとして export する。
+`.env.local` に記載（gitignore 対象、既定値はローカル Supabase）。Supabase クライアントは `utils/supabase/client.ts` でシングルトンとして export する。
+
+## ローカル Supabase 環境
+
+DB スキーマ・RPC・RLS の変更検証は、本番プロジェクトに直接行わずローカルスタックで行う（Docker Desktop が必要）。`.env.local` は既定でローカル Supabase を指すため、`npm run dev` は追加設定なしでローカルに繋がる。
+
+```bash
+npm run db:start   # ローカルスタック起動（初回はイメージDLで数分かかる）
+npm run db:reset   # migrationsを1本目から全適用 + seed.sql投入 + 型生成
+npm run db:stop    # ローカルスタック停止
+```
+
+- `supabase/seed.sql` に、複数候補日 × 複数参加者 × ok/maybe/ng が混在するサンプルデータが定義されている（パスワードは全員 `test1234`）。
+- 本番へマイグレーションを反映する前に `supabase db diff --linked` で drift（本番とマイグレーション履歴のズレ）がないか確認する。反映自体は従来通り `supabase db push`。
+
+### 本番 Supabase への一時切り替え
+
+本番固有のバグ再現など、稀に本番へ接続して確認したい場合のみ使う。
+
+```bash
+npm run env:prod    # .env.local.production の値を .env.local にコピー
+npm run env:local    # .env.local.example の値に戻す（ローカルへ復帰）
+```
+
+- `.env.local.production` は各自の手元にのみ置く個人ファイル（gitignore 対象、リポジトリには含めない）。本番の URL / anon key を記載する。
+- 本番へ接続した状態で `npm run dev` すると、`utils/supabase/client.ts` がターミナルに警告を出す（戻し忘れの事故防止）。

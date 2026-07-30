@@ -13,7 +13,14 @@ npm run lint      # ESLint
 npm run prettier  # Prettierによるフォーマット
 npm run test      # Vitest（ユニットテスト）
 npm run test:watch # Vitest watchモード
+npm run db:start   # ローカルSupabaseスタック起動（Docker Desktopが必要）
+npm run db:reset   # migrations全適用 + seed投入 + 型生成（gen:types込み）
+npm run db:stop    # ローカルSupabaseスタック停止
+npm run env:local  # .env.localをローカルSupabase向けに設定（既定）
+npm run env:prod   # .env.localを本番Supabase向けに切り替え（稀なケースのみ）
 ```
+
+DBスキーマ・RPC・RLSの変更検証はローカルSupabaseで行う（→ [docs/overview.md](../docs/overview.md#ローカルsupabase環境)）。本番への反映前に `supabase db diff --linked` でdriftがないか確認する。
 
 ## テスト
 
