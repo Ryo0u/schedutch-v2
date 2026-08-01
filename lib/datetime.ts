@@ -32,6 +32,15 @@ export function toJSTDateString(input: DateInput): string {
   return new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Tokyo" }).format(d);
 }
 
+/**
+ * UTC日時をJSTの年月日を表すDateオブジェクト（時刻はブラウザのローカル0時）で返す。
+ * react-day-picker はDateのローカル年月日で日付を比較するため、カレンダーの日付照合に使う。
+ */
+export function toJSTDateOnly(input: DateInput): Date {
+  const [year, month, day] = toJSTDateString(input).split("-").map(Number);
+  return new Date(year!, month! - 1, day!);
+}
+
 /*
  * カレンダーで選んだ日付 + "HH:MM" を JST の壁時計時刻とみなし、
  * 正しい UTC instant の ISO 文字列を返す。

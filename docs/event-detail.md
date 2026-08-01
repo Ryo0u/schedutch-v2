@@ -17,6 +17,8 @@
 
 予定一覧と予定抽出は `ExtractSlotsProvider`（Context）で包まれ、抽出結果のハイライト状態を共有する。画面幅 lg 以上ではサイドナビ（`EventSideNav`）を表示する。本文と同じ `flex` コンテナ内で `sticky` 配置され、本文の左に並ぶ。
 
+サイドナビの「予定一覧」アコーディオンを開くと、候補日一覧を `CandidateList.tsx` がカレンダー形式（`components/ui/calendar.tsx`）で表示する。候補日以外の日付は選択不可、スクロール中の現在アクティブな候補日はハイライトされ表示月も自動追従する。候補日をクリックすると該当セクションへ `scrollIntoView` する。
+
 ## 回答フロー（新規参加）
 
 `components/responses/JoinButton.tsx` →「予定を回答する」→ `ResponsesForm.tsx`（ダイアログ）。
