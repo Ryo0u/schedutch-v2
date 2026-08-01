@@ -1,6 +1,6 @@
 # 予定抽出機能
 
-実装: `features/event-detail/components/extract/`（UI: `ExtractResponses.tsx`、アルゴリズム: `extractSlotsAlgorithm.ts`、ロジック hook: `hooks/useExtractSlots.ts`）
+実装: `features/event-detail/`（UI: `components/extract/ExtractPanel.tsx`、ロジック hook: `components/extract/hooks/useExtractSlots.ts`、アルゴリズム: `lib/extractSlots.ts`）
 
 回答結果から「条件を満たす時間帯」を抽出し、コピペ可能なテキストとして出力する機能。状態は `ExtractSlotsContext` で予定一覧（`ResponsesInfo`）と共有し、抽出結果をグリッドにハイライト表示できる。
 
@@ -23,7 +23,7 @@
 
 「条件をリセット」で全条件を初期化できる。
 
-## アルゴリズム（`extractSlotsAlgorithm.ts`）
+## アルゴリズム（`lib/extractSlots.ts`）
 
 30 分（`SLOT_INTERVAL`）のコマを単位として処理する。
 
