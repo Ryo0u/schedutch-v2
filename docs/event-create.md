@@ -15,25 +15,25 @@
 
 フォームは `react-hook-form` + `zodResolver`。送信中は `<fieldset disabled>` でフォーム全体を無効化する。
 
-## 候補日の入力（`components/candidates/InputEventCandidates.tsx`）
+## 候補日の入力（`components/candidates/CandidatesFields.tsx`）
 
 1. `react-day-picker` の**範囲選択カレンダー**で日付範囲を選ぶ（デフォルト: 今日〜今日 + 5 日。デスクトップは 2 ヶ月表示、ロケール `ja`）。
 2. 開始 / 終了時刻を `Select` で選ぶ（選択肢は `TIME_OPTIONS` = 30 分刻み。初期値 06:00〜21:00）。
 3. 「追加」ボタンで、範囲内の各日を 1 日 1 候補として `useFieldArray` に展開する。
    - すでに追加済みの日付は `toDateString` 比較で重複除外され、カレンダー上でも `disabled` になる。
-4. 追加済み候補は `CandidatesList` に一覧表示される（0 件時は `EmptyList`）。
+4. 追加済み候補は `CandidateList` に一覧表示される（0 件時は `EmptyList`）。
 
-## 送信フロー（`components/CreateEvent.tsx`）
+## 送信フロー（`components/CreateEventContainer.tsx`）
 
 1. パスワードを `hashPassword`（`lib/password.ts`）で bcrypt ハッシュ化する。
    - `pgcrypto` の `crypt()` が `$2b$` を解釈できないため、プレフィックスを `$2a$` に正規化する。
 2. 各候補の日付 + 時刻を `jstWallTimeToISO`（`lib/datetime.ts`）で JST 壁時計 → UTC の ISO 文字列に変換し、配列 index を `index_number` として付与する。
 3. `useCreateEvent` hook 経由で RPC `create_event_with_candidates` を呼ぶ（イベントと候補日をトランザクションで作成）。
-4. 成功: `CreatedDialog` を表示。失敗: sonner トースト「イベント作成に失敗しました」。
+4. 成功: `EventCreatedDialog` を表示。失敗: sonner トースト「イベント作成に失敗しました」。
 
 「リセット」ボタンで `form.reset()` により全項目を初期化できる。
 
-## 作成完了ダイアログ（`components/CreatedDialog.tsx`）
+## 作成完了ダイアログ（`components/EventCreatedDialog.tsx`）
 
 - 共有 URL `${origin}/event/${eventId}` を表示する。
 - クリップボードコピー（コピー後 1 秒間チェックマーク表示）。
