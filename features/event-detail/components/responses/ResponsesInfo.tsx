@@ -16,13 +16,17 @@ function ResponsesInfo({ eventId }: ResponsesInfoProps) {
   const { extractedBlocks, isHighlightEnabled } = useExtractSlotsContext();
   if (!data) return null;
 
-  // 全候補の時間範囲の和集合で表示列を絞る（min/maxはミリ秒で算出し、末尾でJST文字列化する）
+  // 全候補の時間範囲の和集合で表示列を絞る。
+  // インスタントのmin/maxは「最も早い日時」であって「最も早い時刻」ではないため、
+  // JST時刻文字列に変換してから比較する（"HH:MM" のゼロ埋め固定長なので辞書順＝時刻順）。
   let displayedTimes: string[] = [];
   if (data.candidates.length > 0) {
-    const startMs = Math.min(...data.candidates.map((c) => new Date(c.start_time).getTime()));
-    const endMs = Math.max(...data.candidates.map((c) => new Date(c.end_time).getTime()));
-    const globalStart = formatJSTTime(startMs);
-    const globalEnd = formatJSTTime(endMs);
+    const globalStart = data.candidates
+      .map((c) => formatJSTTime(c.start_time))
+      .reduce((min, t) => (t < min ? t : min));
+    const globalEnd = data.candidates
+      .map((c) => formatJSTTime(c.end_time))
+      .reduce((max, t) => (t > max ? t : max));
     displayedTimes = TIME_OPTIONS.filter((t) => t >= globalStart && t < globalEnd);
   }
 
