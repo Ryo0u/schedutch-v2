@@ -35,6 +35,8 @@ export async function getEvent(eventId: string): Promise<EventData> {
       `id, title, comment, created_at, candidates (*), users (id, event_id, name, comment, created_at, responses (*))`
     )
     .eq("id", eventId)
+    .order("start_time", { referencedTable: "candidates", ascending: true })
+    .order("created_at", { referencedTable: "users", ascending: true })
     .single();
 
   if (error) throw error;

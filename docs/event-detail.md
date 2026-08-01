@@ -6,6 +6,8 @@
 
 `EventContainer` が `useEvent`（TanStack Query）でイベント一式（events + candidates + users + responses の結合クエリ）を取得する。ロード中は `EventSkeleton`、失敗時はエラーメッセージを表示する。
 
+埋め込みリレーションの並び順はクエリ側で明示する。候補日は `start_time` 昇順、参加者は `created_at` 昇順。PostgREST は `order` 指定が無い場合の順序を保証しないため、これが無いと予定一覧・サイドナビカレンダー・回答グリッドの表示順が不定になる。候補日に `index_number`（追加順）を使わないのは、作成画面の候補日一覧が日付昇順で表示されており、詳細画面と並びがズレるため。
+
 各セクションは `data` を prop で受け取らず、`eventId` を受けて自身で `useEvent` する（キャッシュ共有により再フェッチは起きない）。
 
 | セクション | 実装 | 内容 |
