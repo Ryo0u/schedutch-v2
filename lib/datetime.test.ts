@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   toJSTDateString,
+  toJSTDateOnly,
   formatJSTTime,
   formatJSTDate,
   jstWallTimeToISO,
@@ -12,6 +13,16 @@ describe("toJSTDateString", () => {
   it('UTC日時をJSTの"YYYY-MM-DD"にする（ブラウザTZ非依存）', () => {
     expect(toJSTDateString("2024-03-15T15:00:00.000Z")).toBe("2024-03-16");
     expect(toJSTDateString("2024-03-15T14:59:00.000Z")).toBe("2024-03-15");
+  });
+});
+
+describe("toJSTDateOnly", () => {
+  it("JSTの年月日をブラウザローカルの0時Dateとして返す", () => {
+    const d = toJSTDateOnly("2024-03-15T15:00:00.000Z");
+    expect(d.getFullYear()).toBe(2024);
+    expect(d.getMonth()).toBe(2);
+    expect(d.getDate()).toBe(16);
+    expect(d.getHours()).toBe(0);
   });
 });
 
