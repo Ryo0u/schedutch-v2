@@ -1,5 +1,6 @@
 import * as z from 'zod';
 import { titleSchema, passwordSchema, commentSchema } from '@/lib/validation';
+import { TIME_OPTIONS } from '@/lib/constants';
 
 export const eventCreateFormSchema = z.object({
   title: titleSchema,
@@ -9,8 +10,10 @@ export const eventCreateFormSchema = z.object({
     z.array(
       z.object({
         date: z.date(),
-        startTime: z.string(),
-        endTime: z.string(),
+        // z.string() だと空文字を通し、superRefine の parseInt('') が NaN になって
+        // 前後関係チェックもすり抜けるため、値の集合をスキーマで保証する
+        startTime: z.enum(TIME_OPTIONS, { message: '開始時間を選択してください' }),
+        endTime: z.enum(TIME_OPTIONS, { message: '終了時間を選択してください' }),
       })
     )
     .min(1, '候補日を1つ以上選択し、追加ボタンを押してください')

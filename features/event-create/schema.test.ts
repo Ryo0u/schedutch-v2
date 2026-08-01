@@ -45,6 +45,30 @@ describe("eventCreateFormSchema", () => {
       expect(eventCreateFormSchema.safeParse({ ...validData, candidates: [] }).success).toBe(false);
     });
 
+    it("空文字の時刻を拒否する", () => {
+      expect(
+        eventCreateFormSchema.safeParse({
+          ...validData,
+          candidates: [{ date: new Date(2024, 2, 15), startTime: "", endTime: "10:00" }],
+        }).success
+      ).toBe(false);
+      expect(
+        eventCreateFormSchema.safeParse({
+          ...validData,
+          candidates: [{ date: new Date(2024, 2, 15), startTime: "09:00", endTime: "" }],
+        }).success
+      ).toBe(false);
+    });
+
+    it("TIME_OPTIONS に無い時刻を拒否する", () => {
+      expect(
+        eventCreateFormSchema.safeParse({
+          ...validData,
+          candidates: [{ date: new Date(2024, 2, 15), startTime: "09:15", endTime: "10:00" }],
+        }).success
+      ).toBe(false);
+    });
+
     it("開始時刻 >= 終了時刻の候補を拒否し、該当indexにissueが付く", () => {
       const result = eventCreateFormSchema.safeParse({
         ...validData,
