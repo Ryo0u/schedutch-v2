@@ -21,10 +21,12 @@ function ResponsesInfo({ eventId }: ResponsesInfoProps) {
   // JST時刻文字列に変換してから比較する（"HH:MM" のゼロ埋め固定長なので辞書順＝時刻順）。
   let displayedTimes: string[] = [];
   if (data.candidates.length > 0) {
-    const startTimes = data.candidates.map((c) => formatJSTTime(c.start_time)).sort();
-    const endTimes = data.candidates.map((c) => formatJSTTime(c.end_time)).sort();
-    const globalStart = startTimes[0];
-    const globalEnd = endTimes[endTimes.length - 1];
+    const globalStart = data.candidates
+      .map((c) => formatJSTTime(c.start_time))
+      .reduce((min, t) => (t < min ? t : min));
+    const globalEnd = data.candidates
+      .map((c) => formatJSTTime(c.end_time))
+      .reduce((max, t) => (t > max ? t : max));
     displayedTimes = TIME_OPTIONS.filter((t) => t >= globalStart && t < globalEnd);
   }
 
