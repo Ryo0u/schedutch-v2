@@ -6,6 +6,7 @@ import type { ExtractTab } from "./hooks/useExtractSlots";
 
 interface ParticipantSelectorProps {
   users: Pick<User, "id" | "name">[];
+  activeTab: ExtractTab;
   selectedUserIds: Set<string>;
   selectedHeadcounts: Set<number>;
   onTabChange: (value: ExtractTab) => void;
@@ -15,6 +16,7 @@ interface ParticipantSelectorProps {
 
 function ParticipantSelector({
   users,
+  activeTab,
   selectedUserIds,
   selectedHeadcounts,
   onTabChange,
@@ -22,7 +24,7 @@ function ParticipantSelector({
   onToggleHeadcount,
 }: ParticipantSelectorProps) {
   return (
-    <Tabs defaultValue="people" onValueChange={(value) => onTabChange(value as ExtractTab)} className="flex-1 mb-5">
+    <Tabs value={activeTab} onValueChange={(value) => onTabChange(value as ExtractTab)} className="flex-1 mb-5">
       <TabsList variant="line" className="mb-2">
         <TabsTrigger value="people">参加者を選択</TabsTrigger>
         <TabsTrigger value="number">人数を選択</TabsTrigger>

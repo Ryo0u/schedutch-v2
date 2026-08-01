@@ -28,6 +28,7 @@ function ExtractPanel({ eventId }: { eventId: string }) {
         <div className="flex-1 flex flex-col">
           <ParticipantSelector
             users={data.users}
+            activeTab={extract.activeTab}
             selectedUserIds={extract.selectedUserIds}
             selectedHeadcounts={extract.selectedHeadcounts}
             onTabChange={extract.handleTabChange}
