@@ -1,5 +1,5 @@
-import { Control } from 'react-hook-form';
-import { UserFormData } from '@/features/event-detail/schema';
+import { type Control } from 'react-hook-form';
+import { type UserFormData } from '@/features/event-detail/schema';
 import { COMMENT_MAX_LENGTH } from '@/lib/validation';
 import { FieldGroup } from '@/components/ui/field';
 import TextField from '@/components/form/TextField';

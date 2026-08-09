@@ -1,4 +1,15 @@
+# ビルド成果物・依存
 .next
 node_modules
+coverage
+.vercel
+
+# 静的アセット
 public
+
+# 生成物（supabase gen types / supabase CLI の一時ファイル）
+lib/database.types.ts
+supabase/.temp
+
+# ドキュメントは表組みの手動整形を維持するため対象外
 *.md

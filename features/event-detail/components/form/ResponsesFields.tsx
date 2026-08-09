@@ -1,4 +1,4 @@
-import { Control, FieldValues, useFieldArray } from "react-hook-form";
+import { type Control, type FieldValues, useFieldArray } from "react-hook-form";
 import { useState } from "react";
 import { TIME_OPTIONS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
