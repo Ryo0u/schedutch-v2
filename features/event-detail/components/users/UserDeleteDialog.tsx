@@ -38,7 +38,8 @@ function UserDeleteDialog({ eventId, data, open, onOpenChange }: UserDeleteDialo
         toast.success('回答を削除しました', { position: 'top-center' });
         onOpenChange(false);
       }
-    } catch {
+    } catch (error) {
+      console.error('failed to delete user', error);
       toast.error('削除に失敗しました', { position: 'top-center' });
     }
   };

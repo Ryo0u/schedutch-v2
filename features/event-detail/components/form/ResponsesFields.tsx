@@ -4,7 +4,7 @@ import { TIME_OPTIONS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { formatJSTCandidateDateLabel } from '@/lib/datetime';
 import { STATUS_META } from '@/features/event-detail/lib/status';
-import { buildResponseSlotMap } from '@/features/event-detail/lib/responses';
+import { buildResponseSlotMap, responseSlotKey } from '@/features/event-detail/lib/responses';
 import { useResponseDrag } from '@/features/event-detail/hooks/useResponseDrag';
 import StatusToggle from './StatusToggle';
 import type { Candidate, ResponseStatus } from '@/features/event-detail/types';
@@ -80,7 +80,7 @@ function ResponsesFields<T extends FormWithResponses>({ control, data }: Respons
                   </td>
 
                   {TIME_OPTIONS.map((timeOption) => {
-                    const slotInfo = responseMap[`${candidate.id}-${timeOption}`];
+                    const slotInfo = responseMap[responseSlotKey(candidate.id, timeOption)];
 
                     // 候補日の時間範囲外
                     if (!slotInfo) {

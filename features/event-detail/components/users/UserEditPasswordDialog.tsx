@@ -46,7 +46,8 @@ function UserEditPasswordDialog({
         if (!isMatch) throw createPasswordMismatchError();
       });
       if (success) onConfirm(password);
-    } catch {
+    } catch (error) {
+      console.error('failed to verify user password', error);
       toast.error('確認に失敗しました', { position: 'top-center' });
     }
   };
