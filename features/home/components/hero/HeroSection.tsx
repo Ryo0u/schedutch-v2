@@ -12,8 +12,7 @@ export default function HeroSection() {
           backgroundImage:
             'linear-gradient(var(--color-border) 1px, transparent 1px), linear-gradient(90deg, var(--color-border) 1px, transparent 1px)',
           backgroundSize: '56px 56px',
-          maskImage:
-            'radial-gradient(ellipse 120% 80% at 50% 0%, black 40%, transparent 85%)',
+          maskImage: 'radial-gradient(ellipse 120% 80% at 50% 0%, black 40%, transparent 85%)',
           WebkitMaskImage:
             'radial-gradient(ellipse 120% 80% at 50% 0%, black 40%, transparent 85%)',
           opacity: 0.35,
@@ -23,9 +22,9 @@ export default function HeroSection() {
       <div className="relative mx-auto flex min-h-[90svh] max-w-7xl flex-col gap-12 px-4 pt-16 pb-12 sm:px-6 lg:flex-row lg:items-center lg:gap-8 lg:py-0">
         {/* キャッチコピー */}
         <div className="flex-1 lg:py-24">
-          <h1 className="font-heading font-black leading-none tracking-tight">
+          <h1 className="font-heading leading-none font-black tracking-tight">
             <span
-              className="hero-line block text-foreground"
+              className="hero-line text-foreground block"
               style={{
                 fontSize: 'clamp(2.4rem, 5.5vw, 5rem)',
                 animationDelay: '0ms',
@@ -34,7 +33,7 @@ export default function HeroSection() {
               いつ集まれる？を、
             </span>
             <span
-              className="hero-line block text-primary"
+              className="hero-line text-primary block"
               style={{
                 fontSize: 'clamp(3rem, 8vw, 7rem)',
                 animationDelay: '150ms',
@@ -45,7 +44,7 @@ export default function HeroSection() {
           </h1>
 
           <p
-            className="hero-line mt-6 max-w-md text-base leading-relaxed text-muted-foreground sm:text-lg"
+            className="hero-line text-muted-foreground mt-6 max-w-md text-base leading-relaxed sm:text-lg"
             style={{ animationDelay: '280ms' }}
           >
             30分単位の日程調整ツール。登録もログインも要りません。
@@ -57,23 +56,23 @@ export default function HeroSection() {
           >
             <Link
               href="/new"
-              className="inline-flex items-center gap-2 rounded-xl border-2 border-foreground bg-primary px-8 py-3.5 text-base font-bold text-primary-foreground shadow-[4px_4px_0_var(--shadow-ink-primary)] transition-all duration-100 hover:-translate-y-0.5 hover:shadow-[5px_5px_0_var(--shadow-ink-primary)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[2px_2px_0_var(--shadow-ink-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:border-foreground/25"
+              className="border-foreground bg-primary text-primary-foreground focus-visible:ring-ring dark:border-foreground/25 inline-flex items-center gap-2 rounded-xl border-2 px-8 py-3.5 text-base font-bold shadow-[4px_4px_0_var(--shadow-ink-primary)] transition-all duration-100 hover:-translate-y-0.5 hover:shadow-[5px_5px_0_var(--shadow-ink-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:translate-x-0.5 active:translate-y-0.5 active:shadow-[2px_2px_0_var(--shadow-ink-primary)]"
             >
               無料でイベントを作成
             </Link>
             <a
               href="#how"
-              className="text-sm font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              className="text-muted-foreground hover:text-foreground text-sm font-medium underline-offset-4 hover:underline"
             >
               使い方を見る
             </a>
           </div>
 
-          <ul className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
+          <ul className="text-muted-foreground mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs">
             {['会員登録なし', 'ずっと無料', '30秒でイベント作成'].map((item) => (
               <li key={item} className="flex items-center gap-1.5">
                 <svg
-                  className="h-3.5 w-3.5 shrink-0 text-primary"
+                  className="text-primary h-3.5 w-3.5 shrink-0"
                   viewBox="0 0 16 16"
                   fill="currentColor"
                   aria-hidden="true"

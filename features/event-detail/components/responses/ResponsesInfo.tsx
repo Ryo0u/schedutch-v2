@@ -1,11 +1,11 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { TIME_OPTIONS } from "@/lib/constants";
-import { formatJSTTime } from "@/lib/datetime";
-import { RESPONSE_STATUSES, STATUS_META } from "@/features/event-detail/lib/status";
-import { useEvent } from "@/features/event-detail/hooks/useEvent";
-import { useExtractSlotsContext } from "../extract/ExtractSlotsContext";
-import CandidateSection from "./CandidateSection";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { TIME_OPTIONS } from '@/lib/constants';
+import { formatJSTTime } from '@/lib/datetime';
+import { RESPONSE_STATUSES, STATUS_META } from '@/features/event-detail/lib/status';
+import { useEvent } from '@/features/event-detail/hooks/useEvent';
+import { useExtractSlotsContext } from '../extract/ExtractSlotsContext';
+import CandidateSection from './CandidateSection';
 
 interface ResponsesInfoProps {
   eventId: string;
@@ -31,15 +31,17 @@ function ResponsesInfo({ eventId }: ResponsesInfoProps) {
   }
 
   return (
-    <Card className="shadow-md shadow-primary/10 ring-primary/20">
+    <Card className="shadow-primary/10 ring-primary/20 shadow-md">
       <CardHeader>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <CardTitle className="text-xl font-black">予定一覧</CardTitle>
-          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+          <div className="text-muted-foreground flex items-center gap-4 text-xs">
             {RESPONSE_STATUSES.map((status) => (
               <span key={status} className="flex items-center gap-1.5">
-                <span className={`inline-block w-3 h-3 rounded-sm ${STATUS_META[status].legendDotClass}`} />
-                {status === "ok" ? "参加できる" : status === "maybe" ? "未定" : "参加できない"}
+                <span
+                  className={`inline-block h-3 w-3 rounded-sm ${STATUS_META[status].legendDotClass}`}
+                />
+                {status === 'ok' ? '参加できる' : status === 'maybe' ? '未定' : '参加できない'}
               </span>
             ))}
           </div>
@@ -50,7 +52,7 @@ function ResponsesInfo({ eventId }: ResponsesInfoProps) {
 
       <CardContent>
         <div className="w-full overflow-x-auto p-1.5 sm:p-3">
-          <table className="min-w-max mx-auto">
+          <table className="mx-auto min-w-max">
             {data.candidates.map((candidate) => (
               <CandidateSection
                 key={candidate.id}

@@ -11,7 +11,7 @@ import {
 
 export default function Page() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="bg-background text-foreground min-h-screen">
       <HeroSection />
       <StepsSection />
       <ComparisonSection />

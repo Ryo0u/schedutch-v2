@@ -1,4 +1,12 @@
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { TIME_OPTIONS } from '@/lib/constants';
 
 interface TimeSelectProps {
@@ -11,7 +19,9 @@ interface TimeSelectProps {
 
 function TimeSelect({ value, onValueChange, id, ariaInvalid, groupLabel }: TimeSelectProps) {
   const options = TIME_OPTIONS.map((time) => (
-    <SelectItem key={time} value={time}>{time}</SelectItem>
+    <SelectItem key={time} value={time}>
+      {time}
+    </SelectItem>
   ));
 
   return (

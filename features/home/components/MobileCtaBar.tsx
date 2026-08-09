@@ -14,7 +14,7 @@ export default function MobileCtaBar() {
 
   return (
     <div
-      className={`fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/90 backdrop-blur-sm transition-transform duration-300 sm:hidden ${
+      className={`border-border bg-background/90 fixed right-0 bottom-0 left-0 z-50 border-t backdrop-blur-sm transition-transform duration-300 sm:hidden ${
         show ? 'translate-y-0' : 'translate-y-full'
       }`}
       style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
@@ -22,7 +22,7 @@ export default function MobileCtaBar() {
       <div className="px-4 pt-3">
         <Link
           href="/new"
-          className="block w-full rounded-xl border-2 border-foreground bg-primary py-3.5 text-center text-base font-bold text-primary-foreground shadow-[3px_3px_0_var(--shadow-ink-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:border-foreground/25"
+          className="border-foreground bg-primary text-primary-foreground focus-visible:ring-ring dark:border-foreground/25 block w-full rounded-xl border-2 py-3.5 text-center text-base font-bold shadow-[3px_3px_0_var(--shadow-ink-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
         >
           無料でイベントを作成
         </Link>

@@ -1,6 +1,6 @@
-import { useCallback, useState } from "react";
-import type { ResponseStatus } from "@/features/event-detail/types";
-import type { ResponseFormValue } from "@/features/event-detail/schema";
+import { useCallback, useState } from 'react';
+import type { ResponseStatus } from '@/features/event-detail/types';
+import type { ResponseFormValue } from '@/features/event-detail/schema';
 
 type DraggableField = ResponseFormValue;
 
@@ -11,7 +11,7 @@ type DraggableField = ResponseFormValue;
 export function useResponseDrag<T extends DraggableField>(
   fields: T[],
   update: (index: number, value: T) => void,
-  currentState: ResponseStatus
+  currentState: ResponseStatus,
 ) {
   const [isDragging, setIsDragging] = useState(false);
 
@@ -21,7 +21,7 @@ export function useResponseDrag<T extends DraggableField>(
       if (!field) return;
       update(index, { ...field, status: currentState });
     },
-    [fields, update, currentState]
+    [fields, update, currentState],
   );
 
   const stopDragging = () => setIsDragging(false);
@@ -39,10 +39,10 @@ export function useResponseDrag<T extends DraggableField>(
     const touch = e.touches[0];
     if (!touch) return;
     const element = document.elementFromPoint(touch.clientX, touch.clientY);
-    const tdElement = element?.closest("[data-index]");
+    const tdElement = element?.closest('[data-index]');
     if (!tdElement) return;
 
-    applyToSlot(Number(tdElement.getAttribute("data-index")));
+    applyToSlot(Number(tdElement.getAttribute('data-index')));
   };
 
   const cellHandlers = (index: number) => ({

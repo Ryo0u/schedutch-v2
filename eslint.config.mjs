@@ -21,7 +21,8 @@ const supabaseImportPattern = {
  */
 const otherFeaturesImportPattern = (feature) => ({
   group: ['@/features/*', '@/features/*/**', `!@/features/${feature}`, `!@/features/${feature}/**`],
-  message: 'feature 間の直接 import は禁止。共有したいものは lib/ か components/ui/ に昇格させること。',
+  message:
+    'feature 間の直接 import は禁止。共有したいものは lib/ か components/ui/ に昇格させること。',
 });
 
 /** no-restricted-imports は単一ルールで patterns がブロック間でマージされないため、都度組み立てる */

@@ -1,11 +1,11 @@
-import { supabase } from "@/utils/supabase/client";
-import type { Json } from "@/lib/database.types";
-import type { EventData, ResponseStatus } from "@/features/event-detail/types";
-import { createEventNotFoundError } from "@/features/event-detail/api/errors";
+import { supabase } from '@/utils/supabase/client';
+import type { Json } from '@/lib/database.types';
+import type { EventData, ResponseStatus } from '@/features/event-detail/types';
+import { createEventNotFoundError } from '@/features/event-detail/api/errors';
 
 /** 編集ダイアログを開く前の事前検証。ユーザー本人のパスワードが正しいかを返す */
 export async function verifyUserPassword(userId: string, password: string): Promise<boolean> {
-  const { data, error } = await supabase.rpc("verify_user_password", {
+  const { data, error } = await supabase.rpc('verify_user_password', {
     p_user_id: userId,
     p_password: password,
   });
@@ -30,13 +30,13 @@ export interface ResponseInput extends Record<string, Json> {
  */
 export async function getEvent(eventId: string): Promise<EventData> {
   const { data, error } = await supabase
-    .from("events")
+    .from('events')
     .select(
-      `id, title, comment, created_at, candidates (*), users (id, event_id, name, comment, created_at, responses (*))`
+      `id, title, comment, created_at, candidates (*), users (id, event_id, name, comment, created_at, responses (*))`,
     )
-    .eq("id", eventId)
-    .order("start_time", { referencedTable: "candidates", ascending: true })
-    .order("created_at", { referencedTable: "users", ascending: true })
+    .eq('id', eventId)
+    .order('start_time', { referencedTable: 'candidates', ascending: true })
+    .order('created_at', { referencedTable: 'users', ascending: true })
     .single();
 
   if (error) throw error;
@@ -54,7 +54,7 @@ export interface SaveUserResponsesInput {
 
 /** 参加者と回答をまとめて作成（RPC 経由） */
 export async function saveUserResponses(input: SaveUserResponsesInput): Promise<string> {
-  const { data, error } = await supabase.rpc("save_user_responses", {
+  const { data, error } = await supabase.rpc('save_user_responses', {
     p_event_id: input.eventId,
     p_name: input.name,
     p_comment: input.comment,
@@ -78,7 +78,7 @@ export interface UpdateUserWithResponsesInput {
 
 /** 参加者情報を更新し、回答を洗い替えする（RPC 経由・パスワード照合込み） */
 export async function updateUserWithResponses(input: UpdateUserWithResponsesInput): Promise<void> {
-  const { error } = await supabase.rpc("update_user_with_responses", {
+  const { error } = await supabase.rpc('update_user_with_responses', {
     p_user_id: input.userId,
     p_password: input.password,
     p_name: input.name,
@@ -98,7 +98,7 @@ export interface UpdateEventInput {
 
 /** イベントのタイトル・コメントを更新する（RPC 経由・パスワード照合込み） */
 export async function updateEvent(input: UpdateEventInput): Promise<void> {
-  const { error } = await supabase.rpc("update_event", {
+  const { error } = await supabase.rpc('update_event', {
     p_event_id: input.eventId,
     p_password: input.password,
     p_title: input.title,
@@ -109,7 +109,7 @@ export async function updateEvent(input: UpdateEventInput): Promise<void> {
 
 /** 参加者を削除する（RPC 経由・本人 or イベントのパスワードで照合） */
 export async function deleteUser(userId: string, password: string): Promise<void> {
-  const { error } = await supabase.rpc("delete_user", {
+  const { error } = await supabase.rpc('delete_user', {
     p_user_id: userId,
     p_password: password,
   });
@@ -118,7 +118,7 @@ export async function deleteUser(userId: string, password: string): Promise<void
 
 /** イベントを削除する（RPC 経由・イベントのパスワードで照合） */
 export async function deleteEvent(eventId: string, password: string): Promise<void> {
-  const { error } = await supabase.rpc("delete_event", {
+  const { error } = await supabase.rpc('delete_event', {
     p_event_id: eventId,
     p_password: password,
   });

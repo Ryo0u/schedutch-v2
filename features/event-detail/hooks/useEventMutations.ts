@@ -1,17 +1,17 @@
-import { useMutation, useQueryClient, type UseMutationOptions } from "@tanstack/react-query";
+import { useMutation, useQueryClient, type UseMutationOptions } from '@tanstack/react-query';
 import {
   saveUserResponses,
   updateUserWithResponses,
   updateEvent,
   deleteUser,
   deleteEvent,
-} from "@/features/event-detail/api/eventApi";
-import { eventKeys } from "./useEvent";
+} from '@/features/event-detail/api/eventApi';
+import { eventKeys } from './useEvent';
 
 /** 成功後に該当イベントの再取得（invalidate）を行う mutation の定型をまとめる */
 function useEventMutation<TData, TVariables>(
   eventId: string,
-  mutationFn: UseMutationOptions<TData, unknown, TVariables>["mutationFn"]
+  mutationFn: UseMutationOptions<TData, unknown, TVariables>['mutationFn'],
 ) {
   const queryClient = useQueryClient();
   return useMutation({
@@ -39,9 +39,8 @@ export function useUpdateEvent(eventId: string) {
 
 /** 参加者を削除し、成功後にイベントを再取得する */
 export function useDeleteUser(eventId: string) {
-  return useEventMutation(
-    eventId,
-    ({ userId, password }: { userId: string; password: string }) => deleteUser(userId, password)
+  return useEventMutation(eventId, ({ userId, password }: { userId: string; password: string }) =>
+    deleteUser(userId, password),
   );
 }
 

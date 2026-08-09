@@ -1,6 +1,8 @@
 const toTimeOption = (i: number) => {
-  const hours = Math.floor(i / 2).toString().padStart(2, '0');
-  const minutes = (i % 2 === 0 ? '00' : '30');
+  const hours = Math.floor(i / 2)
+    .toString()
+    .padStart(2, '0');
+  const minutes = i % 2 === 0 ? '00' : '30';
   return `${hours}:${minutes}`;
 };
 

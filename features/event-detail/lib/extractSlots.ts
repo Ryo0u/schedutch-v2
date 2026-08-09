@@ -1,7 +1,7 @@
-import { formatJSTTime, formatJSTDate } from "@/lib/datetime";
-import { SLOT_INTERVAL_MS, MS_PER_MINUTE } from "@/lib/constants";
-import { STATUS_META } from "@/features/event-detail/lib/status";
-import type { User } from "@/features/event-detail/types";
+import { formatJSTTime, formatJSTDate } from '@/lib/datetime';
+import { SLOT_INTERVAL_MS, MS_PER_MINUTE } from '@/lib/constants';
+import { STATUS_META } from '@/features/event-detail/lib/status';
+import type { User } from '@/features/event-detail/types';
 
 export type ParticipantInfo = { id: string; name: string; status: string };
 
@@ -12,9 +12,9 @@ export type FilterCondition =
   | { type: 'PARTICIPANTS'; userIds: string[] }
   | { type: 'HEADCOUNTS'; counts: number[] }
   | { type: 'DURATION'; minMinutes: number }
-  | { type: 'DATERANGE'; start: number, end: number };
+  | { type: 'DATERANGE'; start: number; end: number };
 
-type ExtractUser = Pick<User, "id" | "name" | "responses">;
+type ExtractUser = Pick<User, 'id' | 'name' | 'responses'>;
 
 interface ExtractSlotsParams {
   users: ExtractUser[];
@@ -28,13 +28,20 @@ interface ExtractSlotsParams {
 type ResponseMaps = Map<string, Map<number, string>>;
 
 const buildResponseMaps = (users: ExtractUser[]): ResponseMaps => {
-  return new Map(users.map(u => [
-    u.id,
-    new Map(u.responses.map(r => [new Date(r.time).getTime(), r.status])),
-  ]));
+  return new Map(
+    users.map((u) => [
+      u.id,
+      new Map(u.responses.map((r) => [new Date(r.time).getTime(), r.status])),
+    ]),
+  );
 };
 
-const isUserAvailable = (responseMaps: ResponseMaps, userId: string, time: number, includeMaybe: boolean) => {
+const isUserAvailable = (
+  responseMaps: ResponseMaps,
+  userId: string,
+  time: number,
+  includeMaybe: boolean,
+) => {
   const status = responseMaps.get(userId)?.get(time);
   if (!status) return false;
   if (status === 'ok') return true;
@@ -57,16 +64,20 @@ const checkSlotConditions = (
   responseMaps: ResponseMaps,
   includeMaybe: boolean,
 ): boolean => {
-  return conditions.every(condition => {
+  return conditions.every((condition) => {
     switch (condition.type) {
       case 'PARTICIPANTS':
-        return condition.userIds.every(uid => isUserAvailable(responseMaps, uid, time, includeMaybe));
+        return condition.userIds.every((uid) =>
+          isUserAvailable(responseMaps, uid, time, includeMaybe),
+        );
       case 'HEADCOUNTS': {
-        const count = users.filter(u => isUserAvailable(responseMaps, u.id, time, includeMaybe)).length;
+        const count = users.filter((u) =>
+          isUserAvailable(responseMaps, u.id, time, includeMaybe),
+        ).length;
         return condition.counts.includes(count);
       }
       case 'DATERANGE':
-        return condition.start <= time && time <= condition.end
+        return condition.start <= time && time <= condition.end;
       default:
         return true;
     }
@@ -84,16 +95,22 @@ const createMergedBlocks = (
   return times.reduce((acc: TimeBlock[], time) => {
     // この時間の参加者リストを作成
     const currentParticipants = users
-      .filter(u => isUserAvailable(responseMaps, u.id, time, includeMaybe) && participantsFilter(u))
-      .map(u => ({
+      .filter(
+        (u) => isUserAvailable(responseMaps, u.id, time, includeMaybe) && participantsFilter(u),
+      )
+      .map((u) => ({
         id: u.id,
         name: u.name,
-        status: responseMaps.get(u.id)?.get(time) ?? "ok"
+        status: responseMaps.get(u.id)?.get(time) ?? 'ok',
       }));
 
     const lastBlock = acc[acc.length - 1];
     // 「時間が連続」かつ「参加者と状態が一致」なら結合
-    if (lastBlock && time === lastBlock.end + SLOT_INTERVAL_MS && areParticipantsEqual(lastBlock.participants, currentParticipants)) {
+    if (
+      lastBlock &&
+      time === lastBlock.end + SLOT_INTERVAL_MS &&
+      areParticipantsEqual(lastBlock.participants, currentParticipants)
+    ) {
       lastBlock.end = time;
     } else {
       acc.push({ start: time, end: time, participants: currentParticipants });
@@ -104,10 +121,10 @@ const createMergedBlocks = (
 
 // 塊単位のルールを適応
 const checkBlockConditions = (block: TimeBlock, conditions: FilterCondition[]) => {
-  return conditions.every(cond => {
+  return conditions.every((cond) => {
     switch (cond.type) {
       case 'DURATION': {
-        const durationMs = (block.end + SLOT_INTERVAL_MS) - block.start;
+        const durationMs = block.end + SLOT_INTERVAL_MS - block.start;
         return durationMs >= cond.minMinutes * MS_PER_MINUTE;
       }
       default:
@@ -119,43 +136,61 @@ const checkBlockConditions = (block: TimeBlock, conditions: FilterCondition[]) =
 const formatExtractTimes = (blocks: TimeBlock[]): string[] => {
   const result: string[] = [];
 
-  const grouped = blocks.reduce((acc, block) => {
-    const dateKey = formatJSTDate(block.start, { month: "numeric", day: "numeric" });
-    if (!acc[dateKey]) acc[dateKey] = [];
-    acc[dateKey].push(block);
-    return acc;
-  }, {} as Record<string, TimeBlock[]>);
+  const grouped = blocks.reduce(
+    (acc, block) => {
+      const dateKey = formatJSTDate(block.start, { month: 'numeric', day: 'numeric' });
+      if (!acc[dateKey]) acc[dateKey] = [];
+      acc[dateKey].push(block);
+      return acc;
+    },
+    {} as Record<string, TimeBlock[]>,
+  );
 
   Object.entries(grouped).forEach(([date, daysBlocks]) => {
     result.push(date);
-    daysBlocks.forEach(block => {
+    daysBlocks.forEach((block) => {
       const start = formatJSTTime(block.start);
       const end = formatJSTTime(block.end + SLOT_INTERVAL_MS);
       // 表示時に maybe の人には symbol を付ける
-      const names = block.participants.map(p => p.status === 'maybe' ? `${p.name}(${STATUS_META.maybe.symbol})` : p.name).join(', ');
+      const names = block.participants
+        .map((p) => (p.status === 'maybe' ? `${p.name}(${STATUS_META.maybe.symbol})` : p.name))
+        .join(', ');
       result.push(`${start} - ${end} : ${names}`);
     });
-    result.push("");
+    result.push('');
   });
 
   return result;
-}
+};
 
 // 抽出処理の入口: 条件に合うコマを絞り込み → 連続コマを結合 → 塊単位の条件で絞り込み
-export function extractSlots({ users, includeMaybe, conditions, participantsFilter }: ExtractSlotsParams): {
+export function extractSlots({
+  users,
+  includeMaybe,
+  conditions,
+  participantsFilter,
+}: ExtractSlotsParams): {
   blocks: TimeBlock[];
   formatted: string[];
 } {
   const responseMaps = buildResponseMaps(users);
 
   // 全タイムスタンプの取得
-  const allTimes = Array.from(new Set(
-    users.flatMap(u => u.responses.map(r => new Date(r.time).getTime()))
-  )).sort((a, b) => a - b);
+  const allTimes = Array.from(
+    new Set(users.flatMap((u) => u.responses.map((r) => new Date(r.time).getTime()))),
+  ).sort((a, b) => a - b);
 
-  const filteredTimes = allTimes.filter(t => checkSlotConditions(t, conditions, users, responseMaps, includeMaybe));
-  const mergedBlocks = createMergedBlocks(filteredTimes, users, responseMaps, includeMaybe, participantsFilter);
-  const finalBlocks = mergedBlocks.filter(b => checkBlockConditions(b, conditions));
+  const filteredTimes = allTimes.filter((t) =>
+    checkSlotConditions(t, conditions, users, responseMaps, includeMaybe),
+  );
+  const mergedBlocks = createMergedBlocks(
+    filteredTimes,
+    users,
+    responseMaps,
+    includeMaybe,
+    participantsFilter,
+  );
+  const finalBlocks = mergedBlocks.filter((b) => checkBlockConditions(b, conditions));
 
   return { blocks: finalBlocks, formatted: formatExtractTimes(finalBlocks) };
 }

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import type { User } from "@/features/event-detail/types";
+import { useState } from 'react';
+import type { User } from '@/features/event-detail/types';
 
 /**
  * UsersInfo の行から開始する、本人によるセルフサービスの編集・削除フロー。
@@ -19,7 +19,7 @@ import type { User } from "@/features/event-detail/types";
  */
 export function useUserDialogFlow() {
   const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [confirmedPassword, setConfirmedPassword] = useState("");
+  const [confirmedPassword, setConfirmedPassword] = useState('');
   const [passwordOpen, setPasswordOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [deletingUser, setDeletingUser] = useState<User | null>(null);
@@ -52,7 +52,7 @@ export function useUserDialogFlow() {
     setEditOpen(open);
     if (!open) {
       setEditingUser(null);
-      setConfirmedPassword("");
+      setConfirmedPassword('');
     }
   };
 

@@ -1,17 +1,25 @@
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "@/components/ui/dialog";
-import { FieldGroup } from "@/components/ui/field";
-import TextField from "@/components/form/TextField";
-import TextareaCounterField from "@/components/form/TextareaCounterField";
-import { Edit } from "lucide-react";
-import { toast } from "sonner";
-import { useUpdateEvent } from "@/features/event-detail/hooks/useEventMutations";
-import { isPasswordError } from "@/features/event-detail/api/errors";
-import { eventEditFormSchema, type EventEditFormData } from "@/features/event-detail/schema";
-import { COMMENT_MAX_LENGTH } from "@/lib/validation";
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { FieldGroup } from '@/components/ui/field';
+import TextField from '@/components/form/TextField';
+import TextareaCounterField from '@/components/form/TextareaCounterField';
+import { Edit } from 'lucide-react';
+import { toast } from 'sonner';
+import { useUpdateEvent } from '@/features/event-detail/hooks/useEventMutations';
+import { isPasswordError } from '@/features/event-detail/api/errors';
+import { eventEditFormSchema, type EventEditFormData } from '@/features/event-detail/schema';
+import { COMMENT_MAX_LENGTH } from '@/lib/validation';
 
 interface DialogProps {
   eventId: string;
@@ -29,12 +37,12 @@ function EventEditDialog({ eventId, open, onOpenChange, data }: DialogProps) {
 
   const form = useForm<EventEditFormData>({
     resolver: zodResolver(eventEditFormSchema),
-    defaultValues: { title: "", comment: "", password: "" },
+    defaultValues: { title: '', comment: '', password: '' },
   });
 
   useEffect(() => {
     if (open) {
-      form.reset({ title: data.title, comment: data.comment ?? "", password: "" });
+      form.reset({ title: data.title, comment: data.comment ?? '', password: '' });
     }
   }, [open, data.title, data.comment, form]);
 
@@ -47,14 +55,14 @@ function EventEditDialog({ eventId, open, onOpenChange, data }: DialogProps) {
         comment: values.comment,
       });
 
-      toast.success("イベントを更新しました", { position: "top-center" });
+      toast.success('イベントを更新しました', { position: 'top-center' });
       onOpenChange(false);
     } catch (error) {
       if (isPasswordError(error)) {
-        form.setError("password", { message: "パスワードが正しくありません" });
+        form.setError('password', { message: 'パスワードが正しくありません' });
       } else {
-        console.error("Failed to update event:", error);
-        toast.error("更新に失敗しました", { position: "top-center" });
+        console.error('Failed to update event:', error);
+        toast.error('更新に失敗しました', { position: 'top-center' });
       }
     }
   };
@@ -64,24 +72,46 @@ function EventEditDialog({ eventId, open, onOpenChange, data }: DialogProps) {
       <DialogContent>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <DialogHeader className="mb-5">
-            <DialogTitle className="flex flex-col justify-center items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+            <DialogTitle className="flex flex-col items-center justify-center gap-3">
+              <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-lg">
                 <Edit className="h-5 w-5" />
               </div>
               <span className="text-xl font-bold">イベントを編集する</span>
             </DialogTitle>
-            <DialogDescription className="text-center">タイトル・コメントを編集し、編集用パスワードを入力してください</DialogDescription>
+            <DialogDescription className="text-center">
+              タイトル・コメントを編集し、編集用パスワードを入力してください
+            </DialogDescription>
           </DialogHeader>
 
           <FieldGroup className="mb-5">
             <TextField control={form.control} name="title" label="タイトル" required />
-            <TextareaCounterField control={form.control} name="comment" label="コメント" rows={4} maxLength={COMMENT_MAX_LENGTH} />
-            <TextField control={form.control} name="password" label="編集用パスワード" required placeholder="......." />
+            <TextareaCounterField
+              control={form.control}
+              name="comment"
+              label="コメント"
+              rows={4}
+              maxLength={COMMENT_MAX_LENGTH}
+            />
+            <TextField
+              control={form.control}
+              name="password"
+              label="編集用パスワード"
+              required
+              placeholder="......."
+            />
           </FieldGroup>
 
           <DialogFooter>
-            <DialogClose render={<Button type="button" variant="outline">キャンセル</Button>}></DialogClose>
-            <Button type="submit" disabled={updateEvent.isPending}>{updateEvent.isPending ? "保存中..." : "保存する"}</Button>
+            <DialogClose
+              render={
+                <Button type="button" variant="outline">
+                  キャンセル
+                </Button>
+              }
+            ></DialogClose>
+            <Button type="submit" disabled={updateEvent.isPending}>
+              {updateEvent.isPending ? '保存中...' : '保存する'}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

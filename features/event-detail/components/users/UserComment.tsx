@@ -1,9 +1,16 @@
-"use client"
+'use client';
 
-import { MessageCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverDescription, PopoverHeader, PopoverTitle, PopoverTrigger } from "@/components/ui/popover";
-import { useDeviceType } from "@/hooks/useDeviceType";
+import { MessageCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  Popover,
+  PopoverContent,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { useDeviceType } from '@/hooks/useDeviceType';
 
 interface UserCommentProps {
   comment: string;
@@ -15,11 +22,15 @@ function UserComment({ comment }: UserCommentProps) {
 
   if (!comment) return null;
 
-  if (device === "mobile") {
+  if (device === 'mobile') {
     return (
       <Popover>
         <PopoverTrigger
-         render={<Button variant="ghost"><MessageCircle className="h-4 w-4 text-accent-foreground"/></Button>}
+          render={
+            <Button variant="ghost">
+              <MessageCircle className="text-accent-foreground h-4 w-4" />
+            </Button>
+          }
         />
         <PopoverContent align="start">
           <PopoverHeader>
@@ -28,12 +39,10 @@ function UserComment({ comment }: UserCommentProps) {
           </PopoverHeader>
         </PopoverContent>
       </Popover>
-    )
+    );
   }
 
-  return (
-    <span className="text-accent-foreground text-xs">{comment}</span>
-  )
+  return <span className="text-accent-foreground text-xs">{comment}</span>;
 }
 
 export default UserComment;

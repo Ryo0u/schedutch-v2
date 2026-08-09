@@ -3,8 +3,8 @@ name: CI
 on:
   push:
     branches: [develop, main]
+  # 向き先を限定しない。スタックした PR（作業ブランチ宛の PR）でも検証を回すため。
   pull_request:
-    branches: [develop, main]
 
 jobs:
   lint-test-build:
@@ -25,6 +25,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Format check
+        run: npm run format:check
 
       - name: Lint
         run: npm run lint

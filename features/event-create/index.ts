@@ -1,1 +1,1 @@
-export { default as CreateEventContainer } from "./components/CreateEventContainer";
+export { default as CreateEventContainer } from './components/CreateEventContainer';

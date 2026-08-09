@@ -12,18 +12,18 @@ function Header() {
   const isLP = pathname === '/';
 
   return (
-    <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-md">
+    <header className="bg-background/80 sticky top-0 z-50 border-b backdrop-blur-md">
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link
           href="/"
-          className="flex items-center gap-2 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="focus-visible:ring-ring flex items-center gap-2 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
         >
           <span className="flex gap-0.5" aria-hidden="true">
             <span className="h-3 w-3 rounded-[3px] bg-blue-400" />
             <span className="h-3 w-3 rounded-[3px] bg-amber-400" />
-            <span className="h-3 w-3 rounded-[3px] bg-muted-foreground/40" />
+            <span className="bg-muted-foreground/40 h-3 w-3 rounded-[3px]" />
           </span>
-          <span className="text-sm font-bold tracking-tight text-foreground">Schedutch</span>
+          <span className="text-foreground text-sm font-bold tracking-tight">Schedutch</span>
         </Link>
 
         <nav className="flex items-center gap-3">
@@ -31,13 +31,13 @@ function Header() {
             <div className="hidden items-center gap-5 sm:flex">
               <a
                 href="#how"
-                className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground text-sm transition-colors"
               >
                 使い方
               </a>
               <a
                 href="#extract"
-                className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground text-sm transition-colors"
               >
                 予定抽出
               </a>
@@ -56,7 +56,7 @@ function Header() {
 
           <Link
             href="/new"
-            className="rounded-lg border-2 border-foreground bg-primary px-4 py-2 text-sm font-bold text-primary-foreground shadow-[2px_2px_0_var(--shadow-ink-primary)] transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[3px_3px_0_var(--shadow-ink-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:border-foreground/25"
+            className="border-foreground bg-primary text-primary-foreground focus-visible:ring-ring dark:border-foreground/25 rounded-lg border-2 px-4 py-2 text-sm font-bold shadow-[2px_2px_0_var(--shadow-ink-primary)] transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[3px_3px_0_var(--shadow-ink-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
           >
             イベントを作成
           </Link>

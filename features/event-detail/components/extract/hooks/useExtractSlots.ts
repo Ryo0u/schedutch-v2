@@ -1,18 +1,26 @@
-import { useMemo, useState } from "react";
-import type { Candidate, User } from "@/features/event-detail/types";
-import { extractSlots, type FilterCondition, type TimeBlock } from "@/features/event-detail/lib/extractSlots";
-import { toJSTDateString, jstDateStringToStartOfDayMs, jstDateStringToEndOfDayMs } from "@/lib/datetime";
+import { useMemo, useState } from 'react';
+import type { Candidate, User } from '@/features/event-detail/types';
+import {
+  extractSlots,
+  type FilterCondition,
+  type TimeBlock,
+} from '@/features/event-detail/lib/extractSlots';
+import {
+  toJSTDateString,
+  jstDateStringToStartOfDayMs,
+  jstDateStringToEndOfDayMs,
+} from '@/lib/datetime';
 
-export type ExtractTab = "people" | "number";
+export type ExtractTab = 'people' | 'number';
 
 interface UseExtractSlotsArgs {
-  candidates: Pick<Candidate, "id" | "start_time">[];
-  users: Pick<User, "id" | "name" | "responses">[];
+  candidates: Pick<Candidate, 'id' | 'start_time'>[];
+  users: Pick<User, 'id' | 'name' | 'responses'>[];
 }
 
 export function useExtractSlots({ candidates, users }: UseExtractSlotsArgs) {
   // 条件のフラグ管理
-  const [activeTab, setActiveTab] = useState<ExtractTab>("people");
+  const [activeTab, setActiveTab] = useState<ExtractTab>('people');
   const [includeMaybe, setIncludeMaybe] = useState(false);
   const [isDurationEnabled, setIsDurationEnabled] = useState(false);
   const [isDateRangeEnabled, setIsDateRangeEnabled] = useState(false);
@@ -21,7 +29,7 @@ export function useExtractSlots({ candidates, users }: UseExtractSlotsArgs) {
   const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set());
   const [selectedHeadcounts, setSelectedHeadcounts] = useState<Set<number>>(new Set());
   const [minDuration, setMinDuration] = useState(0);
-  const [dateRange, setDateRange] = useState<[string, string]>(["", ""]);
+  const [dateRange, setDateRange] = useState<[string, string]>(['', '']);
 
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
   const [extractedBlocks, setExtractedBlocks] = useState<TimeBlock[]>([]);
@@ -31,7 +39,7 @@ export function useExtractSlots({ candidates, users }: UseExtractSlotsArgs) {
 
   const availableDates = useMemo(() => {
     // JST の "YYYY-MM-DD" で一意な日付リストを作成（ブラウザTZ非依存）
-    const dates = candidates.map(c => toJSTDateString(c.start_time));
+    const dates = candidates.map((c) => toJSTDateString(c.start_time));
     return Array.from(new Set(dates)).sort();
   }, [candidates]);
 
@@ -51,7 +59,7 @@ export function useExtractSlots({ candidates, users }: UseExtractSlotsArgs) {
     setAvailableSlots([]);
     setExtractedBlocks([]);
 
-    if (value === "people") {
+    if (value === 'people') {
       setSelectedHeadcounts(new Set());
     } else {
       setSelectedUserIds(new Set());
@@ -59,7 +67,7 @@ export function useExtractSlots({ candidates, users }: UseExtractSlotsArgs) {
   };
 
   const toggleUserId = (userId: string) => {
-    setSelectedUserIds(prev => {
+    setSelectedUserIds((prev) => {
       const next = new Set(prev);
       if (next.has(userId)) {
         next.delete(userId);
@@ -71,7 +79,7 @@ export function useExtractSlots({ candidates, users }: UseExtractSlotsArgs) {
   };
 
   const toggleHeadcount = (count: number) => {
-    setSelectedHeadcounts(prev => {
+    setSelectedHeadcounts((prev) => {
       const next = new Set(prev);
       if (next.has(count)) {
         next.delete(count);
@@ -101,7 +109,7 @@ export function useExtractSlots({ candidates, users }: UseExtractSlotsArgs) {
   };
 
   const handleReset = () => {
-    setActiveTab("people");
+    setActiveTab('people');
     setSelectedUserIds(new Set());
     setSelectedHeadcounts(new Set());
     setAvailableSlots([]);
@@ -110,14 +118,14 @@ export function useExtractSlots({ candidates, users }: UseExtractSlotsArgs) {
     setIsDurationEnabled(false);
     setMinDuration(0);
     setIsDateRangeEnabled(false);
-    setDateRange(["", ""]);
+    setDateRange(['', '']);
     setIsHighlightEnabled(true);
   };
 
   const handleExtractSlots = () => {
     // 条件リストの作成
     const conditions: FilterCondition[] = [];
-    if (activeTab === "people") {
+    if (activeTab === 'people') {
       conditions.push({ type: 'PARTICIPANTS', userIds: Array.from(selectedUserIds) });
     } else {
       conditions.push({ type: 'HEADCOUNTS', counts: Array.from(selectedHeadcounts) });
@@ -128,11 +136,11 @@ export function useExtractSlots({ candidates, users }: UseExtractSlotsArgs) {
     }
 
     if (isDateRangeEnabled) {
-      const fallbackStart = availableDates[0] ?? "1970-01-01";
+      const fallbackStart = availableDates[0] ?? '1970-01-01';
       const startDate = dateRange[0] || fallbackStart;
       const start = jstDateStringToStartOfDayMs(startDate);
 
-      const fallbackEnd = availableDates[availableDates.length - 1] ?? "9999-12-31";
+      const fallbackEnd = availableDates[availableDates.length - 1] ?? '9999-12-31';
       const endDate = dateRange[1] || fallbackEnd;
       const end = jstDateStringToEndOfDayMs(endDate);
 
@@ -143,7 +151,7 @@ export function useExtractSlots({ candidates, users }: UseExtractSlotsArgs) {
       users,
       includeMaybe,
       conditions,
-      participantsFilter: (u) => (activeTab === "people" ? selectedUserIds.has(u.id) : true),
+      participantsFilter: (u) => (activeTab === 'people' ? selectedUserIds.has(u.id) : true),
     });
 
     setAvailableSlots(formatted);

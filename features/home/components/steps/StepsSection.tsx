@@ -4,13 +4,13 @@ import { STEPS } from '../../constants';
 
 export default function StepsSection() {
   return (
-    <section id="how" className="relative bg-muted pt-24 pb-32 sm:pt-32 sm:pb-40">
+    <section id="how" className="bg-muted relative pt-24 pb-32 sm:pt-32 sm:pb-40">
       {/* セクションヘッダー */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <h2 className="font-heading text-3xl font-black tracking-tight text-foreground sm:text-4xl">
+        <h2 className="font-heading text-foreground text-3xl font-black tracking-tight sm:text-4xl">
           使い方は、<span className="marker">4ステップ</span>。
         </h2>
-        <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+        <p className="text-muted-foreground mt-4 max-w-2xl text-sm leading-relaxed">
           アカウント登録不要。URLを共有するだけで、全員の予定が揃います。
         </p>
       </div>
@@ -19,7 +19,7 @@ export default function StepsSection() {
       <div className="relative mx-auto mt-16 max-w-7xl px-4 sm:mt-20 sm:px-6">
         {/* マーカーレール（各ステップの番号バッジの中心を貫通する太さ・位置に揃えている） */}
         <div
-          className="pointer-events-none absolute top-0 bottom-0 left-7 w-3 rounded-full bg-accent"
+          className="bg-accent pointer-events-none absolute top-0 bottom-0 left-7 w-3 rounded-full"
           aria-hidden="true"
         />
 

@@ -1,9 +1,17 @@
-"use client"
+'use client';
 
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { FieldGroup } from '@/components/ui/field';
@@ -20,8 +28,8 @@ import { COMMENT_MAX_LENGTH } from '@/lib/validation';
 interface UserEditDialogProps {
   eventId: string;
   data: {
-    user: Pick<User, "id" | "name" | "comment" | "responses">;
-    candidates: Pick<Candidate, "id" | "start_time" | "end_time">[];
+    user: Pick<User, 'id' | 'name' | 'comment' | 'responses'>;
+    candidates: Pick<Candidate, 'id' | 'start_time' | 'end_time'>[];
   };
   /** 事前検証済みの平文パスワード。更新 RPC が再検証する */
   password: string;
@@ -34,15 +42,15 @@ function UserEditDialog({ eventId, data, password, open, onOpenChange }: UserEdi
 
   const form = useForm<UserEditFormData>({
     resolver: zodResolver(userEditFormSchema),
-    defaultValues: { name: "", comment: "", responses: [] },
+    defaultValues: { name: '', comment: '', responses: [] },
   });
 
   useEffect(() => {
     if (open) {
       form.reset({
         name: data.user.name,
-        comment: data.user.comment ?? "",
-        responses: data.user.responses.map(r => ({
+        comment: data.user.comment ?? '',
+        responses: data.user.responses.map((r) => ({
           candidate_id: r.candidate_id,
           time: new Date(r.time),
           status: r.status,
@@ -63,22 +71,22 @@ function UserEditDialog({ eventId, data, password, open, onOpenChange }: UserEdi
         responses: formattedResponses,
       });
 
-      toast.success("回答を更新しました", { position: 'top-center' });
+      toast.success('回答を更新しました', { position: 'top-center' });
       onOpenChange(false);
     } catch (error) {
       console.error('Failed to update user:', error);
-      toast.error("更新に失敗しました", { position: 'top-center' });
+      toast.error('更新に失敗しました', { position: 'top-center' });
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[95vw] md:max-w-2xl lg:max-w-6xl max-h-[90vh] flex flex-col p-0 overflow-hidden">
-        <DialogHeader className="p-6 pb-2 text-center shrink-0">
-          <DialogTitle className="text-xl font-black">{data.user.name} の回答を編集する</DialogTitle>
-          <DialogDescription>
-            名前・コメント・回答を編集してください
-          </DialogDescription>
+      <DialogContent className="flex max-h-[90vh] max-w-[95vw] flex-col overflow-hidden p-0 md:max-w-2xl lg:max-w-6xl">
+        <DialogHeader className="shrink-0 p-6 pb-2 text-center">
+          <DialogTitle className="text-xl font-black">
+            {data.user.name} の回答を編集する
+          </DialogTitle>
+          <DialogDescription>名前・コメント・回答を編集してください</DialogDescription>
         </DialogHeader>
 
         <Separator className="shrink-0" />
@@ -86,11 +94,17 @@ function UserEditDialog({ eventId, data, password, open, onOpenChange }: UserEdi
         <form
           id="user-edit-form"
           onSubmit={form.handleSubmit(onSubmit)}
-          className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-6"
+          className="flex-1 space-y-6 overflow-x-hidden overflow-y-auto p-6"
         >
           <FieldGroup>
             <TextField control={form.control} name="name" label="名前" required />
-            <TextareaCounterField control={form.control} name="comment" label="コメント" rows={10} maxLength={COMMENT_MAX_LENGTH} />
+            <TextareaCounterField
+              control={form.control}
+              name="comment"
+              label="コメント"
+              rows={10}
+              maxLength={COMMENT_MAX_LENGTH}
+            />
           </FieldGroup>
 
           <Separator />
@@ -98,11 +112,15 @@ function UserEditDialog({ eventId, data, password, open, onOpenChange }: UserEdi
         </form>
 
         <DialogFooter className="m-3">
-          <DialogClose render={
-            <Button size="lg" variant="ghost" type="button" onClick={() => form.reset()}>キャンセル</Button>
-          }/>
+          <DialogClose
+            render={
+              <Button size="lg" variant="ghost" type="button" onClick={() => form.reset()}>
+                キャンセル
+              </Button>
+            }
+          />
           <Button size="lg" type="submit" form="user-edit-form" disabled={updateUser.isPending}>
-            {updateUser.isPending ? "保存中..." : "保存する"}
+            {updateUser.isPending ? '保存中...' : '保存する'}
           </Button>
         </DialogFooter>
       </DialogContent>

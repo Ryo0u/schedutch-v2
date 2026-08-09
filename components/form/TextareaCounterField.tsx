@@ -1,6 +1,11 @@
 import { type Control, Controller, type FieldPath, type FieldValues } from 'react-hook-form';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
-import { InputGroup, InputGroupAddon, InputGroupText, InputGroupTextarea } from '@/components/ui/input-group';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
+  InputGroupTextarea,
+} from '@/components/ui/input-group';
 
 interface TextareaCounterFieldProps<T extends FieldValues> {
   control: Control<T>;
@@ -41,7 +46,8 @@ function TextareaCounterField<T extends FieldValues>({
             />
             <InputGroupAddon align="block-end">
               <InputGroupText className="tabular-nums">
-                {field.value.length}/{maxLength}{unit}
+                {field.value.length}/{maxLength}
+                {unit}
               </InputGroupText>
             </InputGroupAddon>
           </InputGroup>

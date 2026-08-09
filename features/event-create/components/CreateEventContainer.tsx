@@ -68,31 +68,27 @@ export default function CreateEventContainer() {
     // onSubmit を form 側で受けないと、入力欄での Enter がネイティブ送信になりページがリロードされる
     <form onSubmit={form.handleSubmit(onSubmit)}>
       <fieldset disabled={isSubmitting}>
-        <div className="flex flex-col sm:flex-row justify-center items-end gap-8 w-full max-w-6xl mx-auto mt-5 mb-8">
-          <section className="flex-1 max-w-xl shrink-0 px-3">
+        <div className="mx-auto mt-5 mb-8 flex w-full max-w-6xl flex-col items-end justify-center gap-8 sm:flex-row">
+          <section className="max-w-xl flex-1 shrink-0 px-3">
             <NewHero />
             <EventInfoFields control={form.control} />
           </section>
 
-          <section className="flex-1 max-w-xl px-3">
+          <section className="max-w-xl flex-1 px-3">
             <CandidatesFields control={form.control} fields={fields} append={append} />
           </section>
         </div>
 
-        <section className='flex-row justify-center w-full max-w-6xl mx-auto px-3'>
-          <CandidateList control={form.control} fields={fields} remove={remove}/>
+        <section className="mx-auto w-full max-w-6xl flex-row justify-center px-3">
+          <CandidateList control={form.control} fields={fields} remove={remove} />
         </section>
 
-        <section className='max-w-6xl mx-auto px-3 mb-5'>
+        <section className="mx-auto mb-5 max-w-6xl px-3">
           <EventCreateActions isSubmitting={isSubmitting} onReset={() => form.reset()} />
         </section>
       </fieldset>
 
-      <EventCreatedDialog
-        open={showDialog}
-        onChangeOpen={setShowDialog}
-        eventId={createdEventId}
-      />
+      <EventCreatedDialog open={showDialog} onChangeOpen={setShowDialog} eventId={createdEventId} />
     </form>
   );
 }
