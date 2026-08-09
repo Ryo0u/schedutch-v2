@@ -2,7 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { usePrefersReducedMotion } from '@/features/home/hooks/usePrefersReducedMotion';
-import { COMPARISON_TIME_LABELS, HERO_MEMBERS, HERO_RESULT_TEXT, type CellStatus } from '@/features/home/constants';
+import {
+  COMPARISON_TIME_LABELS,
+  HERO_MEMBERS,
+  HERO_RESULT_TEXT,
+  type CellStatus,
+} from '@/features/home/constants';
 
 const CELL_W = 1.5;
 const GAP = 0.25;
@@ -13,15 +18,7 @@ const GRID_LEFT = NAME_W + GAP;
 const HL_START = 6;
 const HL_END = 9;
 
-function Cell({
-  status,
-  delay,
-  dimmed,
-}: {
-  status: CellStatus;
-  delay: number;
-  dimmed: boolean;
-}) {
+function Cell({ status, delay, dimmed }: { status: CellStatus; delay: number; dimmed: boolean }) {
   const styles: Record<CellStatus, string> = {
     o: 'bg-blue-400/80 text-white',
     t: 'bg-yellow-300/80 text-yellow-900',
@@ -70,10 +67,10 @@ export default function HeroGrid() {
   return (
     <div className="card-pop w-full p-4 sm:p-6">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <span className="rounded-md bg-primary px-3 py-1 text-sm font-bold text-primary-foreground">
+        <span className="bg-primary text-primary-foreground rounded-md px-3 py-1 text-sm font-bold">
           7月3日(金)
         </span>
-        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+        <div className="text-muted-foreground flex items-center gap-3 text-xs">
           <span className="flex items-center gap-1.5">
             <i className="inline-block h-2.5 w-2.5 rounded-sm bg-blue-400/80" />
             参加できる
@@ -83,7 +80,7 @@ export default function HeroGrid() {
             未定
           </span>
           <span className="flex items-center gap-1.5">
-            <i className="inline-block h-2.5 w-2.5 rounded-sm bg-muted-foreground/30" />
+            <i className="bg-muted-foreground/30 inline-block h-2.5 w-2.5 rounded-sm" />
             参加できない
           </span>
         </div>
@@ -92,7 +89,7 @@ export default function HeroGrid() {
       <div className="overflow-x-auto pb-1">
         <div style={{ width: 'fit-content' }}>
           <div
-            className="mb-1 flex font-mono text-muted-foreground"
+            className="text-muted-foreground mb-1 flex font-mono"
             style={{ paddingLeft: `${GRID_LEFT}rem`, fontSize: '10px' }}
           >
             {COMPARISON_TIME_LABELS.map((h) => (
@@ -105,7 +102,7 @@ export default function HeroGrid() {
           <div className="relative">
             {HERO_MEMBERS.map((m, row) => (
               <div key={m.name} className="mb-1 flex items-center gap-1">
-                <div className="w-14 shrink-0 truncate text-right text-xs font-medium text-foreground/70">
+                <div className="text-foreground/70 w-14 shrink-0 truncate text-right text-xs font-medium">
                   {m.name}
                 </div>
                 <div className="flex gap-1">
@@ -122,7 +119,7 @@ export default function HeroGrid() {
             ))}
 
             <div
-              className={`pointer-events-none absolute rounded-lg border-2 border-primary transition-opacity duration-700 ${phase >= 1 ? 'opacity-100' : 'opacity-0'}`}
+              className={`border-primary pointer-events-none absolute rounded-lg border-2 transition-opacity duration-700 ${phase >= 1 ? 'opacity-100' : 'opacity-0'}`}
               style={{
                 top: '-0.25rem',
                 left: `${GRID_LEFT + HL_START * PITCH - 0.125}rem`,
@@ -135,13 +132,13 @@ export default function HeroGrid() {
       </div>
 
       <div
-        className={`card-pop mt-4 bg-muted p-5 transition-all duration-500 ${phase >= 2 ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}
+        className={`card-pop bg-muted mt-4 p-5 transition-all duration-500 ${phase >= 2 ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}
       >
-        <div className="mb-2 flex items-center justify-between text-xs text-muted-foreground">
+        <div className="text-muted-foreground mb-2 flex items-center justify-between text-xs">
           <span>抽出結果</span>
           <span aria-hidden="true">⧉ コピー</span>
         </div>
-        <p className="font-mono text-xs text-primary sm:text-sm">
+        <p className="text-primary font-mono text-xs sm:text-sm">
           {typed}
           <span className="animate-pulse">▍</span>
         </p>

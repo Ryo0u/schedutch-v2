@@ -1,6 +1,14 @@
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Trash2 } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Trash2 } from 'lucide-react';
 
 interface DeleteDialogShellProps {
   open: boolean;
@@ -28,8 +36,8 @@ function DeleteDialogShell({
       <DialogContent>
         <form onSubmit={onSubmit}>
           <DialogHeader className="mb-5">
-            <DialogTitle className="flex flex-col justify-center items-center gap-3 text-destructive">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-destructive/10">
+            <DialogTitle className="text-destructive flex flex-col items-center justify-center gap-3">
+              <div className="bg-destructive/10 flex h-10 w-10 items-center justify-center rounded-lg">
                 <Trash2 className="h-5 w-5" />
               </div>
               <span className="text-xl font-bold">{title}</span>
@@ -40,9 +48,15 @@ function DeleteDialogShell({
           {children}
 
           <DialogFooter>
-            <DialogClose render={<Button type="button" variant="outline">キャンセル</Button>} />
+            <DialogClose
+              render={
+                <Button type="button" variant="outline">
+                  キャンセル
+                </Button>
+              }
+            />
             <Button type="submit" variant="destructive" disabled={isSubmitting || submitDisabled}>
-              {isSubmitting ? "削除中..." : "削除する"}
+              {isSubmitting ? '削除中...' : '削除する'}
             </Button>
           </DialogFooter>
         </form>

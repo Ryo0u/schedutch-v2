@@ -1,7 +1,7 @@
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { cn } from "@/lib/utils";
-import { RESPONSE_STATUSES, STATUS_META } from "@/features/event-detail/lib/status";
-import type { ResponseStatus } from "@/features/event-detail/types";
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { cn } from '@/lib/utils';
+import { RESPONSE_STATUSES, STATUS_META } from '@/features/event-detail/lib/status';
+import type { ResponseStatus } from '@/features/event-detail/types';
 
 interface StatusToggleProps {
   value: ResponseStatus;
@@ -10,7 +10,7 @@ interface StatusToggleProps {
 
 function StatusToggle({ value, onChange }: StatusToggleProps) {
   return (
-    <div className="sticky right-0 top-0 z-40 mb-2 flex justify-end">
+    <div className="sticky top-0 right-0 z-40 mb-2 flex justify-end">
       <ToggleGroup
         size="sm"
         spacing={2}
@@ -27,10 +27,12 @@ function StatusToggle({ value, onChange }: StatusToggleProps) {
             <ToggleGroupItem
               key={status}
               value={status}
-              className={cn("bg-background", value === status && meta.toggleActiveClass)}
+              className={cn('bg-background', value === status && meta.toggleActiveClass)}
             >
               <span className="sm:hidden">{meta.symbol}</span>
-              <span className="hidden sm:inline">{meta.label}（{meta.symbol}）</span>
+              <span className="hidden sm:inline">
+                {meta.label}（{meta.symbol}）
+              </span>
             </ToggleGroupItem>
           );
         })}

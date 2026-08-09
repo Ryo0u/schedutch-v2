@@ -1,5 +1,5 @@
-import { supabase } from "@/utils/supabase/client";
-import type { Json } from "@/lib/database.types";
+import { supabase } from '@/utils/supabase/client';
+import type { Json } from '@/lib/database.types';
 
 /** RPC 用に整形済みの候補日（time は ISO 文字列）。RPC への jsonb 引数として渡すため Json 互換を強制する */
 export interface CandidateInput extends Record<string, Json> {
@@ -17,7 +17,7 @@ export interface CreateEventInput {
 
 /** イベントと候補日をトランザクションで作成（RPC 経由）。作成した event id を返す */
 export async function createEvent(input: CreateEventInput): Promise<string> {
-  const { data, error } = await supabase.rpc("create_event_with_candidates", {
+  const { data, error } = await supabase.rpc('create_event_with_candidates', {
     p_title: input.title,
     p_password_digest: input.passwordDigest,
     p_comment: input.comment,

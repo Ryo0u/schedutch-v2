@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { isPasswordError } from "@/features/event-detail/api/errors";
+import { useState } from 'react';
+import { isPasswordError } from '@/features/event-detail/api/errors';
 
 /**
  * パスワードを伴う操作（削除・事前検証など）の送信中フラグとエラー表示をまとめたフック。
@@ -22,7 +22,7 @@ export function usePasswordConfirm() {
       return true;
     } catch (error) {
       if (isPasswordError(error)) {
-        setErrorMsg("パスワードが間違っています");
+        setErrorMsg('パスワードが間違っています');
         return false;
       }
       throw error;

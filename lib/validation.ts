@@ -1,4 +1,4 @@
-import * as z from "zod";
+import * as z from 'zod';
 
 export const TITLE_MAX_LENGTH = 10;
 export const PASSWORD_MIN_LENGTH = 3;
@@ -8,7 +8,7 @@ export const COMMENT_MAX_LENGTH = 30;
 /** タイトルフィールドの共通バリデーション */
 export const titleSchema = z
   .string()
-  .min(1, "タイトルを入力してください")
+  .min(1, 'タイトルを入力してください')
   .max(TITLE_MAX_LENGTH, `タイトルを${TITLE_MAX_LENGTH}文字以内で入力してください`);
 
 /** パスワードフィールドの共通バリデーション */

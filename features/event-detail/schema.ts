@@ -7,14 +7,13 @@ export const userFormSchema = z.object({
   name: nameSchema,
   comment: commentSchema,
   password: passwordSchema,
-  responses:
-    z.array(
-      z.object({
-        candidate_id: z.string(),
-        time: z.date(),
-        status: z.enum(RESPONSE_STATUSES),
-      })
-    ),
+  responses: z.array(
+    z.object({
+      candidate_id: z.string(),
+      time: z.date(),
+      status: z.enum(RESPONSE_STATUSES),
+    }),
+  ),
 });
 export type UserFormData = z.infer<typeof userFormSchema>;
 export type ResponseFormValue = UserFormData['responses'][number];

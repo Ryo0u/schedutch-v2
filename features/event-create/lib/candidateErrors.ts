@@ -5,7 +5,7 @@ type CandidateErrors = FieldErrors<EventCreateFormData>['candidates'];
 
 export const CANDIDATE_TIME_ERROR_MESSAGE = '時間に不備がある候補日があります';
 export const CANDIDATE_INVALID_ERROR_MESSAGE =
-	'候補日のデータに不備があります。該当の候補日を削除して追加し直してください';
+  '候補日のデータに不備があります。該当の候補日を削除して追加し直してください';
 
 /**
  * 候補日一覧のフッターに出すエラーメッセージを組み立てる。
@@ -18,13 +18,13 @@ export const CANDIDATE_INVALID_ERROR_MESSAGE =
  * ネストしたエラーは要素直下に message を持たないため、message の有無だけを見ると取りこぼす。
  */
 export const buildCandidateListErrorMessage = (errors: CandidateErrors): string | null => {
-	if (!Array.isArray(errors)) return null;
+  if (!Array.isArray(errors)) return null;
 
-	// 削除済みインデックスは穴（undefined）になるため取り除く
-	const itemErrors = errors.filter((error) => error != null);
-	if (itemErrors.length === 0) return null;
+  // 削除済みインデックスは穴（undefined）になるため取り除く
+  const itemErrors = errors.filter((error) => error != null);
+  if (itemErrors.length === 0) return null;
 
-	if (itemErrors.some((error) => error.message)) return CANDIDATE_TIME_ERROR_MESSAGE;
+  if (itemErrors.some((error) => error.message)) return CANDIDATE_TIME_ERROR_MESSAGE;
 
-	return CANDIDATE_INVALID_ERROR_MESSAGE;
+  return CANDIDATE_INVALID_ERROR_MESSAGE;
 };

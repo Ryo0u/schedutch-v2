@@ -1,12 +1,12 @@
-import { SLOT_INTERVAL_MS } from "@/lib/constants";
-import { formatJSTTime } from "@/lib/datetime";
-import type { ResponseInput } from "@/features/event-detail/api/eventApi";
-import type { Candidate } from "@/features/event-detail/types";
-import type { ResponseFormValue } from "@/features/event-detail/schema";
+import { SLOT_INTERVAL_MS } from '@/lib/constants';
+import { formatJSTTime } from '@/lib/datetime';
+import type { ResponseInput } from '@/features/event-detail/api/eventApi';
+import type { Candidate } from '@/features/event-detail/types';
+import type { ResponseFormValue } from '@/features/event-detail/schema';
 
 /** 候補日の範囲をSLOT_INTERVAL_MS刻みで初期化する（未回答は"ok"扱い） */
 export function buildInitialResponses(
-  candidates: Pick<Candidate, "id" | "start_time" | "end_time">[]
+  candidates: Pick<Candidate, 'id' | 'start_time' | 'end_time'>[],
 ): ResponseFormValue[] {
   const responses: ResponseFormValue[] = [];
 
@@ -19,7 +19,7 @@ export function buildInitialResponses(
       responses.push({
         candidate_id: candidate.id,
         time: new Date(currentMs),
-        status: "ok",
+        status: 'ok',
       });
       currentMs += SLOT_INTERVAL_MS;
     }
@@ -44,13 +44,13 @@ export function responseSlotKey(candidateId: string, hhmm: string): string {
 
 /** 回答フィールド配列を「candidate_id-HHmm」キーのマップに変換する（ResponsesFieldsのセル検索用） */
 export function buildResponseSlotMap<T extends { candidate_id: string; time: Date }>(
-  fields: T[]
+  fields: T[],
 ): Record<string, T & { index: number }> {
   return fields.reduce(
     (acc, field, index) => {
       acc[responseSlotKey(field.candidate_id, formatJSTTime(field.time))] = { ...field, index };
       return acc;
     },
-    {} as Record<string, T & { index: number }>
+    {} as Record<string, T & { index: number }>,
   );
 }

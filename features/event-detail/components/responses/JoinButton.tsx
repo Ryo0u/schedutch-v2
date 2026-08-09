@@ -17,11 +17,7 @@ export default function JoinButton({ eventId }: JoinButtonProps) {
 
   return (
     <>
-      <Button
-        size="lg"
-        className="rounded-full px-8 font-bold"
-        onClick={() => setIsOpen(true)}
-      >
+      <Button size="lg" className="rounded-full px-8 font-bold" onClick={() => setIsOpen(true)}>
         予定を回答する
       </Button>
 

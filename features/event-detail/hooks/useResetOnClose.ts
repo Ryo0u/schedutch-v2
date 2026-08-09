@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 
 /**
  * ダイアログが閉じた（open: true → false）タイミングで onReset を実行する。

@@ -17,15 +17,15 @@ export default function CtaSection() {
         }}
       />
       <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6">
-        <h2 className="font-heading text-3xl font-black tracking-tight text-foreground sm:text-4xl">
+        <h2 className="font-heading text-foreground text-3xl font-black tracking-tight sm:text-4xl">
           次の集まり、<span className="marker text-primary">30秒</span>で作れます
         </h2>
-        <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+        <p className="text-muted-foreground mt-4 text-sm leading-relaxed">
           候補日を選んでURLを送るだけ。登録もログインも要りません。
         </p>
         <Link
           href="/new"
-          className="mt-8 inline-block rounded-xl border-2 border-foreground bg-primary px-10 py-4 text-base font-bold text-primary-foreground shadow-[5px_5px_0_var(--shadow-ink-primary)] transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[7px_7px_0_var(--shadow-ink-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:border-foreground/25"
+          className="border-foreground bg-primary text-primary-foreground focus-visible:ring-ring dark:border-foreground/25 mt-8 inline-block rounded-xl border-2 px-10 py-4 text-base font-bold shadow-[5px_5px_0_var(--shadow-ink-primary)] transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[7px_7px_0_var(--shadow-ink-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
         >
           無料でイベントを作成
         </Link>

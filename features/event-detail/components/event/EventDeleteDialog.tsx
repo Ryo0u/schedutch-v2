@@ -1,29 +1,29 @@
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Field, FieldError } from "@/components/ui/field";
-import { toast } from "sonner";
+import { useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { Field, FieldError } from '@/components/ui/field';
+import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
-import { useDeleteEvent } from "@/features/event-detail/hooks/useEventMutations";
-import { usePasswordConfirm } from "@/features/event-detail/hooks/usePasswordConfirm";
-import { useResetOnClose } from "@/features/event-detail/hooks/useResetOnClose";
-import DeleteDialogShell from "@/features/event-detail/components/shared/DeleteDialogShell";
+import { useDeleteEvent } from '@/features/event-detail/hooks/useEventMutations';
+import { usePasswordConfirm } from '@/features/event-detail/hooks/usePasswordConfirm';
+import { useResetOnClose } from '@/features/event-detail/hooks/useResetOnClose';
+import DeleteDialogShell from '@/features/event-detail/components/shared/DeleteDialogShell';
 
 interface DialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   data: {
     id: string;
-  }
+  };
 }
 
 function EventDeleteDialog({ open, onOpenChange, data }: DialogProps) {
-  const [ password, setPassword ] = useState<string>("");
+  const [password, setPassword] = useState<string>('');
   const router = useRouter();
   const deleteEvent = useDeleteEvent();
   const { isSubmitting, errorMsg, setErrorMsg, run } = usePasswordConfirm();
 
   useResetOnClose(open, () => {
-    setPassword("");
+    setPassword('');
     setErrorMsg(null);
   });
 
@@ -33,14 +33,14 @@ function EventDeleteDialog({ open, onOpenChange, data }: DialogProps) {
     try {
       const success = await run(() => deleteEvent.mutateAsync({ eventId: data.id, password }));
       if (success) {
-        toast.success("イベントを削除しました", {position: 'top-center'})
-        router.push("/")
+        toast.success('イベントを削除しました', { position: 'top-center' });
+        router.push('/');
       }
     } catch (error) {
-      console.error("failed to delete event", error)
-      toast.error("イベントの削除に失敗しました", {position: 'top-center'})
+      console.error('failed to delete event', error);
+      toast.error('イベントの削除に失敗しました', { position: 'top-center' });
     }
-  }
+  };
 
   return (
     <DeleteDialogShell
@@ -59,10 +59,10 @@ function EventDeleteDialog({ open, onOpenChange, data }: DialogProps) {
           placeholder="......."
           aria-invalid={!!errorMsg}
         />
-        {errorMsg && <FieldError errors={[{ message: errorMsg }]}/>}
+        {errorMsg && <FieldError errors={[{ message: errorMsg }]} />}
       </Field>
     </DeleteDialogShell>
-  )
+  );
 }
 
-export default EventDeleteDialog
+export default EventDeleteDialog;

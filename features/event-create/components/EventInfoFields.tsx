@@ -1,13 +1,7 @@
 import { type EventCreateFormData } from '@/features/event-create/schema';
 import { type Control } from 'react-hook-form';
 import { COMMENT_MAX_LENGTH } from '@/lib/validation';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FieldGroup } from '@/components/ui/field';
 import { Separator } from '@/components/ui/separator';
 import TextField from '@/components/form/TextField';
@@ -20,11 +14,9 @@ interface EventInfoFieldsProps {
 const EventInfoFields = ({ control }: EventInfoFieldsProps) => {
   return (
     <div>
-      <Card className="shadow-md shadow-primary/10 ring-primary/20">
+      <Card className="shadow-primary/10 ring-primary/20 shadow-md">
         <CardHeader>
-          <CardTitle className="text-center text-xl font-bold">
-            基本情報
-          </CardTitle>
+          <CardTitle className="text-center text-xl font-bold">基本情報</CardTitle>
           <CardDescription className="text-center">
             イベント名と編集用パスワードを入力してください
           </CardDescription>

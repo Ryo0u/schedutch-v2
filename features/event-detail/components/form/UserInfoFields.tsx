@@ -17,7 +17,13 @@ function UserInfoFields({ control }: InputUserProps) {
         <TextField control={control} name="password" label="パスワード" required />
       </div>
 
-      <TextareaCounterField control={control} name="comment" label="コメント" rows={10} maxLength={COMMENT_MAX_LENGTH} />
+      <TextareaCounterField
+        control={control}
+        name="comment"
+        label="コメント"
+        rows={10}
+        maxLength={COMMENT_MAX_LENGTH}
+      />
     </FieldGroup>
   );
 }

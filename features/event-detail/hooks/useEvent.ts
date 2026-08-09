@@ -1,8 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
-import { getEvent } from "@/features/event-detail/api/eventApi";
+import { useQuery } from '@tanstack/react-query';
+import { getEvent } from '@/features/event-detail/api/eventApi';
 
 export const eventKeys = {
-  all: ["events"] as const,
+  all: ['events'] as const,
   detail: (eventId: string) => [...eventKeys.all, eventId] as const,
 };
 
