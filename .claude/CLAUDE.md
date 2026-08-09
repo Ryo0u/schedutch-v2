@@ -9,8 +9,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```bash
 npm run dev       # 開発サーバー起動 (localhost:3000)
 npm run build     # プロダクションビルド
-npm run lint      # ESLint
-npm run prettier  # Prettierによるフォーマット
+npm run lint      # ESLint（警告も許容しない）
+npm run lint:fix  # ESLintの自動修正
+npm run format       # Prettierによるフォーマット
+npm run format:check # Prettierの差分チェック（CIと同じ）
 npm run test      # Vitest（ユニットテスト）
 npm run test:watch # Vitest watchモード
 npm run db:start   # ローカルSupabaseスタック起動（Docker Desktopが必要）
