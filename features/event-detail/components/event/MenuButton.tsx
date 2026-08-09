@@ -18,22 +18,23 @@ import UserDeletePickerDialog from '../users/UserDeletePickerDialog';
 import EventShareDialog from './EventShareDialog';
 import { useEvent } from '@/features/event-detail/hooks/useEvent';
 
+/** 幹事用メニューから開けるダイアログの種別 */
+type EventMenuAction = 'eventEdit' | 'eventShare' | 'eventDelete' | 'usersDelete';
+
 interface MenuProps {
   eventId: string;
 }
 
 function MenuButton({ eventId }: MenuProps) {
   const { data } = useEvent(eventId);
-  const [isOpen, setIsOpen] = useState(false); // パスワード承認画面
-  const [actionType, setActionType] = useState<
-    'eventEdit' | 'eventShare' | 'eventDelete' | 'usersDelete' | null
-  >(null);
+  // 「今どのダイアログが開いているか」を単一の状態で持つ（null は全て閉じている）
+  const [openDialog, setOpenDialog] = useState<EventMenuAction | null>(null);
 
   if (!data) return null;
 
-  const handleMenuClick = (action: 'eventEdit' | 'eventShare' | 'eventDelete' | 'usersDelete') => {
-    setActionType(action);
-    setIsOpen(true);
+  /** ダイアログ側から閉じられたときに選択を解除する */
+  const closeDialog = (open: boolean) => {
+    if (!open) setOpenDialog(null);
   };
 
   return (
@@ -50,15 +51,15 @@ function MenuButton({ eventId }: MenuProps) {
         <DropdownMenuContent>
           <DropdownMenuGroup>
             <DropdownMenuLabel>Event</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => handleMenuClick('eventEdit')}>
+            <DropdownMenuItem onClick={() => setOpenDialog('eventEdit')}>
               <Edit />
               編集
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleMenuClick('eventShare')}>
+            <DropdownMenuItem onClick={() => setOpenDialog('eventShare')}>
               <Share2 />
               共有
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleMenuClick('eventDelete')} variant="destructive">
+            <DropdownMenuItem onClick={() => setOpenDialog('eventDelete')} variant="destructive">
               <Trash2 />
               削除
             </DropdownMenuItem>
@@ -68,7 +69,7 @@ function MenuButton({ eventId }: MenuProps) {
 
           <DropdownMenuGroup>
             <DropdownMenuLabel>Users</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => handleMenuClick('usersDelete')} variant="destructive">
+            <DropdownMenuItem onClick={() => setOpenDialog('usersDelete')} variant="destructive">
               <Trash2 />
               削除
             </DropdownMenuItem>
@@ -76,21 +77,24 @@ function MenuButton({ eventId }: MenuProps) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {actionType === 'eventEdit' && (
-        <EventEditDialog eventId={eventId} data={data} open={isOpen} onOpenChange={setIsOpen} />
-      )}
-      {actionType === 'eventShare' && <EventShareDialog open={isOpen} onOpenChange={setIsOpen} />}
-      {actionType === 'eventDelete' && (
-        <EventDeleteDialog data={data} open={isOpen} onOpenChange={setIsOpen} />
-      )}
-      {actionType === 'usersDelete' && (
-        <UserDeletePickerDialog
-          eventId={eventId}
-          data={data}
-          open={isOpen}
-          onOpenChange={setIsOpen}
-        />
-      )}
+      <EventEditDialog
+        eventId={eventId}
+        data={data}
+        open={openDialog === 'eventEdit'}
+        onOpenChange={closeDialog}
+      />
+      <EventShareDialog open={openDialog === 'eventShare'} onOpenChange={closeDialog} />
+      <EventDeleteDialog
+        data={data}
+        open={openDialog === 'eventDelete'}
+        onOpenChange={closeDialog}
+      />
+      <UserDeletePickerDialog
+        eventId={eventId}
+        data={data}
+        open={openDialog === 'usersDelete'}
+        onOpenChange={closeDialog}
+      />
     </>
   );
 }

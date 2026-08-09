@@ -5,13 +5,15 @@ import {
   InputGroupText,
   InputGroupTextarea,
 } from '@/components/ui/input-group';
-import { CopyIcon } from 'lucide-react';
+import { Check, Copy } from 'lucide-react';
+import { useCopyToClipboard } from '@/hooks/useCopyToClipboard';
 
 interface ExtractResultPanelProps {
   slots: string[];
 }
 
 function ExtractResultPanel({ slots }: ExtractResultPanelProps) {
+  const { copied, copy } = useCopyToClipboard();
   const text = slots.join('\n');
 
   return (
@@ -27,9 +29,9 @@ function ExtractResultPanel({ slots }: ExtractResultPanelProps) {
           variant="ghost"
           size="icon-xs"
           aria-label="抽出結果をコピー"
-          onClick={() => navigator.clipboard.writeText(text)}
+          onClick={() => copy(text)}
         >
-          <CopyIcon />
+          {copied ? <Check /> : <Copy />}
         </InputGroupButton>
       </InputGroupAddon>
     </InputGroup>
