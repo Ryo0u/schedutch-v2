@@ -1,5 +1,5 @@
-import { EventCreateFormData } from '@/features/event-create/schema';
-import { Control } from 'react-hook-form';
+import { type EventCreateFormData } from '@/features/event-create/schema';
+import { type Control } from 'react-hook-form';
 import { COMMENT_MAX_LENGTH } from '@/lib/validation';
 import {
   Card,

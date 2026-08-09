@@ -1,5 +1,5 @@
-import { EventCreateFormData } from '@/features/event-create/schema';
-import { Control, Controller, useFormState, type FieldArrayWithId, type UseFieldArrayRemove } from 'react-hook-form';
+import { type EventCreateFormData } from '@/features/event-create/schema';
+import { type Control, Controller, useFormState, type FieldArrayWithId, type UseFieldArrayRemove } from 'react-hook-form';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Field, FieldContent, FieldGroup, FieldLabel } from '@/components/ui/field';

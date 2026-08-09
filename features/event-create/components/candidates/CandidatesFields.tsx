@@ -1,5 +1,5 @@
-import { EventCreateFormData } from '@/features/event-create/schema';
-import { Control, Controller, type FieldArrayWithId, type UseFieldArrayAppend } from 'react-hook-form';
+import { type EventCreateFormData } from '@/features/event-create/schema';
+import { type Control, Controller, type FieldArrayWithId, type UseFieldArrayAppend } from 'react-hook-form';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Calendar } from '@/components/ui/calendar';

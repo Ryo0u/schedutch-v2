@@ -1,4 +1,4 @@
-import { Control, Controller, FieldPath, FieldValues } from 'react-hook-form';
+import { type Control, Controller, type FieldPath, type FieldValues } from 'react-hook-form';
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 
