@@ -111,7 +111,7 @@ mutation の catch 節では、ユーザー影響の有無で通知先を分け�
 - 変数・関数は camelCase、型・コンポーネントは PascalCase。
 - コンポーネントファイルは PascalCase（例: `EventContainer.tsx`）。hook は `useXxx.ts`（camelCase）。
 - **コンポーネントは名詞句**で `[ドメイン][操作/状態][UI種別]` の順に命名する（例: `EventEditDialog`, `UserDeletePickerDialog`）。動詞始まり（`InputXxx` / `CreateXxx` / `SelectXxx`）は使わない。
-- UI種別サフィックスの語彙: `Container` / `Dialog` / `Fields`（フォームの入力フィールド群）/ `List` / `Section` / `Panel` / `Button` / `Actions`（ボタン群）/ `Skeleton` / `Info`（表示セクション）。
+- UI種別サフィックスの語彙: `Container` / `Dialog` / `Form`（送信処理まで持つフォーム全体）/ `Fields`（フォームの入力フィールド群）/ `List` / `Section` / `Panel` / `Button` / `Actions`（ボタン群）/ `Skeleton` / `Info`（表示セクション）。
 - 単複: 単一エンティティを扱うものは単数（`UserEditDialog`）、コレクション全体を表示するものは複数（`UsersInfo`, `ResponsesInfo`）。ただし `List` サフィックスはコレクションが自明なので単数 + List（`CandidateList`）。
 - 関数は動詞始まり camelCase（api は CRUD 動詞: get/create/save/update/delete/verify、lib は to/format/build 等）。定数は UPPER_SNAKE、zod スキーマは `xxxSchema`。
 - 新規ファイルにタイポ・表記ゆれを持ち込まない。

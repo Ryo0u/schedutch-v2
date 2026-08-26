@@ -94,8 +94,9 @@ export function useResponseDraft(eventId: string) {
     }
   }, [cancelPendingSave, key]);
 
-  // アンマウント時に debounce のタイマーを残さない
-  useEffect(() => cancelPendingSave, [cancelPendingSave]);
+  // ダイアログを閉じるとこの hook ごと破棄されるため、デバウンス待ちの下書きを書き切ってから終わる。
+  // 破棄・送信済みの場合は clear() が待機中の保存を取り消しているので、ここでは何も書かない
+  useEffect(() => flush, [flush]);
 
   return useMemo(() => ({ load, save, flush, clear }), [load, save, flush, clear]);
 }
