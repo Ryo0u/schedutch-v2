@@ -55,6 +55,15 @@ function ResponsesDialog({ eventId, data, open, onOpenChange }: ResponsesDialogP
     }
   }, [open, data.candidates, form]);
 
+  // 保存に成功したときだけ入力をクリアする。reset は実行順序の都合で onSubmit 内ではなく useEffect で行う
+  // isSubmitSuccessful は render 時に読まないと formState の購読が張られず、更新されても再レンダーされない
+  const { isSubmitSuccessful } = form.formState;
+  useEffect(() => {
+    if (isSubmitSuccessful) {
+      form.reset();
+    }
+  }, [isSubmitSuccessful, form]);
+
   const onSubmit = async (values: UserFormData) => {
     try {
       const hashedPassword = await hashPassword(values.password);
@@ -70,10 +79,13 @@ function ResponsesDialog({ eventId, data, open, onOpenChange }: ResponsesDialogP
       });
 
       onOpenChange(false);
-      form.reset();
     } catch (error) {
+      const message = '回答の保存に失敗しました。';
       console.error('Failed to create user:', error);
-      toast.error('回答の保存に失敗しました。', { position: 'top-center' });
+      toast.error(message, { position: 'top-center' });
+      // handleSubmit は onSubmit が例外を投げなければ成功扱いにするため、errors を非空にして
+      // isSubmitSuccessful を false に保つ。これがないと失敗時も上の reset が走り入力が消える
+      form.setError('root.serverError', { message });
     }
   };
 
