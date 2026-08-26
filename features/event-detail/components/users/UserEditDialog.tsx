@@ -62,11 +62,9 @@ function UserEditDialog({ eventId, data, password, open, onOpenChange }: UserEdi
 
   // isDirty は render 時に読まないと formState の購読が張られず、更新されても再レンダーされない
   const { isDirty } = form.formState;
-  const closeGuard = useDirtyCloseGuard({
-    isDirty,
-    onOpenChange,
-    onDiscard: () => form.reset(),
-  });
+  // 破棄時に form.reset を呼ばないのは、空の defaultValues に戻った状態が
+  // 閉じるアニメーション中に見えてしまうため。開き直せば open 時の useEffect が現在値を入れ直す
+  const closeGuard = useDirtyCloseGuard({ isDirty, onOpenChange });
 
   const onSubmit = async (values: UserEditFormData) => {
     try {

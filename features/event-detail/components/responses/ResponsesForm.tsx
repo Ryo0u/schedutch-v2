@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Check } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -53,22 +53,23 @@ function ResponsesForm({ eventId, data, onOpenChange }: ResponsesFormProps) {
     },
   });
 
-  const resetToInitial = useCallback(() => {
-    form.reset({
-      name: '',
-      comment: '',
-      password: '',
-      responses: buildInitialResponses(data.candidates),
-    });
-    responseDraft.clear();
-  }, [form, data.candidates, responseDraft]);
-
   // isDirty は render 時に読まないと formState の購読が張られず、更新されても再レンダーされない
   const { isDirty } = form.formState;
 
-  // 入力が始まってから下書きを保存する。開いただけで下書きを作らないよう isDirty を条件にする
+  // 入力が始まってから下書きを保存する。開いただけで下書きを作らないよう isDirty を条件にする。
+  // 復元直後は defaultValues が下書きそのもので isDirty が false になるため、
+  // 「一度 dirty になってから戻った」ときだけ下書きを消す（wasDirtyRef で遷移を見る）
+  const wasDirtyRef = useRef(false);
   useEffect(() => {
-    if (!isDirty) return;
+    if (!isDirty) {
+      if (wasDirtyRef.current) {
+        responseDraft.clear();
+        wasDirtyRef.current = false;
+      }
+      return;
+    }
+
+    wasDirtyRef.current = true;
 
     const persist = ({ name, comment, responses }: UserFormData) => {
       responseDraft.save({ name, comment, responses });
@@ -86,7 +87,8 @@ function ResponsesForm({ eventId, data, onOpenChange }: ResponsesFormProps) {
   const closeGuard = useDirtyCloseGuard({
     isDirty,
     onOpenChange,
-    onDiscard: resetToInitial,
+    // 閉じればこのツリーごと破棄されるため、入力を戻す必要はない
+    onDiscard: responseDraft.clear,
   });
 
   const onSubmit = async (values: UserFormData) => {

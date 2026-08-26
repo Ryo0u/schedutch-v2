@@ -9,15 +9,18 @@ interface UseDirtyCloseGuardOptions {
   /** 未保存の変更があるか（react-hook-form の formState.isDirty を渡す） */
   isDirty: boolean;
   onOpenChange: (open: boolean) => void;
-  /** 破棄が確定したときに入力をクリアする処理 */
-  onDiscard: () => void;
+  /** 破棄が確定したときの後始末（下書きの削除など）。閉じればフォームは破棄されるので、入力を戻す必要はない */
+  onDiscard?: () => void;
 }
 
 /**
  * 未保存の入力があるダイアログを、誤操作で閉じてしまわないようにする。
  *
- * 背景クリックによる dismiss は呼び出し側で `disablePointerDismissal` を渡して無効化し、
- * ここでは Esc・閉じるボタン・キャンセルボタン経由の close を確認ダイアログに差し替える。
+ * 背景クリックによる dismiss は、呼び出し側で `disablePointerDismissal` を渡して無効化する。
+ * どの経路に確認ダイアログを挟むかは呼び出し側の配線で決まる。
+ * - `handleOpenChange` を Dialog に渡すと、Esc と閉じるボタンも確認を挟む（UserEditDialog）
+ * - `requestClose` だけを使えば、確認はそのボタン経由に限られる（ResponsesForm。
+ *   Esc と閉じるボタンは下書きが残るため確認せずに閉じてよい）
  */
 export function useDirtyCloseGuard({
   isDirty,
@@ -49,7 +52,7 @@ export function useDirtyCloseGuard({
 
   const confirmDiscard = () => {
     setIsConfirmOpen(false);
-    onDiscard();
+    onDiscard?.();
     onOpenChange(false);
   };
 
