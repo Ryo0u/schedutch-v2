@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { Check } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DialogFooter } from '@/components/ui/dialog';
@@ -62,17 +63,6 @@ function ResponsesForm({ eventId, data, onOpenChange }: ResponsesFormProps) {
     responseDraft.clear();
   }, [form, data.candidates, responseDraft]);
 
-  useEffect(() => {
-    if (!restoredDraft) return;
-
-    // id を固定し、再実行されても通知が積み重ならないようにする
-    toast.info('前回の入力を復元しました', {
-      id: 'response-draft-restored',
-      position: 'top-center',
-      action: { label: '破棄', onClick: resetToInitial },
-    });
-  }, [restoredDraft, resetToInitial]);
-
   // isDirty は render 時に読まないと formState の購読が張られず、更新されても再レンダーされない
   const { isDirty } = form.formState;
 
@@ -132,6 +122,14 @@ function ResponsesForm({ eventId, data, onOpenChange }: ResponsesFormProps) {
         <Separator />
         <ResponsesFields control={form.control} data={data} />
       </form>
+
+      {/* 閉じても入力が消えないことを、閉じる前に伝える */}
+      {isDirty && (
+        <p className="text-muted-foreground flex items-center justify-center gap-1.5 px-6 text-xs sm:justify-end">
+          <Check className="size-3.5" />
+          入力内容は自動で保存されます
+        </p>
+      )}
 
       <DialogFooter className="m-3">
         <Button size="lg" variant="ghost" type="button" onClick={closeGuard.requestClose}>
