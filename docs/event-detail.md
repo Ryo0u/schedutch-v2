@@ -27,8 +27,24 @@
 
 1. **参加者情報**（`components/form/UserInfoFields.tsx`）: 名前・コメント・パスワードを入力。
    - バリデーション（`schema.ts` の `userFormSchema`）: 名前 1〜10 文字 / コメント 30 文字以内 / パスワード 3〜12 文字。
-2. **回答グリッド**（`components/form/ResponsesFields.tsx`）: ダイアログを開くと候補日ごとに `start_time`〜`end_time` を 30 分刻みで展開し、全スロットを `status: "ok"` で初期化する。
+2. **回答グリッド**（`components/form/ResponsesFields.tsx`）: ダイアログを開くと候補日ごとに `start_time`〜`end_time` を 30 分刻みで展開し、全スロットを `status: "ok"` で初期化する。下書きが残っている場合はそちらを復元する（下記）。
 3. 送信: パスワードを `hashPassword` でハッシュ化し、RPC `save_user_responses` でユーザーと回答をまとめて保存する。
+
+### 入力の保護（新規回答）
+
+他の参加者の回答を見るために一度ダイアログを閉じても、入力をやり直さずに済むようにしている。
+
+- 背景クリックでは閉じない（`disablePointerDismissal`）。
+- × と Esc は確認なしで閉じる。入力は下書きとして残るため失われない。
+- キャンセルボタンは破棄の意思表示として扱い、未保存の変更があれば `shared/UnsavedChangesDialog.tsx` で確認する（`hooks/useDirtyCloseGuard.ts`）。
+- 下書きは `hooks/useResponseDraft.ts` が sessionStorage に保存する。入力が始まってから（`isDirty`）500ms のデバウンスで書き込み、閉じる直前に書き切る。
+- 入力中はフッター上部に「入力内容は自動で保存されます」と表示する。閉じても消えないことを、閉じる前に伝えるため。
+- 下書きが残っている状態で回答ダイアログを開こうとすると、`responses/ResponseDraftDialog.tsx` が先に出て、続きから入力するか最初から入力するかを選ばせる。黙って復元すると、書き直したい人が一度開いてから破棄する遠回りを強いられるため。
+- 下書きは送信成功時と、「最初から入力する」「破棄して閉じる」を選んだときに削除する。
+- パスワードは下書きに含めないため、復元後も入力し直す必要がある。
+- 保存形式の検証は `lib/responseDraft.ts`。版数違い・壊れた JSON・現在の候補日に無い `candidate_id` を含むものは復元せず破棄する。
+
+参加者の編集（`UserEditDialog`）はサーバーの現在値が正なので下書きの対象外。こちらは × と Esc でも破棄確認を挟む。
 
 ### 回答グリッドの操作（新規・編集で共用）
 
