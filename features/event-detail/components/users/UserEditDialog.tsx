@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -18,6 +17,8 @@ import { FieldGroup } from '@/components/ui/field';
 import TextField from '@/components/form/TextField';
 import TextareaCounterField from '@/components/form/TextareaCounterField';
 import ResponsesFields from '../form/ResponsesFields';
+import UnsavedChangesDialog from '../shared/UnsavedChangesDialog';
+import { useDirtyCloseGuard } from '@/features/event-detail/hooks/useDirtyCloseGuard';
 import { toast } from 'sonner';
 import type { Candidate, User } from '@/features/event-detail/types';
 import { useUpdateUser } from '@/features/event-detail/hooks/useEventMutations';
@@ -59,6 +60,14 @@ function UserEditDialog({ eventId, data, password, open, onOpenChange }: UserEdi
     }
   }, [open, data.user.name, data.user.comment, data.user.responses, form]);
 
+  // isDirty は render 時に読まないと formState の購読が張られず、更新されても再レンダーされない
+  const { isDirty } = form.formState;
+  const closeGuard = useDirtyCloseGuard({
+    isDirty,
+    onOpenChange,
+    onDiscard: () => form.reset(),
+  });
+
   const onSubmit = async (values: UserEditFormData) => {
     try {
       const formattedResponses = toResponseInputs(values.responses);
@@ -80,7 +89,7 @@ function UserEditDialog({ eventId, data, password, open, onOpenChange }: UserEdi
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={closeGuard.handleOpenChange} disablePointerDismissal>
       <DialogContent className="flex max-h-[90vh] max-w-[95vw] flex-col overflow-hidden p-0 md:max-w-2xl lg:max-w-6xl">
         <DialogHeader className="shrink-0 p-6 pb-2 text-center">
           <DialogTitle className="text-xl font-black">
@@ -112,17 +121,15 @@ function UserEditDialog({ eventId, data, password, open, onOpenChange }: UserEdi
         </form>
 
         <DialogFooter className="m-3">
-          <DialogClose
-            render={
-              <Button size="lg" variant="ghost" type="button" onClick={() => form.reset()}>
-                キャンセル
-              </Button>
-            }
-          />
+          <Button size="lg" variant="ghost" type="button" onClick={closeGuard.requestClose}>
+            キャンセル
+          </Button>
           <Button size="lg" type="submit" form="user-edit-form" disabled={updateUser.isPending}>
             {updateUser.isPending ? '保存中...' : '保存する'}
           </Button>
         </DialogFooter>
+
+        <UnsavedChangesDialog {...closeGuard.confirm} />
       </DialogContent>
     </Dialog>
   );

@@ -34,13 +34,16 @@ function AlertDialogOverlay({ className, ...props }: AlertDialogPrimitive.Backdr
 function AlertDialogContent({
   className,
   size = 'default',
+  forceRenderOverlay = false,
   ...props
 }: AlertDialogPrimitive.Popup.Props & {
   size?: 'default' | 'sm';
+  /** 他のダイアログの内側に置く場合に指定する。Base UI は nested な backdrop を既定で描画しない */
+  forceRenderOverlay?: boolean;
 }) {
   return (
     <AlertDialogPortal>
-      <AlertDialogOverlay />
+      <AlertDialogOverlay forceRender={forceRenderOverlay} />
       <AlertDialogPrimitive.Popup
         data-slot="alert-dialog-content"
         data-size={size}

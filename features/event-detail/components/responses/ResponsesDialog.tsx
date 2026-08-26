@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -21,6 +20,8 @@ import { type Candidate } from '@/features/event-detail/types';
 import { type UserFormData, userFormSchema } from '@/features/event-detail/schema';
 import { useSaveResponses } from '@/features/event-detail/hooks/useEventMutations';
 import { buildInitialResponses, toResponseInputs } from '@/features/event-detail/lib/responses';
+import { useDirtyCloseGuard } from '@/features/event-detail/hooks/useDirtyCloseGuard';
+import UnsavedChangesDialog from '../shared/UnsavedChangesDialog';
 import { toast } from 'sonner';
 
 interface ResponsesDialogProps {
@@ -56,13 +57,19 @@ function ResponsesDialog({ eventId, data, open, onOpenChange }: ResponsesDialogP
   }, [open, data.candidates, form]);
 
   // 保存に成功したときだけ入力をクリアする。reset は実行順序の都合で onSubmit 内ではなく useEffect で行う
-  // isSubmitSuccessful は render 時に読まないと formState の購読が張られず、更新されても再レンダーされない
-  const { isSubmitSuccessful } = form.formState;
+  // isSubmitSuccessful / isDirty は render 時に読まないと formState の購読が張られず、更新されても再レンダーされない
+  const { isSubmitSuccessful, isDirty } = form.formState;
   useEffect(() => {
     if (isSubmitSuccessful) {
       form.reset();
     }
   }, [isSubmitSuccessful, form]);
+
+  const closeGuard = useDirtyCloseGuard({
+    isDirty,
+    onOpenChange,
+    onDiscard: () => form.reset(),
+  });
 
   const onSubmit = async (values: UserFormData) => {
     try {
@@ -90,7 +97,7 @@ function ResponsesDialog({ eventId, data, open, onOpenChange }: ResponsesDialogP
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={closeGuard.handleOpenChange} disablePointerDismissal>
       <DialogContent className="flex max-h-[90vh] max-w-[95vw] flex-col overflow-hidden p-0 md:max-w-2xl lg:max-w-6xl">
         <DialogHeader className="shrink-0 p-6 pb-2 text-center">
           <DialogTitle className="text-xl font-black">予定を回答する</DialogTitle>
@@ -112,13 +119,9 @@ function ResponsesDialog({ eventId, data, open, onOpenChange }: ResponsesDialogP
         </form>
 
         <DialogFooter className="m-3">
-          <DialogClose
-            render={
-              <Button size="lg" variant="ghost" type="button" onClick={() => form.reset()}>
-                キャンセル
-              </Button>
-            }
-          />
+          <Button size="lg" variant="ghost" type="button" onClick={closeGuard.requestClose}>
+            キャンセル
+          </Button>
           <Button
             size="lg"
             variant="default"
@@ -129,6 +132,8 @@ function ResponsesDialog({ eventId, data, open, onOpenChange }: ResponsesDialogP
             {saveResponses.isPending ? '登録中...' : '登録する'}
           </Button>
         </DialogFooter>
+
+        <UnsavedChangesDialog {...closeGuard.confirm} />
       </DialogContent>
     </Dialog>
   );
