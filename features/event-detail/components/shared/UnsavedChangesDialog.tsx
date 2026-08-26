@@ -29,7 +29,7 @@ function UnsavedChangesDialog({ open, onOpenChange, onDiscard }: UnsavedChangesD
           </AlertDialogMedia>
           <AlertDialogTitle>入力内容を破棄しますか？</AlertDialogTitle>
           <AlertDialogDescription>
-            まだ保存されていない入力があります。閉じると入力した内容は失われます。
+            まだ保存されていない入力があります。破棄すると元には戻せません。
           </AlertDialogDescription>
         </AlertDialogHeader>
 
