@@ -1,6 +1,8 @@
 import type { Tables } from '@/lib/database.types';
+import type { ResponseStatus } from './lib/status';
 
-export type ResponseStatus = 'ok' | 'maybe' | 'ng';
+// 定義の実体は RESPONSE_STATUSES（lib/status.ts）。従来どおりここから import できるよう再エクスポートする
+export type { ResponseStatus };
 
 /**
  * DB上は event_id / comment / index_number 等が nullable だが、
