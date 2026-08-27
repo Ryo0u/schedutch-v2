@@ -1,6 +1,5 @@
 import { type Control } from 'react-hook-form';
 import { type UserFormData } from '@/features/event-detail/schema';
-import { COMMENT_MAX_LENGTH } from '@/lib/validation';
 import { FieldGroup } from '@/components/ui/field';
 import TextField from '@/components/form/TextField';
 import TextareaCounterField from '@/components/form/TextareaCounterField';
@@ -17,13 +16,7 @@ function UserInfoFields({ control }: InputUserProps) {
         <TextField control={control} name="password" label="パスワード" required />
       </div>
 
-      <TextareaCounterField
-        control={control}
-        name="comment"
-        label="コメント"
-        rows={10}
-        maxLength={COMMENT_MAX_LENGTH}
-      />
+      <TextareaCounterField control={control} name="comment" label="コメント" rows={10} />
     </FieldGroup>
   );
 }

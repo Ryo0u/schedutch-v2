@@ -1,9 +1,14 @@
 import * as z from 'zod';
-import { RESPONSE_STATUSES } from './status';
-import type { ResponseFormValue } from '@/features/event-detail/schema';
+import { userFormSchema, type ResponseFormValue } from '@/features/event-detail/schema';
 
 /** 保存形式を変えたときに古い下書きを破棄させるための版数 */
 const DRAFT_VERSION = 1;
+
+// 回答の形はフォームと同じでなければ復元できないため、フォームのスキーマから派生させる。
+// time だけは JSON に Date を載せられないので ISO 文字列に差し替える
+const draftResponseSchema = userFormSchema.shape.responses.element.extend({
+  time: z.string(),
+});
 
 // 入力途中の値を保存するため、name/comment はフォームのバリデーションを通さない。
 // パスワードは共有端末に平文で残さないよう、下書きには含めない
@@ -11,13 +16,7 @@ const draftSchema = z.object({
   version: z.literal(DRAFT_VERSION),
   name: z.string(),
   comment: z.string(),
-  responses: z.array(
-    z.object({
-      candidate_id: z.string(),
-      time: z.string(),
-      status: z.enum(RESPONSE_STATUSES),
-    }),
-  ),
+  responses: z.array(draftResponseSchema),
 });
 
 export interface ResponseDraft {
