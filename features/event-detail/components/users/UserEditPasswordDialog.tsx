@@ -33,7 +33,7 @@ function UserEditPasswordDialog({
   onConfirm,
 }: UserEditPasswordDialogProps) {
   const verifyPassword = useVerifyUserPassword();
-  const { password, setPassword, isSubmitting, errorMsg, confirm } = usePasswordConfirm({
+  const { password, setPassword, isSubmitting, errorMsg, canSubmit, confirm } = usePasswordConfirm({
     open,
     errorMessage: '確認に失敗しました',
   });
@@ -83,7 +83,7 @@ function UserEditPasswordDialog({
                 </Button>
               }
             />
-            <Button type="submit" disabled={isSubmitting || !password}>
+            <Button type="submit" disabled={isSubmitting || !canSubmit}>
               {isSubmitting ? '確認中...' : '編集する'}
             </Button>
           </DialogFooter>

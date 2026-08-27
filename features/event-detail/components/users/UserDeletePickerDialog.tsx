@@ -23,7 +23,7 @@ interface DialogProps {
 function UserDeletePickerDialog({ eventId, data, open, onOpenChange }: DialogProps) {
   const [userId, setUserId] = useState('');
   const deleteUser = useDeleteUser(eventId);
-  const { password, setPassword, isSubmitting, errorMsg, confirm } = usePasswordConfirm({
+  const { password, setPassword, isSubmitting, errorMsg, canSubmit, confirm } = usePasswordConfirm({
     open,
     errorMessage: '参加者の削除に失敗しました',
   });
@@ -55,7 +55,7 @@ function UserDeletePickerDialog({ eventId, data, open, onOpenChange }: DialogPro
       }
       onSubmit={handleSubmit}
       isSubmitting={isSubmitting}
-      submitDisabled={!password || !userId}
+      submitDisabled={!canSubmit || !userId}
     >
       <FieldSet className="mb-5 w-full">
         <Field data-invalid={!!errorMsg}>

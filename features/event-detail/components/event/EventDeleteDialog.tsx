@@ -17,7 +17,7 @@ interface DialogProps {
 function EventDeleteDialog({ open, onOpenChange, data }: DialogProps) {
   const router = useRouter();
   const deleteEvent = useDeleteEvent();
-  const { password, setPassword, isSubmitting, errorMsg, confirm } = usePasswordConfirm({
+  const { password, setPassword, isSubmitting, errorMsg, canSubmit, confirm } = usePasswordConfirm({
     open,
     errorMessage: 'イベントの削除に失敗しました',
   });
@@ -40,6 +40,7 @@ function EventDeleteDialog({ open, onOpenChange, data }: DialogProps) {
       description="編集用パスワードを入力してください"
       onSubmit={handleDelete}
       isSubmitting={isSubmitting}
+      submitDisabled={!canSubmit}
     >
       <Field className="mb-5">
         <Input

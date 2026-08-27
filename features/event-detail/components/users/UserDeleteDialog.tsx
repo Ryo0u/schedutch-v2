@@ -19,7 +19,7 @@ interface UserDeleteDialogProps {
 
 function UserDeleteDialog({ eventId, data, open, onOpenChange }: UserDeleteDialogProps) {
   const deleteUser = useDeleteUser(eventId);
-  const { password, setPassword, isSubmitting, errorMsg, confirm } = usePasswordConfirm({
+  const { password, setPassword, isSubmitting, errorMsg, canSubmit, confirm } = usePasswordConfirm({
     open,
     errorMessage: '削除に失敗しました',
   });
@@ -48,7 +48,7 @@ function UserDeleteDialog({ eventId, data, open, onOpenChange }: UserDeleteDialo
       }
       onSubmit={handleDelete}
       isSubmitting={isSubmitting}
-      submitDisabled={!password}
+      submitDisabled={!canSubmit}
     >
       <Field className="mb-5" data-invalid={!!errorMsg}>
         <FieldLabel>パスワード</FieldLabel>

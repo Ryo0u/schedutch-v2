@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { passwordConfirmSchema } from '@/lib/validation';
 import { isPasswordError } from '@/features/event-detail/api/errors';
 import { useResetOnClose } from './useResetOnClose';
 
@@ -50,5 +51,9 @@ export function usePasswordConfirm({ open, errorMessage }: UsePasswordConfirmOpt
     }
   };
 
-  return { password, setPassword, isSubmitting, errorMsg, confirm };
+  // 「照合用パスワードは空でなければよい」の判定をスキーマ側に一本化し、
+  // 呼び出し側が個別に空チェックを書かなくて済むようにする
+  const canSubmit = passwordConfirmSchema.safeParse(password).success;
+
+  return { password, setPassword, isSubmitting, errorMsg, canSubmit, confirm };
 }
