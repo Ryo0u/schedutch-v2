@@ -15,7 +15,7 @@ export const titleSchema = z
 export const passwordSchema = z
   .string()
   .min(PASSWORD_MIN_LENGTH, `パスワードを${PASSWORD_MIN_LENGTH}文字以上で入力してください`)
-  .max(PASSWORD_MAX_LENGTH, `パスワードを${PASSWORD_MAX_LENGTH}字以内で入力してください`);
+  .max(PASSWORD_MAX_LENGTH, `パスワードを${PASSWORD_MAX_LENGTH}文字以内で入力してください`);
 
 /** コメントフィールドの共通バリデーション */
 export const commentSchema = z
