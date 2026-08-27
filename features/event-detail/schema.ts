@@ -1,5 +1,10 @@
 import * as z from 'zod';
-import { titleSchema, passwordSchema, commentSchema } from '@/lib/validation';
+import {
+  titleSchema,
+  passwordSchema,
+  passwordConfirmSchema,
+  commentSchema,
+} from '@/lib/validation';
 import { nameSchema } from './lib/validation';
 import { RESPONSE_STATUSES } from './lib/status';
 
@@ -25,6 +30,6 @@ export type UserEditFormData = z.infer<typeof userEditFormSchema>;
 export const eventEditFormSchema = z.object({
   title: titleSchema,
   comment: commentSchema,
-  password: z.string().min(1, '編集用パスワードを入力してください'),
+  password: passwordConfirmSchema,
 });
 export type EventEditFormData = z.infer<typeof eventEditFormSchema>;

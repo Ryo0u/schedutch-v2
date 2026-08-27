@@ -1,4 +1,5 @@
 import { type Control, Controller, type FieldPath, type FieldValues } from 'react-hook-form';
+import { COMMENT_MAX_LENGTH } from '@/lib/validation';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import {
   InputGroup,
@@ -12,7 +13,8 @@ interface TextareaCounterFieldProps<T extends FieldValues> {
   name: FieldPath<T>;
   label: string;
   rows: number;
-  maxLength: number;
+  /** 文字数カウンタの分母。既定はコメント欄の上限（commentSchema と同じ値）を使う */
+  maxLength?: number;
   placeholder?: string;
   className?: string;
   unit?: string;
@@ -23,7 +25,7 @@ function TextareaCounterField<T extends FieldValues>({
   name,
   label,
   rows,
-  maxLength,
+  maxLength = COMMENT_MAX_LENGTH,
   placeholder,
   className = 'min-h-15 resize-none',
   unit = '',

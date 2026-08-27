@@ -24,7 +24,6 @@ import type { Candidate, User } from '@/features/event-detail/types';
 import { useUpdateUser } from '@/features/event-detail/hooks/useEventMutations';
 import { toResponseInputs } from '@/features/event-detail/lib/responses';
 import { userEditFormSchema, type UserEditFormData } from '@/features/event-detail/schema';
-import { COMMENT_MAX_LENGTH } from '@/lib/validation';
 
 interface UserEditDialogProps {
   eventId: string;
@@ -110,7 +109,6 @@ function UserEditDialog({ eventId, data, password, open, onOpenChange }: UserEdi
               name="comment"
               label="コメント"
               rows={10}
-              maxLength={COMMENT_MAX_LENGTH}
             />
           </FieldGroup>
 

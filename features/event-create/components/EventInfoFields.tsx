@@ -1,6 +1,5 @@
 import { type EventCreateFormData } from '@/features/event-create/schema';
 import { type Control } from 'react-hook-form';
-import { COMMENT_MAX_LENGTH } from '@/lib/validation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FieldGroup } from '@/components/ui/field';
 import { Separator } from '@/components/ui/separator';
@@ -47,7 +46,6 @@ const EventInfoFields = ({ control }: EventInfoFieldsProps) => {
               name="comment"
               label="コメント"
               rows={10}
-              maxLength={COMMENT_MAX_LENGTH}
               className="min-h-18 resize-none"
               placeholder="頑張ります！！"
             />
