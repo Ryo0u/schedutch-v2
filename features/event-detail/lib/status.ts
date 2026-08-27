@@ -1,6 +1,11 @@
-import type { ResponseStatus } from '@/features/event-detail/types';
+/**
+ * 回答の状態。この配列を単一の定義とし、型・STATUS_META のキー・zod の enum を
+ * すべてここから導出する。値を増減させる場合は、DB 側の
+ * responses.status の check 制約（supabase/migrations）も合わせて変更すること。
+ */
+export const RESPONSE_STATUSES = ['ok', 'maybe', 'ng'] as const;
 
-export const RESPONSE_STATUSES: ResponseStatus[] = ['ok', 'maybe', 'ng'];
+export type ResponseStatus = (typeof RESPONSE_STATUSES)[number];
 
 interface StatusMeta {
   symbol: string;
