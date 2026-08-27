@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button';
 import UserInfoFields from '../form/UserInfoFields';
 import ResponsesFields from '../form/ResponsesFields';
 import UnsavedChangesDialog from '../shared/UnsavedChangesDialog';
-import { hashPassword } from '@/lib/password';
 import { type Candidate } from '@/features/event-detail/types';
 import { type UserFormData, userFormSchema } from '@/features/event-detail/schema';
 import { useSaveResponses } from '@/features/event-detail/hooks/useEventMutations';
@@ -93,15 +92,13 @@ function ResponsesForm({ eventId, data, onOpenChange }: ResponsesFormProps) {
 
   const onSubmit = async (values: UserFormData) => {
     try {
-      const hashedPassword = await hashPassword(values.password);
-
       const formattedResponses = toResponseInputs(values.responses);
 
       await saveResponses.mutateAsync({
         eventId,
         name: values.name,
         comment: values.comment,
-        passwordDigest: hashedPassword,
+        password: values.password,
         responses: formattedResponses,
       });
 

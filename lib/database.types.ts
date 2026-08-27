@@ -173,7 +173,7 @@ export type Database = {
         Args: {
           p_candidates: Json
           p_comment: string
-          p_password_digest: string
+          p_password: string
           p_title: string
         }
         Returns: string

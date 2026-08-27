@@ -3,7 +3,7 @@
 -- 予定抽出機能（docs/extract.md）や回答一覧の動作確認をブラウザ操作なしで行えるようにする。
 --
 -- パスワードは全員共通で "test1234"。
--- digest は lib/password.ts と同じ手順（bcryptjs + $2a$ プレフィックス）で生成済み。
+-- digest は RPC と同じ手順（pgcrypto の crypt + cost 10）で生成する。
 
 begin;
 
@@ -12,7 +12,7 @@ values (
   '11111111-1111-1111-1111-111111111111',
   '秋の顔合わせ会',
   '候補日から都合の良い時間を選んでください',
-  '$2a$10$B70os3pZXWHzPrtOSoQ5c.NLXKBJFTPE2MjFvq1ORKa22sJO6nwXy'
+  extensions.crypt('test1234', extensions.gen_salt('bf', 10))
 );
 
 -- 候補日1: 2026-08-03(月) 09:00-12:00 JST
@@ -24,9 +24,9 @@ values
 
 insert into public.users (id, event_id, name, comment, password_digest)
 values
-  ('33333333-3333-3333-3333-333333333331', '11111111-1111-1111-1111-111111111111', '田中', null, '$2a$10$B70os3pZXWHzPrtOSoQ5c.NLXKBJFTPE2MjFvq1ORKa22sJO6nwXy'),
-  ('33333333-3333-3333-3333-333333333332', '11111111-1111-1111-1111-111111111111', '佐藤', 'できれば午後がいいです', '$2a$10$B70os3pZXWHzPrtOSoQ5c.NLXKBJFTPE2MjFvq1ORKa22sJO6nwXy'),
-  ('33333333-3333-3333-3333-333333333333', '11111111-1111-1111-1111-111111111111', '鈴木', null, '$2a$10$B70os3pZXWHzPrtOSoQ5c.NLXKBJFTPE2MjFvq1ORKa22sJO6nwXy');
+  ('33333333-3333-3333-3333-333333333331', '11111111-1111-1111-1111-111111111111', '田中', null, extensions.crypt('test1234', extensions.gen_salt('bf', 10))),
+  ('33333333-3333-3333-3333-333333333332', '11111111-1111-1111-1111-111111111111', '佐藤', 'できれば午後がいいです', extensions.crypt('test1234', extensions.gen_salt('bf', 10))),
+  ('33333333-3333-3333-3333-333333333333', '11111111-1111-1111-1111-111111111111', '鈴木', null, extensions.crypt('test1234', extensions.gen_salt('bf', 10)));
 
 -- 田中: 候補日1は終日ok、候補日2は最終スロットのみng
 insert into public.responses (user_id, candidate_id, time, status)
