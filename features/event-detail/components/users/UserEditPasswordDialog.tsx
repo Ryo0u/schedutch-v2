@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -13,11 +12,9 @@ import {
 } from '@/components/ui/dialog';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { toast } from 'sonner';
 import type { User } from '@/features/event-detail/types';
+import { useVerifyUserPassword } from '@/features/event-detail/hooks/useVerifyUserPassword';
 import { usePasswordConfirm } from '@/features/event-detail/hooks/usePasswordConfirm';
-import { verifyUserPassword } from '@/features/event-detail/api/eventApi';
-import { createPasswordMismatchError } from '@/features/event-detail/api/errors';
 
 interface UserEditPasswordDialogProps {
   data: {
@@ -35,33 +32,22 @@ function UserEditPasswordDialog({
   onOpenChange,
   onConfirm,
 }: UserEditPasswordDialogProps) {
-  const [password, setPassword] = useState('');
-  const { isSubmitting, errorMsg, setErrorMsg, run } = usePasswordConfirm();
+  const verifyPassword = useVerifyUserPassword();
+  const { password, setPassword, isSubmitting, errorMsg, confirm } = usePasswordConfirm({
+    open,
+    errorMessage: '確認に失敗しました',
+  });
 
   // 編集ダイアログを開く前にサーバー側で事前検証する
   const handleEdit = async () => {
-    try {
-      const success = await run(async () => {
-        const isMatch = await verifyUserPassword(data.user.id, password);
-        if (!isMatch) throw createPasswordMismatchError();
-      });
-      if (success) onConfirm(password);
-    } catch (error) {
-      console.error('failed to verify user password', error);
-      toast.error('確認に失敗しました', { position: 'top-center' });
-    }
-  };
-
-  const handleOpenChange = (open: boolean) => {
-    if (!open) {
-      setPassword('');
-      setErrorMsg(null);
-    }
-    onOpenChange(open);
+    const success = await confirm(() =>
+      verifyPassword.mutateAsync({ userId: data.user.id, password }),
+    );
+    if (success) onConfirm(password);
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <form
           onSubmit={(e) => {
@@ -83,10 +69,7 @@ function UserEditPasswordDialog({
             <Input
               autoFocus
               value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                setErrorMsg(null);
-              }}
+              onChange={(e) => setPassword(e.target.value)}
               aria-invalid={!!errorMsg}
             />
             {errorMsg && <FieldError errors={[{ message: errorMsg }]} />}

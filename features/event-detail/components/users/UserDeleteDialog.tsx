@@ -1,13 +1,11 @@
 'use client';
 
-import { useState } from 'react';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import type { User } from '@/features/event-detail/types';
 import { useDeleteUser } from '@/features/event-detail/hooks/useEventMutations';
 import { usePasswordConfirm } from '@/features/event-detail/hooks/usePasswordConfirm';
-import { useResetOnClose } from '@/features/event-detail/hooks/useResetOnClose';
 import DeleteDialogShell from '@/features/event-detail/components/shared/DeleteDialogShell';
 
 interface UserDeleteDialogProps {
@@ -20,27 +18,19 @@ interface UserDeleteDialogProps {
 }
 
 function UserDeleteDialog({ eventId, data, open, onOpenChange }: UserDeleteDialogProps) {
-  const [password, setPassword] = useState('');
   const deleteUser = useDeleteUser(eventId);
-  const { isSubmitting, errorMsg, setErrorMsg, run } = usePasswordConfirm();
-
-  useResetOnClose(open, () => {
-    setPassword('');
-    setErrorMsg(null);
+  const { password, setPassword, isSubmitting, errorMsg, confirm } = usePasswordConfirm({
+    open,
+    errorMessage: '削除に失敗しました',
   });
 
   const handleDelete = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    try {
-      const success = await run(() => deleteUser.mutateAsync({ userId: data.user.id, password }));
-      if (success) {
-        toast.success('回答を削除しました', { position: 'top-center' });
-        onOpenChange(false);
-      }
-    } catch (error) {
-      console.error('failed to delete user', error);
-      toast.error('削除に失敗しました', { position: 'top-center' });
+    const success = await confirm(() => deleteUser.mutateAsync({ userId: data.user.id, password }));
+    if (success) {
+      toast.success('回答を削除しました', { position: 'top-center' });
+      onOpenChange(false);
     }
   };
 
@@ -65,10 +55,7 @@ function UserDeleteDialog({ eventId, data, open, onOpenChange }: UserDeleteDialo
         <Input
           autoFocus
           value={password}
-          onChange={(e) => {
-            setPassword(e.target.value);
-            setErrorMsg(null);
-          }}
+          onChange={(e) => setPassword(e.target.value)}
           aria-invalid={!!errorMsg}
         />
         {errorMsg && <FieldError errors={[{ message: errorMsg }]} />}
