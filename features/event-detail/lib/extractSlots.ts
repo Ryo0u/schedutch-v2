@@ -1,9 +1,9 @@
 import { formatJSTTime, formatJSTDate } from '@/lib/datetime';
 import { SLOT_INTERVAL_MS, MS_PER_MINUTE } from '@/lib/constants';
 import { STATUS_META } from '@/features/event-detail/lib/status';
-import type { User } from '@/features/event-detail/types';
+import type { ResponseStatus, User } from '@/features/event-detail/types';
 
-export type ParticipantInfo = { id: string; name: string; status: string };
+export type ParticipantInfo = { id: string; name: string; status: ResponseStatus };
 
 export type TimeBlock = { start: number; end: number; participants: ParticipantInfo[] };
 
@@ -25,7 +25,7 @@ interface ExtractSlotsParams {
 }
 
 // userId -> (time -> status)。線形探索を避けるための事前索引
-type ResponseMaps = Map<string, Map<number, string>>;
+type ResponseMaps = Map<string, Map<number, ResponseStatus>>;
 
 const buildResponseMaps = (users: ExtractUser[]): ResponseMaps => {
   return new Map(
