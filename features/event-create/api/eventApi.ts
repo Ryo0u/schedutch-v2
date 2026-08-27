@@ -10,7 +10,7 @@ export interface CandidateInput extends Record<string, Json> {
 
 export interface CreateEventInput {
   title: string;
-  passwordDigest: string;
+  password: string;
   comment: string;
   candidates: CandidateInput[];
 }
@@ -19,7 +19,7 @@ export interface CreateEventInput {
 export async function createEvent(input: CreateEventInput): Promise<string> {
   const { data, error } = await supabase.rpc('create_event_with_candidates', {
     p_title: input.title,
-    p_password_digest: input.passwordDigest,
+    p_password: input.password,
     p_comment: input.comment,
     p_candidates: input.candidates,
   });

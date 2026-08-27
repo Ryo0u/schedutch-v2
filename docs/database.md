@@ -62,7 +62,7 @@
 
 | 関数 | 引数 | 戻り値 | 挙動 |
 |---|---|---|---|
-| `create_event_with_candidates` | `p_title, p_password_digest, p_comment, p_candidates jsonb` | uuid | イベントと候補日をトランザクションで作成し event id を返す |
+| `create_event_with_candidates` | `p_title, p_password, p_comment, p_candidates jsonb` | uuid | イベントと候補日をトランザクションで作成し event id を返す |
 | `save_user_responses` | `p_event_id, p_name, p_comment, p_password, p_response_data jsonb` | json `{user_id}` | candidate_id が当該イベント所属かを検証したうえで、ユーザーと回答を一括作成 |
 | `update_event` | `p_event_id, p_password, p_title, p_comment` | void | イベントパスワード照合 → タイトル・コメント更新 |
 | `update_user_with_responses` | `p_user_id, p_password, p_name, p_comment, p_response_data jsonb` | void | 本人パスワード照合 + candidate 所属検証 → ユーザー更新・回答を洗い替え |
@@ -72,8 +72,8 @@
 
 ## パスワードの取り扱い
 
-- **保存**: 作成時（イベント・参加者とも）にクライアントで `bcryptjs` によりハッシュ化してから保存する（`lib/password.ts` の `hashPassword`）。`pgcrypto` の `crypt()` が `$2b$` プレフィックスを解釈できないため、`$2a$` に正規化する。
-- **照合**: サーバー（RPC 内 `crypt()`）側でのみ行う。クライアントで `bcrypt.compare` はしない。`password_digest` はクライアントに一切配信しない（型にも持たせない）。
+- **保存**: 作成系 RPC（`create_event_with_candidates` / `save_user_responses`）が平文を受け取り、`extensions.crypt(平文, extensions.gen_salt('bf', 10))` でハッシュ化して保存する。クライアントはハッシュ化しない。
+- **照合**: サーバー（RPC 内 `crypt()`）側でのみ行う。`password_digest` はクライアントに一切配信しない（型にも持たせない）。
 - **不一致エラー**: パスワード不一致時、RPC は SQLSTATE **`PWD01`** の例外を投げる（`20260705051246_use_errcode_for_password_mismatch.sql`）。クライアントは `isPasswordError()`（`features/event-detail/api/eventApi.ts`）で `error.code === 'PWD01'` を判定してエラー表示にマッピングする。`verify_user_password` は真偽値を返すため、呼び出し側で `createPasswordMismatchError()` により同じ分類に載せる。
 
 ## 時刻の扱い

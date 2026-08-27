@@ -48,7 +48,7 @@ export interface SaveUserResponsesInput {
   eventId: string;
   name: string;
   comment: string;
-  passwordDigest: string;
+  password: string;
   responses: ResponseInput[];
 }
 
@@ -58,7 +58,7 @@ export async function saveUserResponses(input: SaveUserResponsesInput): Promise<
     p_event_id: input.eventId,
     p_name: input.name,
     p_comment: input.comment,
-    p_password: input.passwordDigest,
+    p_password: input.password,
     p_response_data: input.responses,
   });
 

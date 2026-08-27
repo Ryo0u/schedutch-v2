@@ -7,7 +7,6 @@ import { toast } from 'sonner';
 import { eventCreateFormSchema, type EventCreateFormData } from '@/features/event-create/schema';
 import { useCreateEvent } from '@/features/event-create/hooks/useCreateEvent';
 import { jstWallTimeToISO } from '@/lib/datetime';
-import { hashPassword } from '@/lib/password';
 import NewHero from './NewHero';
 import EventInfoFields from './EventInfoFields';
 import CandidatesFields from './candidates/CandidatesFields';
@@ -37,8 +36,6 @@ export default function CreateEventContainer() {
 
   const onSubmit = async (values: EventCreateFormData) => {
     try {
-      const hashedPassword = await hashPassword(values.password);
-
       // 候補日データをUTC instant（ISO文字列）に整形
       // jstWallTimeToISO でカレンダー日付+時刻をJST壁時計として扱い正しいUTCに変換する
       const candidatesToInsert = values.candidates.map((c, index) => ({
@@ -50,7 +47,7 @@ export default function CreateEventContainer() {
       // supabase内でトランザクションを実装している
       const eventId = await createEvent.mutateAsync({
         title: values.title,
-        passwordDigest: hashedPassword,
+        password: values.password,
         comment: values.comment,
         candidates: candidatesToInsert,
       });
