@@ -19,10 +19,9 @@ export const eventCreateFormSchema = z.object({
     .min(1, '候補日を1つ以上選択し、追加ボタンを押してください')
     .superRefine((data, ctx) => {
       data.forEach((item, index) => {
-        const start = parseInt(item.startTime.replace(':', ''), 10);
-        const end = parseInt(item.endTime.replace(':', ''), 10);
-
-        if (start >= end) {
+        // TIME_OPTIONS はゼロ埋めした "HH:MM" の昇順なので、文字列比較がそのまま時刻の前後になる
+        // （この前提は lib/constants.test.ts で固定している）
+        if (item.startTime >= item.endTime) {
           ctx.addIssue({
             code: 'custom',
             message: '開始時間は終了時間より前に入力してください',
