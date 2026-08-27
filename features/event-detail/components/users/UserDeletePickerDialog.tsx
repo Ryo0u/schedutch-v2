@@ -21,30 +21,23 @@ interface DialogProps {
 }
 
 function UserDeletePickerDialog({ eventId, data, open, onOpenChange }: DialogProps) {
-  const [password, setPassword] = useState('');
   const [userId, setUserId] = useState('');
   const deleteUser = useDeleteUser(eventId);
-  const { isSubmitting, errorMsg, setErrorMsg, run } = usePasswordConfirm();
-
-  useResetOnClose(open, () => {
-    setPassword('');
-    setUserId('');
-    setErrorMsg(null);
+  const { password, setPassword, isSubmitting, errorMsg, confirm } = usePasswordConfirm({
+    open,
+    errorMessage: '参加者の削除に失敗しました',
   });
+
+  useResetOnClose(open, () => setUserId(''));
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!userId) return;
 
-    try {
-      const success = await run(() => deleteUser.mutateAsync({ userId, password }));
-      if (success) {
-        toast.success('参加者を削除しました', { position: 'top-center' });
-        onOpenChange(false);
-      }
-    } catch (error) {
-      console.error('failed to delete user', error);
-      toast.error('参加者の削除に失敗しました', { position: 'top-center' });
+    const success = await confirm(() => deleteUser.mutateAsync({ userId, password }));
+    if (success) {
+      toast.success('参加者を削除しました', { position: 'top-center' });
+      onOpenChange(false);
     }
   };
 

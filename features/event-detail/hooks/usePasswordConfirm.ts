@@ -1,19 +1,36 @@
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { isPasswordError } from '@/features/event-detail/api/errors';
+import { useResetOnClose } from './useResetOnClose';
+
+interface UsePasswordConfirmOptions {
+  open: boolean;
+  /** パスワード不一致以外で失敗したときに出すトーストの文言 */
+  errorMessage: string;
+}
 
 /**
- * パスワードを伴う操作（削除・事前検証など）の送信中フラグとエラー表示をまとめたフック。
+ * パスワード入力欄を1つ持つダイアログ（削除・事前検証など）の定型をまとめたフック。
  *
- * パスワード入力欄自体の state は呼び出し側が持つ（1つの入力値を複数の
- * アクションで共有するケースがあるため）。run() には実行したい非同期処理を渡す。
- * パスワード不一致以外の例外は呼び出し側にそのまま投げ直すので、
- * 呼び出し側で汎用のエラー処理（トースト表示など）を行う。
+ * ダイアログのラッパーは閉じてもアンマウントされず入力値が次回に持ち越されるため、
+ * 値を所有するこのフックがリセットまで持つ。open を取る都合上ダイアログ専用。
  */
-export function usePasswordConfirm() {
+export function usePasswordConfirm({ open, errorMessage }: UsePasswordConfirmOptions) {
+  const [password, setPasswordValue] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const run = async (action: () => Promise<void>): Promise<boolean> => {
+  useResetOnClose(open, () => {
+    setPasswordValue('');
+    setErrorMsg(null);
+  });
+
+  const setPassword = (value: string) => {
+    setPasswordValue(value);
+    setErrorMsg(null);
+  };
+
+  const confirm = async (action: () => Promise<unknown>): Promise<boolean> => {
     setIsSubmitting(true);
     setErrorMsg(null);
 
@@ -23,13 +40,15 @@ export function usePasswordConfirm() {
     } catch (error) {
       if (isPasswordError(error)) {
         setErrorMsg('パスワードが間違っています');
-        return false;
+      } else {
+        console.error('password confirm action failed', error);
+        toast.error(errorMessage, { position: 'top-center' });
       }
-      throw error;
+      return false;
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  return { isSubmitting, errorMsg, setErrorMsg, run };
+  return { password, setPassword, isSubmitting, errorMsg, confirm };
 }
