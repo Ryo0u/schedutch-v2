@@ -11,6 +11,7 @@ import { useEvent } from '@/features/event-detail/hooks/useEvent';
 import { isEventNotFoundError } from '@/features/event-detail/api/errors';
 import ResponsesInfo from './responses/ResponsesInfo';
 import ExtractPanel from './extract/ExtractPanel';
+import PlanSection from './plan/PlanSection';
 import { ExtractSlotsProvider } from './extract/ExtractSlotsContext';
 import EventSideNav from './sidebar/EventSideNav';
 import { SECTION_IDS } from '@/features/event-detail/lib/anchors';
@@ -64,6 +65,11 @@ export default function EventContainer({ eventId }: { eventId: string }) {
 
           <section id={SECTION_IDS.extractResponses} className="mb-8 scroll-mt-20">
             <ExtractPanel eventId={eventId} />
+          </section>
+
+          {/* ExtractBlockList が抽出結果を読むため、Provider の内側に置く */}
+          <section id={SECTION_IDS.plansInfo} className="mb-8 scroll-mt-20">
+            <PlanSection eventId={eventId} />
           </section>
         </ExtractSlotsProvider>
       </div>
