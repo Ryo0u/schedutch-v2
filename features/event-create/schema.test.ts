@@ -42,12 +42,12 @@ describe('eventCreateFormSchema', () => {
   });
 
   describe('comment', () => {
-    it('30文字は許可し、31文字を拒否する', () => {
+    it('200文字は許可し、201文字を拒否する', () => {
       expect(
-        eventCreateFormSchema.safeParse({ ...validData, comment: 'あ'.repeat(30) }).success,
+        eventCreateFormSchema.safeParse({ ...validData, comment: 'あ'.repeat(200) }).success,
       ).toBe(true);
       expect(
-        eventCreateFormSchema.safeParse({ ...validData, comment: 'あ'.repeat(31) }).success,
+        eventCreateFormSchema.safeParse({ ...validData, comment: 'あ'.repeat(201) }).success,
       ).toBe(false);
     });
   });

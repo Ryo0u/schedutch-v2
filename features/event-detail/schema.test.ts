@@ -19,9 +19,11 @@ describe('userFormSchema', () => {
     expect(userFormSchema.safeParse({ ...validUser, name: 'あ'.repeat(11) }).success).toBe(false);
   });
 
-  it('commentは30文字まで', () => {
-    expect(userFormSchema.safeParse({ ...validUser, comment: 'あ'.repeat(30) }).success).toBe(true);
-    expect(userFormSchema.safeParse({ ...validUser, comment: 'あ'.repeat(31) }).success).toBe(
+  it('commentは100文字まで', () => {
+    expect(userFormSchema.safeParse({ ...validUser, comment: 'あ'.repeat(100) }).success).toBe(
+      true,
+    );
+    expect(userFormSchema.safeParse({ ...validUser, comment: 'あ'.repeat(101) }).success).toBe(
       false,
     );
   });
@@ -78,5 +80,14 @@ describe('eventEditFormSchema', () => {
   it('passwordは1文字以上（空を拒否する。文字数上限の検証は更新RPC側の照合に委ねる）', () => {
     expect(eventEditFormSchema.safeParse({ ...validEvent, password: '' }).success).toBe(false);
     expect(eventEditFormSchema.safeParse({ ...validEvent, password: 'a' }).success).toBe(true);
+  });
+
+  it('commentは200文字まで（参加者コメントより上限が広い）', () => {
+    expect(
+      eventEditFormSchema.safeParse({ ...validEvent, comment: 'あ'.repeat(200) }).success,
+    ).toBe(true);
+    expect(
+      eventEditFormSchema.safeParse({ ...validEvent, comment: 'あ'.repeat(201) }).success,
+    ).toBe(false);
   });
 });

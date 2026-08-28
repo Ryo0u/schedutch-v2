@@ -50,12 +50,12 @@ function UsersInfo({ eventId }: UsersInfoProps) {
               className="group hover:bg-muted/40 flex items-center justify-between p-2 transition-all"
             >
               <div className="flex min-w-0 items-center gap-4">
-                <div className="bg-muted text-muted-foreground rounded-full p-2 shadow-sm">
+                <div className="bg-muted text-muted-foreground shrink-0 rounded-full p-2 shadow-sm">
                   <UserCircle className="h-5 w-5" />
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <span className="text-foreground text-sm font-bold tracking-tight">
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className="text-foreground shrink-0 text-sm font-bold tracking-tight">
                     {user.name}
                   </span>
                   <UserComment comment={user.comment} />

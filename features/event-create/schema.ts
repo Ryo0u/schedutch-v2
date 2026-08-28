@@ -1,11 +1,11 @@
 import * as z from 'zod';
-import { titleSchema, passwordSchema, commentSchema } from '@/lib/validation';
+import { titleSchema, passwordSchema, eventCommentSchema } from '@/lib/validation';
 import { TIME_OPTIONS } from '@/lib/constants';
 
 export const eventCreateFormSchema = z.object({
   title: titleSchema,
   password: passwordSchema,
-  comment: commentSchema,
+  comment: eventCommentSchema,
   candidates: z
     .array(
       z.object({
