@@ -1,11 +1,10 @@
 import { useMutation, useQueryClient, type UseMutationOptions } from '@tanstack/react-query';
+import { updateEvent, deleteEvent } from '@/features/event-detail/api/eventApi';
 import {
   saveUserResponses,
   updateUserWithResponses,
-  updateEvent,
   deleteUser,
-  deleteEvent,
-} from '@/features/event-detail/api/eventApi';
+} from '@/features/event-detail/api/userApi';
 import { eventKeys } from './useEvent';
 
 /** 成功後に該当イベントの再取得（invalidate）を行う mutation の定型をまとめる */

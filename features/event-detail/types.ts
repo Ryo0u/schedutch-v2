@@ -1,4 +1,4 @@
-import type { Tables } from '@/lib/database.types';
+import type { Json, Tables } from '@/lib/database.types';
 import type { ResponseStatus } from './lib/status';
 
 // 定義の実体は RESPONSE_STATUSES（lib/status.ts）。従来どおりここから import できるよう再エクスポートする
@@ -32,3 +32,10 @@ export type EventData = Omit<Tables<'events'>, 'comment' | 'password_digest' | '
   candidates: Candidate[];
   users: User[];
 };
+
+/** 保存用に整形済みの回答（time は ISO 文字列）。RPC への jsonb 引数として渡すため Json 互換を強制する */
+export interface ResponseInput extends Record<string, Json> {
+  candidate_id: string;
+  time: string;
+  status: ResponseStatus;
+}
