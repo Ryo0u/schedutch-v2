@@ -90,6 +90,71 @@ export type Database = {
         }
         Relationships: []
       }
+      plan_participants: {
+        Row: {
+          plan_id: string
+          user_id: string
+        }
+        Insert: {
+          plan_id: string
+          user_id: string
+        }
+        Update: {
+          plan_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_participants_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_participants_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plans: {
+        Row: {
+          created_at: string | null
+          end_time: string
+          event_id: string
+          id: string
+          memo: string | null
+          start_time: string
+        }
+        Insert: {
+          created_at?: string | null
+          end_time: string
+          event_id: string
+          id?: string
+          memo?: string | null
+          start_time: string
+        }
+        Update: {
+          created_at?: string | null
+          end_time?: string
+          event_id?: string
+          id?: string
+          memo?: string | null
+          start_time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plans_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       responses: {
         Row: {
           candidate_id: string | null
@@ -178,14 +243,26 @@ export type Database = {
         }
         Returns: string
       }
+      create_plan: {
+        Args: {
+          p_end_time: string
+          p_event_id: string
+          p_memo: string
+          p_start_time: string
+          p_user_ids: string[]
+        }
+        Returns: string
+      }
       delete_event: {
         Args: { p_event_id: string; p_password: string }
         Returns: undefined
       }
+      delete_plan: { Args: { p_plan_id: string }; Returns: undefined }
       delete_user: {
         Args: { p_password: string; p_user_id: string }
         Returns: undefined
       }
+      plan_slot_interval: { Args: never; Returns: string }
       save_user_responses: {
         Args: {
           p_comment: string
@@ -205,6 +282,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      update_plan_memo: {
+        Args: { p_memo: string; p_plan_id: string }
+        Returns: undefined
+      }
       update_user_with_responses: {
         Args: {
           p_comment: string
@@ -213,6 +294,10 @@ export type Database = {
           p_response_data: Json
           p_user_id: string
         }
+        Returns: undefined
+      }
+      validate_plan_participants: {
+        Args: { p_event_id: string; p_user_ids: string[] }
         Returns: undefined
       }
       verify_user_password: {
