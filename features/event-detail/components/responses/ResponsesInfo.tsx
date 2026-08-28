@@ -4,6 +4,8 @@ import { TIME_OPTIONS } from '@/lib/constants';
 import { formatJSTTime } from '@/lib/datetime';
 import { RESPONSE_STATUSES, STATUS_META } from '@/features/event-detail/lib/status';
 import { useEvent } from '@/features/event-detail/hooks/useEvent';
+import { usePlans } from '@/features/event-detail/hooks/usePlans';
+import { PLAN_STRIPE_CLASS } from '@/features/event-detail/lib/plans';
 import { useExtractSlotsContext } from '../extract/ExtractSlotsContext';
 import CandidateSection from './CandidateSection';
 
@@ -13,6 +15,7 @@ interface ResponsesInfoProps {
 
 function ResponsesInfo({ eventId }: ResponsesInfoProps) {
   const { data } = useEvent(eventId);
+  const { data: plans } = usePlans(eventId);
   const { extractedBlocks, isHighlightEnabled } = useExtractSlotsContext();
   if (!data) return null;
 
@@ -35,7 +38,7 @@ function ResponsesInfo({ eventId }: ResponsesInfoProps) {
       <CardHeader>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <CardTitle className="text-xl font-black">予定一覧</CardTitle>
-          <div className="text-muted-foreground flex items-center gap-4 text-xs">
+          <div className="text-muted-foreground flex flex-wrap items-center gap-4 text-xs">
             {RESPONSE_STATUSES.map((status) => (
               <span key={status} className="flex items-center gap-1.5">
                 <span
@@ -44,6 +47,12 @@ function ResponsesInfo({ eventId }: ResponsesInfoProps) {
                 {status === 'ok' ? '参加できる' : status === 'maybe' ? '未定' : '参加できない'}
               </span>
             ))}
+            <span className="flex items-center gap-1.5">
+              <span
+                className={`border-border inline-block h-3 w-3 rounded-sm border ${PLAN_STRIPE_CLASS}`}
+              />
+              開催予定
+            </span>
           </div>
         </div>
       </CardHeader>
@@ -60,6 +69,7 @@ function ResponsesInfo({ eventId }: ResponsesInfoProps) {
                 users={data.users}
                 displayedTimes={displayedTimes}
                 extractedBlocks={isHighlightEnabled ? extractedBlocks : []}
+                plans={plans ?? []}
               />
             ))}
           </table>
