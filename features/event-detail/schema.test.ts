@@ -19,9 +19,11 @@ describe('userFormSchema', () => {
     expect(userFormSchema.safeParse({ ...validUser, name: 'あ'.repeat(11) }).success).toBe(false);
   });
 
-  it('commentは40文字まで', () => {
-    expect(userFormSchema.safeParse({ ...validUser, comment: 'あ'.repeat(40) }).success).toBe(true);
-    expect(userFormSchema.safeParse({ ...validUser, comment: 'あ'.repeat(41) }).success).toBe(
+  it('commentは100文字まで', () => {
+    expect(userFormSchema.safeParse({ ...validUser, comment: 'あ'.repeat(100) }).success).toBe(
+      true,
+    );
+    expect(userFormSchema.safeParse({ ...validUser, comment: 'あ'.repeat(101) }).success).toBe(
       false,
     );
   });

@@ -26,7 +26,7 @@
 `components/responses/JoinButton.tsx` →「予定を回答する」→ `components/responses/ResponsesDialog.tsx`（ダイアログ）。
 
 1. **参加者情報**（`components/form/UserInfoFields.tsx`）: 名前・コメント・パスワードを入力。
-   - バリデーション（`schema.ts` の `userFormSchema`）: 名前 1〜10 文字 / コメント 40 文字以内 / パスワード 3〜12 文字。
+   - バリデーション（`schema.ts` の `userFormSchema`）: 名前 1〜10 文字 / コメント 100 文字以内 / パスワード 3〜12 文字。
 2. **回答グリッド**（`components/form/ResponsesFields.tsx`）: ダイアログを開くと候補日ごとに `start_time`〜`end_time` を 30 分刻みで展開し、全スロットを `status: "ok"` で初期化する。下書きが残っている場合はそちらを復元する（下記）。
 3. 送信: RPC `save_user_responses` でユーザーと回答をまとめて保存する（パスワードは平文で渡し、RPC 内でハッシュ化される）。
 

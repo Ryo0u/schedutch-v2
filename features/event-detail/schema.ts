@@ -14,7 +14,7 @@ export const nameSchema = z
   .min(1, '名前を入力してください')
   .max(NAME_MAX_LENGTH, `名前を${NAME_MAX_LENGTH}文字以内で入力してください`);
 
-export const USER_COMMENT_MAX_LENGTH = 40;
+export const USER_COMMENT_MAX_LENGTH = 100;
 
 /**
  * 参加者のコメントフィールドのバリデーション。
