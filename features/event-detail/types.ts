@@ -33,7 +33,13 @@ export type EventData = Omit<Tables<'events'>, 'comment' | 'password_digest' | '
   users: User[];
 };
 
-/** 保存用に整形済みの回答（time は ISO 文字列）。RPC への jsonb 引数として渡すため Json 互換を強制する */
+/**
+ * 保存用に整形済みの回答（time は ISO 文字列）。RPC への jsonb 引数として渡すため Json 互換を強制する。
+ *
+ * 他の Input 型（SaveUserResponsesInput 等）と違い api/ ではなくここに置くのは、
+ * lib/responses.ts の toResponseInputs が生成し api/userApi.ts が消費する型で、
+ * どちらか一方に置くと lib と api の間に依存が生まれるため。両者より下層のここに置く。
+ */
 export interface ResponseInput extends Record<string, Json> {
   candidate_id: string;
   time: string;
