@@ -1,6 +1,4 @@
-import { formatJSTTime, formatJSTDate } from '@/lib/datetime';
 import { SLOT_INTERVAL_MS, MS_PER_MINUTE } from '@/lib/constants';
-import { STATUS_META } from '@/features/event-detail/lib/status';
 import type { ResponseStatus, User } from '@/features/event-detail/types';
 
 export type ParticipantInfo = { id: string; name: string; status: ResponseStatus };
@@ -133,46 +131,13 @@ const checkBlockConditions = (block: TimeBlock, conditions: FilterCondition[]) =
   });
 };
 
-const formatExtractTimes = (blocks: TimeBlock[]): string[] => {
-  const result: string[] = [];
-
-  const grouped = blocks.reduce(
-    (acc, block) => {
-      const dateKey = formatJSTDate(block.start, { month: 'numeric', day: 'numeric' });
-      if (!acc[dateKey]) acc[dateKey] = [];
-      acc[dateKey].push(block);
-      return acc;
-    },
-    {} as Record<string, TimeBlock[]>,
-  );
-
-  Object.entries(grouped).forEach(([date, daysBlocks]) => {
-    result.push(date);
-    daysBlocks.forEach((block) => {
-      const start = formatJSTTime(block.start);
-      const end = formatJSTTime(block.end + SLOT_INTERVAL_MS);
-      // 表示時に maybe の人には symbol を付ける
-      const names = block.participants
-        .map((p) => (p.status === 'maybe' ? `${p.name}(${STATUS_META.maybe.symbol})` : p.name))
-        .join(', ');
-      result.push(`${start} - ${end} : ${names}`);
-    });
-    result.push('');
-  });
-
-  return result;
-};
-
 // 抽出処理の入口: 条件に合うコマを絞り込み → 連続コマを結合 → 塊単位の条件で絞り込み
 export function extractSlots({
   users,
   includeMaybe,
   conditions,
   participantsFilter,
-}: ExtractSlotsParams): {
-  blocks: TimeBlock[];
-  formatted: string[];
-} {
+}: ExtractSlotsParams): TimeBlock[] {
   const responseMaps = buildResponseMaps(users);
 
   // 全タイムスタンプの取得
@@ -192,5 +157,5 @@ export function extractSlots({
   );
   const finalBlocks = mergedBlocks.filter((b) => checkBlockConditions(b, conditions));
 
-  return { blocks: finalBlocks, formatted: formatExtractTimes(finalBlocks) };
+  return finalBlocks;
 }

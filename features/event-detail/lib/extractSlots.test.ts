@@ -41,7 +41,7 @@ describe('extractSlots', () => {
       { time: slotISO(2), status: 'ok' },
     ]);
 
-    const { blocks } = run([user]);
+    const blocks = run([user]);
 
     expect(blocks).toHaveLength(1);
     expect(blocks[0]).toEqual({
@@ -57,7 +57,7 @@ describe('extractSlots', () => {
       { time: slotISO(2), status: 'ok' },
     ]);
 
-    const { blocks } = run([user]);
+    const blocks = run([user]);
 
     expect(blocks).toHaveLength(2);
     expect(blocks.map((b) => [b.start, b.end])).toEqual([
@@ -76,7 +76,7 @@ describe('extractSlots', () => {
       { time: slotISO(1), status: 'ok' },
     ]);
 
-    const { blocks } = run([u1, u2]);
+    const blocks = run([u1, u2]);
 
     expect(blocks).toHaveLength(2);
     expect(blocks[0]?.participants.map((p) => p.name)).toEqual(['太郎']);
@@ -90,7 +90,7 @@ describe('extractSlots', () => {
     ]);
 
     it('falseならmaybeは参加扱いにしない', () => {
-      const { blocks } = run([user], {
+      const blocks = run([user], {
         conditions: [{ type: 'PARTICIPANTS', userIds: ['u1'] }],
       });
       expect(blocks).toHaveLength(1);
@@ -98,7 +98,7 @@ describe('extractSlots', () => {
     });
 
     it('trueならmaybeも参加扱いになるが、statusが違うため塊は分かれる', () => {
-      const { blocks } = run([user], {
+      const blocks = run([user], {
         includeMaybe: true,
         conditions: [{ type: 'PARTICIPANTS', userIds: ['u1'] }],
       });
@@ -118,7 +118,7 @@ describe('extractSlots', () => {
         { time: slotISO(1), status: 'ok' },
       ]);
 
-      const { blocks } = run([u1, u2], {
+      const blocks = run([u1, u2], {
         conditions: [{ type: 'PARTICIPANTS', userIds: ['u1', 'u2'] }],
       });
 
@@ -138,7 +138,7 @@ describe('extractSlots', () => {
         { time: slotISO(1), status: 'ok' },
       ]);
 
-      const { blocks } = run([u1, u2], {
+      const blocks = run([u1, u2], {
         conditions: [{ type: 'HEADCOUNTS', counts: [2] }],
       });
 
@@ -155,7 +155,7 @@ describe('extractSlots', () => {
         { time: slotISO(2), status: 'ok' },
       ]);
 
-      const { blocks } = run([user], {
+      const blocks = run([user], {
         conditions: [{ type: 'DATERANGE', start: slot(1), end: slot(2) }],
       });
 
@@ -172,7 +172,7 @@ describe('extractSlots', () => {
         { time: slotISO(3), status: 'ok' },
       ]);
 
-      const { blocks } = run([user], {
+      const blocks = run([user], {
         conditions: [{ type: 'DURATION', minMinutes: 60 }],
       });
 
@@ -185,7 +185,7 @@ describe('extractSlots', () => {
     const u1 = makeUser('u1', '太郎', [{ time: slotISO(0), status: 'ok' }]);
     const u2 = makeUser('u2', '花子', [{ time: slotISO(0), status: 'ok' }]);
 
-    const { blocks } = run([u1, u2], {
+    const blocks = run([u1, u2], {
       conditions: [{ type: 'HEADCOUNTS', counts: [2] }],
       participantsFilter: (u) => u.id === 'u1',
     });
@@ -205,7 +205,7 @@ describe('extractSlots', () => {
       { time: slotISO(1), status: 'ok' },
     ]);
 
-    const { blocks } = run([u1, u2]);
+    const blocks = run([u1, u2]);
 
     expect(blocks).toHaveLength(2);
     expect(blocks[0]?.participants).toEqual([{ id: 'u1', name: '太郎', status: 'ok' }]);
@@ -213,45 +213,6 @@ describe('extractSlots', () => {
   });
 
   it('回答が空なら空の結果を返す', () => {
-    const { blocks, formatted } = run([makeUser('u1', '太郎', [])]);
-    expect(blocks).toEqual([]);
-    expect(formatted).toEqual([]);
-  });
-
-  describe('formatted', () => {
-    it('JSTの日付見出し＋時間帯＋参加者名（maybeは記号付き）で整形する', () => {
-      const u1 = makeUser('u1', '太郎', [
-        { time: slotISO(0), status: 'ok' },
-        { time: slotISO(1), status: 'ok' },
-      ]);
-      const u2 = makeUser('u2', '花子', [
-        { time: slotISO(0), status: 'maybe' },
-        { time: slotISO(1), status: 'maybe' },
-      ]);
-
-      const { formatted } = run([u1, u2], { includeMaybe: true });
-
-      // JST 2024-03-15 09:00〜10:00
-      expect(formatted).toEqual(['3/15', '09:00 - 10:00 : 太郎, 花子(▲)', '']);
-    });
-
-    it('日付をまたぐ塊は日付ごとに見出しが付く', () => {
-      const nextDay = 48; // 24時間後
-      const user = makeUser('u1', '太郎', [
-        { time: slotISO(0), status: 'ok' },
-        { time: slotISO(nextDay), status: 'ok' },
-      ]);
-
-      const { formatted } = run([user]);
-
-      expect(formatted).toEqual([
-        '3/15',
-        '09:00 - 09:30 : 太郎',
-        '',
-        '3/16',
-        '09:00 - 09:30 : 太郎',
-        '',
-      ]);
-    });
+    expect(run([makeUser('u1', '太郎', [])])).toEqual([]);
   });
 });

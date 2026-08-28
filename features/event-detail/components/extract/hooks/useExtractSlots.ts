@@ -31,7 +31,6 @@ export function useExtractSlots({ candidates, users }: UseExtractSlotsArgs) {
   const [minDuration, setMinDuration] = useState(0);
   const [dateRange, setDateRange] = useState<[string, string]>(['', '']);
 
-  const [availableSlots, setAvailableSlots] = useState<string[]>([]);
   const [extractedBlocks, setExtractedBlocks] = useState<TimeBlock[]>([]);
 
   // 抽出結果を予定一覧の表にハイライト表示するかどうか
@@ -50,13 +49,11 @@ export function useExtractSlots({ candidates, users }: UseExtractSlotsArgs) {
   if (candidates !== prevCandidates || users !== prevUsers) {
     setPrevCandidates(candidates);
     setPrevUsers(users);
-    setAvailableSlots([]);
     setExtractedBlocks([]);
   }
 
   const handleTabChange = (value: ExtractTab) => {
     setActiveTab(value);
-    setAvailableSlots([]);
     setExtractedBlocks([]);
 
     if (value === 'people') {
@@ -112,7 +109,6 @@ export function useExtractSlots({ candidates, users }: UseExtractSlotsArgs) {
     setActiveTab('people');
     setSelectedUserIds(new Set());
     setSelectedHeadcounts(new Set());
-    setAvailableSlots([]);
     setExtractedBlocks([]);
     setIncludeMaybe(false);
     setIsDurationEnabled(false);
@@ -147,14 +143,13 @@ export function useExtractSlots({ candidates, users }: UseExtractSlotsArgs) {
       conditions.push({ type: 'DATERANGE', start, end });
     }
 
-    const { blocks, formatted } = extractSlots({
+    const blocks = extractSlots({
       users,
       includeMaybe,
       conditions,
       participantsFilter: (u) => (activeTab === 'people' ? selectedUserIds.has(u.id) : true),
     });
 
-    setAvailableSlots(formatted);
     setExtractedBlocks(blocks);
   };
 
@@ -182,7 +177,6 @@ export function useExtractSlots({ candidates, users }: UseExtractSlotsArgs) {
     handleReset,
     handleExtractSlots,
     // 結果
-    availableSlots,
     extractedBlocks,
     // 表へのハイライト表示
     isHighlightEnabled,
