@@ -22,27 +22,34 @@ function UserComment({ comment }: UserCommentProps) {
 
   if (!comment) return null;
 
-  if (device === 'mobile') {
-    return (
-      <Popover>
-        <PopoverTrigger
-          render={
-            <Button variant="ghost">
-              <MessageCircle className="text-accent-foreground h-4 w-4" />
-            </Button>
-          }
-        />
-        <PopoverContent align="start">
-          <PopoverHeader>
-            <PopoverTitle>コメント</PopoverTitle>
-            <PopoverDescription>{comment}</PopoverDescription>
-          </PopoverHeader>
-        </PopoverContent>
-      </Popover>
+  // モバイルは一覧の幅が足りないためアイコンのみ。PCは1行に収まる分を表示し、
+  // 溢れた分は同じPopoverで読ませる（コメントが長くても行が伸びず、操作ボタンを押し出さない）
+  const trigger =
+    device === 'mobile' ? (
+      <Button variant="ghost">
+        <MessageCircle className="text-accent-foreground h-4 w-4" />
+      </Button>
+    ) : (
+      <button
+        type="button"
+        className="text-accent-foreground min-w-0 truncate text-left text-xs"
+        aria-label="コメントを全文表示"
+      >
+        {comment}
+      </button>
     );
-  }
 
-  return <span className="text-accent-foreground text-xs">{comment}</span>;
+  return (
+    <Popover>
+      <PopoverTrigger render={trigger} />
+      <PopoverContent align="start">
+        <PopoverHeader>
+          <PopoverTitle>コメント</PopoverTitle>
+          <PopoverDescription>{comment}</PopoverDescription>
+        </PopoverHeader>
+      </PopoverContent>
+    </Popover>
+  );
 }
 
 export default UserComment;
