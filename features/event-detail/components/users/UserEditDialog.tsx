@@ -23,7 +23,11 @@ import { toast } from 'sonner';
 import type { Candidate, User } from '@/features/event-detail/types';
 import { useUpdateUser } from '@/features/event-detail/hooks/useEventMutations';
 import { toResponseInputs } from '@/features/event-detail/lib/responses';
-import { userEditFormSchema, type UserEditFormData } from '@/features/event-detail/schema';
+import {
+  USER_COMMENT_MAX_LENGTH,
+  userEditFormSchema,
+  type UserEditFormData,
+} from '@/features/event-detail/schema';
 
 interface UserEditDialogProps {
   eventId: string;
@@ -109,6 +113,7 @@ function UserEditDialog({ eventId, data, password, open, onOpenChange }: UserEdi
               name="comment"
               label="コメント"
               rows={10}
+              maxLength={USER_COMMENT_MAX_LENGTH}
             />
           </FieldGroup>
 

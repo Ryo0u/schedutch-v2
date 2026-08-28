@@ -18,6 +18,7 @@ import { Edit } from 'lucide-react';
 import { toast } from 'sonner';
 import { useUpdateEvent } from '@/features/event-detail/hooks/useEventMutations';
 import { isPasswordError } from '@/features/event-detail/api/errors';
+import { EVENT_COMMENT_MAX_LENGTH } from '@/lib/validation';
 import { eventEditFormSchema, type EventEditFormData } from '@/features/event-detail/schema';
 
 interface DialogProps {
@@ -84,7 +85,13 @@ function EventEditDialog({ eventId, open, onOpenChange, data }: DialogProps) {
 
           <FieldGroup className="mb-5">
             <TextField control={form.control} name="title" label="タイトル" required />
-            <TextareaCounterField control={form.control} name="comment" label="コメント" rows={4} />
+            <TextareaCounterField
+              control={form.control}
+              name="comment"
+              label="コメント"
+              rows={4}
+              maxLength={EVENT_COMMENT_MAX_LENGTH}
+            />
             <TextField
               control={form.control}
               name="password"

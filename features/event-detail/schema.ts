@@ -3,7 +3,7 @@ import {
   titleSchema,
   passwordSchema,
   passwordConfirmSchema,
-  commentSchema,
+  eventCommentSchema,
 } from '@/lib/validation';
 import { RESPONSE_STATUSES } from './lib/status';
 
@@ -14,9 +14,20 @@ export const nameSchema = z
   .min(1, '名前を入力してください')
   .max(NAME_MAX_LENGTH, `名前を${NAME_MAX_LENGTH}文字以内で入力してください`);
 
+export const USER_COMMENT_MAX_LENGTH = 40;
+
+/**
+ * 参加者のコメントフィールドのバリデーション。
+ *
+ * UsersInfo の一覧で名前と同じ行に表示されるため、イベントのコメントより上限を抑える。
+ */
+export const userCommentSchema = z
+  .string()
+  .max(USER_COMMENT_MAX_LENGTH, `コメントは${USER_COMMENT_MAX_LENGTH}文字以内で入力してください`);
+
 export const userFormSchema = z.object({
   name: nameSchema,
-  comment: commentSchema,
+  comment: userCommentSchema,
   password: passwordSchema,
   responses: z.array(
     z.object({
@@ -35,7 +46,7 @@ export type UserEditFormData = z.infer<typeof userEditFormSchema>;
 
 export const eventEditFormSchema = z.object({
   title: titleSchema,
-  comment: commentSchema,
+  comment: eventCommentSchema,
   password: passwordConfirmSchema,
 });
 export type EventEditFormData = z.infer<typeof eventEditFormSchema>;

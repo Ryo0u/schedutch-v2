@@ -3,7 +3,7 @@ import * as z from 'zod';
 export const TITLE_MAX_LENGTH = 10;
 export const PASSWORD_MIN_LENGTH = 3;
 export const PASSWORD_MAX_LENGTH = 12;
-export const COMMENT_MAX_LENGTH = 30;
+export const EVENT_COMMENT_MAX_LENGTH = 200;
 
 /** タイトルフィールドの共通バリデーション */
 export const titleSchema = z
@@ -17,10 +17,16 @@ export const passwordSchema = z
   .min(PASSWORD_MIN_LENGTH, `パスワードを${PASSWORD_MIN_LENGTH}文字以上で入力してください`)
   .max(PASSWORD_MAX_LENGTH, `パスワードを${PASSWORD_MAX_LENGTH}文字以内で入力してください`);
 
-/** コメントフィールドの共通バリデーション */
-export const commentSchema = z
+/**
+ * イベントのコメントフィールドのバリデーション。
+ *
+ * 参加者のコメント（features/event-detail の userCommentSchema）とは上限が異なる。
+ * イベント側は EventInfo で独立した段落として表示され、長くなっても折り返すだけなので
+ * 参加者コメントより長い入力を許容する。
+ */
+export const eventCommentSchema = z
   .string()
-  .max(COMMENT_MAX_LENGTH, `コメントは${COMMENT_MAX_LENGTH}文字以内で入力してください`);
+  .max(EVENT_COMMENT_MAX_LENGTH, `コメントは${EVENT_COMMENT_MAX_LENGTH}文字以内で入力してください`);
 
 /**
  * 既存パスワードを照合するフィールドの共通バリデーション。
