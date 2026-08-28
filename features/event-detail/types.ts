@@ -45,3 +45,16 @@ export interface ResponseInput extends Record<string, Json> {
   time: string;
   status: ResponseStatus;
 }
+
+/** 開催予定のメンバー。▲（未定）かどうかは保持せず、表示時に responses から判定する */
+export type PlanParticipant = {
+  id: string;
+  name: string;
+};
+
+/** 開催予定。取得時のネスト構造は planApi 側で平坦化する */
+export type Plan = Omit<Tables<'plans'>, 'event_id' | 'memo' | 'created_at'> & {
+  event_id: string;
+  memo: string;
+  participants: PlanParticipant[];
+};
