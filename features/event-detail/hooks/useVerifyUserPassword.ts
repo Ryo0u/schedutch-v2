@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { verifyUserPassword } from '@/features/event-detail/api/eventApi';
+import { verifyUserPassword } from '@/features/event-detail/api/userApi';
 import { createPasswordMismatchError } from '@/features/event-detail/api/errors';
 
 /**

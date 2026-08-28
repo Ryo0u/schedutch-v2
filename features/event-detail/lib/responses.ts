@@ -1,6 +1,6 @@
 import { SLOT_INTERVAL_MS } from '@/lib/constants';
 import { formatJSTTime } from '@/lib/datetime';
-import type { ResponseInput } from '@/features/event-detail/api/eventApi';
+import type { ResponseInput } from '@/features/event-detail/types';
 import type { Candidate } from '@/features/event-detail/types';
 import type { ResponseFormValue } from '@/features/event-detail/schema';
 
