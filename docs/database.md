@@ -36,6 +36,7 @@
 | comment | text | |
 | password_digest | text | クライアントには配信しない |
 | created_at | timestamptz | default `now()` |
+| updated_at | timestamptz | NOT NULL, default `now()`。`update_user_with_responses` の update で現在時刻に更新する。自動削除の「最終アクティビティ」判定に使う |
 
 ### responses
 
@@ -74,13 +75,13 @@
 - 6 テーブルすべて RLS 有効。`anon` へのポリシーは `FOR SELECT USING (true)` のみで、INSERT / UPDATE / DELETE のポリシーは付与しない（直叩き write を全面封鎖。write は下記 RPC 経由のみ）。
 - `password_digest` は列単位の GRANT で anon の SELECT 対象から除外する（`20260705041653_fix_column_grants.sql`）:
   - events: `id, title, comment, created_at` のみ SELECT 可
-  - users: `id, event_id, name, comment, created_at` のみ SELECT 可
+  - users: `id, event_id, name, comment, created_at, updated_at` のみ SELECT 可
   - candidates / responses / plans / plan_participants: 全列 SELECT 可
 - 注意: `select("*")` は権限のない列が 1 つでもあるとクエリ全体が拒否されるため、取得クエリ（`features/event-detail/api/eventApi.ts` の `getEvent`）は列を明示指定する。
 
 ## RPC 関数
 
-すべて SECURITY DEFINER（`search_path = public, extensions`）。EXECUTE 権限は `anon, authenticated, service_role` に付与。パスワード照合は RPC 内で `extensions.crypt(平文, digest) = digest` により行う。
+すべて SECURITY DEFINER（`search_path = public, extensions`）。EXECUTE 権限は `anon, authenticated, service_role` に付与（`delete_expired_events` のみ `service_role` 限定）。パスワード照合は RPC 内で `extensions.crypt(平文, digest) = digest` により行う。
 
 | 関数 | 引数 | 戻り値 | 挙動 |
 |---|---|---|---|
@@ -94,6 +95,7 @@
 | `create_plan` | `p_event_id, p_start_time, p_end_time, p_memo, p_user_ids uuid[]` | uuid | **パスワード照合なし**。下記 4 つを検証 → 予定とメンバーを作成 |
 | `update_plan_memo` | `p_plan_id, p_memo` | void | **パスワード照合なし**。メモだけを更新する（日時・メンバーは変更できない） |
 | `delete_plan` | `p_plan_id` | void | **パスワード照合なし**。予定を削除（メンバーは CASCADE） |
+| `delete_expired_events` | なし | integer（削除件数） | **`service_role` 限定・パスワード照合なし**。放置イベントを一括削除する（下記「自動削除」） |
 
 **予定の 3 関数（`create_plan` / `update_plan_memo` / `delete_plan`）だけはパスワード照合を行わない。** URL を知る人なら誰でも予定を追加・編集・削除できるという仕様上の決定によるもので、write を RPC 経由に限定する権限モデル自体は他と同じ。メンバーの所属イベント検証は `validate_plan_participants`（内部用。EXECUTE は PUBLIC から revoke 済み）が担う。
 
@@ -107,6 +109,21 @@
 4 のコマ数の計算には回答の刻み幅が要るため、`plan_slot_interval()`（30 分。クライアントの `SLOT_INTERVAL_MS` と対応）を内部用の関数として置いている。
 
 予定の日時・メンバーを更新する RPC は用意しない。任意の日時・メンバーに書き換えられると回答の状態と予定の内容がずれるため、**後から変えられるのはメモだけ**にしている。日時やメンバーを変えたいときは削除して作り直す。
+
+## 自動削除
+
+放置されたイベントを `delete_expired_events()` で定期削除する。Vercel Cron（`app/api/cron/delete-expired-events/route.ts` + `vercel.json`）が1日1回叩く。本番 Supabase（無料プラン）の自動停止対策（write を発生させる keep-alive）も兼ねる。
+
+削除条件（どちらか該当したら削除。`events` の削除で candidates / users / responses / plans / plan_participants は FK CASCADE で連鎖削除される）:
+
+| 状態 | 保持期間 | 起点 |
+|---|---|---|
+| 回答者ゼロ | 60 日 | `events.created_at` |
+| 回答者あり | 30 日 | `max(users.updated_at)`（最終アクティビティ） |
+
+日数は `lib/constants.ts` の `EVENT_RETENTION_DAYS_*` と RPC の `interval` を対応させる。イベント詳細画面（`EventInfo`）は同じロジック（`features/event-detail/lib/deletion.ts`）で削除予定日を表示する。
+
+Cron 経路は `CRON_SECRET`（Vercel が Cron リクエストに付与する Bearer トークンを検証）と `SUPABASE_SERVICE_ROLE_KEY`（`service_role` 限定 RPC を叩くため）を使う。
 
 ## パスワードの取り扱い
 

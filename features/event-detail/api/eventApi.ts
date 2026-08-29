@@ -14,7 +14,7 @@ export async function getEvent(eventId: string): Promise<EventData> {
   const { data, error } = await supabase
     .from('events')
     .select(
-      `id, title, comment, created_at, candidates (*), users (id, event_id, name, comment, created_at, responses (*))`,
+      `id, title, comment, created_at, candidates (*), users (id, event_id, name, comment, created_at, updated_at, responses (*))`,
     )
     .eq('id', eventId)
     .order('start_time', { referencedTable: 'candidates', ascending: true })

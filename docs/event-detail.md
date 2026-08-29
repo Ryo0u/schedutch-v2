@@ -12,7 +12,7 @@
 
 | セクション | 実装 | 内容 |
 |---|---|---|
-| イベント情報 | `components/event/EventInfo.tsx` | タイトル・コメント・日付範囲・候補日件数・回答者数 |
+| イベント情報 | `components/event/EventInfo.tsx` | タイトル・コメント・日付範囲・候補日件数・回答者数・自動削除予定日 |
 | 参加者一覧 | `components/users/UsersInfo.tsx` | 回答者の一覧と編集・削除の入り口 |
 | 予定一覧 | `components/responses/ResponsesInfo.tsx` | 全員の回答をグリッド表示。開催予定の時間帯も帯で示す |
 | 予定抽出 | `components/extract/ExtractPanel.tsx` | 条件抽出（→ [extract.md](extract.md)） |
@@ -21,6 +21,8 @@
 予定一覧・予定抽出・開催予定は `ExtractSlotsProvider`（Context）で包まれ、抽出結果のハイライト状態を共有する。画面幅 lg 以上ではサイドナビ（`EventSideNav`）を表示する。本文と同じ `flex` コンテナ内で `sticky` 配置され、本文の左に並ぶ。
 
 サイドナビの「予定一覧」アコーディオンを開くと、候補日一覧を `CandidateList.tsx` がカレンダー形式（`components/ui/calendar.tsx`）で表示する。候補日以外の日付は選択不可、スクロール中の現在アクティブな候補日はハイライトされ表示月も自動追従する。候補日をクリックすると該当セクションへ `scrollIntoView` する。
+
+`EventInfo` は自動削除予定日も表示する（`features/event-detail/lib/deletion.ts`）。削除ロジックは DB の `delete_expired_events` RPC と揃えており、残り3日以内・期限超過は日付を出さず「まもなく自動的に削除されます」と表示する。削除の仕組み自体は → [database.md](database.md#自動削除)。
 
 ## 回答フロー（新規参加）
 
