@@ -121,7 +121,7 @@
 | 回答者ゼロ | 60 日 | `events.created_at` |
 | 回答者あり | 30 日 | `max(users.updated_at)`（最終アクティビティ） |
 
-日数は `lib/constants.ts` の `EVENT_RETENTION_DAYS_*` と RPC の `interval` を対応させる。イベント詳細画面（`EventInfo`）は同じロジック（`features/event-detail/lib/deletion.ts`）で削除予定日を表示する。
+日数は `features/event-detail/lib/deletion.ts` の `EVENT_RETENTION_DAYS_*` と RPC の `interval` を対応させる。イベント詳細画面（`EventInfo`）は同じロジックで削除予定日を表示する。
 
 Cron 経路は `CRON_SECRET`（Vercel が Cron リクエストに付与する Bearer トークンを検証）と `SUPABASE_SERVICE_ROLE_KEY`（`service_role` 限定 RPC を叩くため）を使う。
 

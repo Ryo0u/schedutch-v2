@@ -1,11 +1,5 @@
 export const MS_PER_MINUTE = 60 * 1000;
 
-// 放置イベントの自動削除までの保持期間。値は supabase の delete_expired_events() RPC
-// （20260829000000_delete_expired_events.sql）の interval と対応させること。
-// 回答者ゼロなら作成日時から、回答者ありなら最終アクティビティ（max(users.updated_at)）から数える。
-export const EVENT_RETENTION_DAYS_NO_RESPONSE = 60;
-export const EVENT_RETENTION_DAYS_AFTER_RESPONSE = 30;
-
 // 予定候補・回答の時間刻み幅（30分）
 export const SLOT_INTERVAL_MS = 30 * MS_PER_MINUTE;
 

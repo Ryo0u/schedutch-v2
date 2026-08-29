@@ -1,7 +1,8 @@
-import {
-  EVENT_RETENTION_DAYS_AFTER_RESPONSE,
-  EVENT_RETENTION_DAYS_NO_RESPONSE,
-} from '@/lib/constants';
+// 放置イベントの自動削除までの保持期間。DB の delete_expired_events() RPC
+// （20260829000000_delete_expired_events.sql）の interval と対応させること。
+// 回答者ゼロなら作成日時から、回答者ありなら最終アクティビティ（max(users.updated_at)）から数える。
+export const EVENT_RETENTION_DAYS_NO_RESPONSE = 60;
+export const EVENT_RETENTION_DAYS_AFTER_RESPONSE = 30;
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
