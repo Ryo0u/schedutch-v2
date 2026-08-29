@@ -93,6 +93,7 @@ schedutch-v2/
 - Supabase への実アクセス（select / rpc / insert 等）は `features/{feature}/api/` の関数に集約し、コンポーネントから直接 `supabase` を呼ばない。api 関数は TanStack Query hook（`features/{feature}/hooks/`）から呼ぶ。
 - **write（作成・更新・削除）は全て Supabase RPC 経由**。RLS で直叩き write を封鎖しているため、`supabase.from(...).update()/.delete()/.insert()` をコンポーネントや api から直接呼ばない。
 - **パスワードのハッシュ化・照合はサーバー（RPC 内 `crypt()`）側で行う**。クライアントでハッシュ化・照合をしない。`password_digest` はクライアントに配信しない（型にも持たせない）。
+- **`events` / `users` に列を追加するマイグレーションは、同じファイルに `grant select ("新列") on ... to anon, authenticated;` を書く**。この 2 テーブルは列単位 revoke 済みでテーブルレベル GRANT が効かず、足さないと新列を含む select が 401 になる（→ [docs/database.md](../docs/database.md#rls--権限)）。
 - 取得データは `data` を prop で配布せず、各セクションが `eventId` を受けて自身で query hook を呼ぶ。mutation 成功時の再取得は hook 内の `invalidateQueries` で行い、`onSuccess` / `refresh` を prop drilling しない。
 - 型の置き場: feature 固有なら `features/{feature}/types.ts`、複数 feature で共有するもののみ `lib/`。
 - 時刻は UTC 保存・表示時に `lib/datetime.ts` の JST 変換関数で変換する。時刻選択肢は `lib/constants.ts` の `TIME_OPTIONS` を共通使用する。
