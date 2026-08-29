@@ -55,6 +55,13 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 
 `.env.local` に記載（gitignore 対象、既定値はローカル Supabase）。Supabase クライアントは `utils/supabase/client.ts` でシングルトンとして export する。
 
+自動削除の Cron（`app/api/cron/delete-expired-events/route.ts`）だけは追加でサーバー専用の変数を使う。ローカル開発では不要、Vercel の環境変数に Type=Secret で登録する。
+
+```
+CRON_SECRET                 # Vercel が Cron リクエストに付与する Bearer トークンの検証用（任意の乱数）
+SUPABASE_SERVICE_ROLE_KEY   # service_role 限定 RPC を叩くための secret キー（sb_secret_...）。ブラウザに配布しない
+```
+
 ## ローカル Supabase 環境
 
 DB スキーマ・RPC・RLS の変更検証は、本番プロジェクトに直接行わずローカルスタックで行う（Docker Desktop が必要）。`.env.local` は既定でローカル Supabase を指すため、`npm run dev` は追加設定なしでローカルに繋がる。
