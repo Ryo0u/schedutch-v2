@@ -65,7 +65,7 @@ export default function CreateEventContainer() {
     // onSubmit を form 側で受けないと、入力欄での Enter がネイティブ送信になりページがリロードされる
     <form onSubmit={form.handleSubmit(onSubmit)}>
       <fieldset disabled={isSubmitting}>
-        <div className="mx-auto mt-5 mb-8 flex w-full max-w-6xl flex-col items-end justify-center gap-8 sm:flex-row">
+        <div className="mx-auto mt-5 mb-8 flex w-full max-w-6xl flex-col items-stretch justify-center gap-8 sm:flex-row sm:items-end">
           <section className="max-w-xl flex-1 shrink-0 px-3">
             <NewHero />
             <EventInfoFields control={form.control} />

@@ -31,11 +31,11 @@ export default function EventError({
         </p>
       </div>
       <div className="flex w-full max-w-xs flex-col gap-2 sm:flex-row">
-        <Link href="/" className={cn(buttonVariants({ variant: 'outline' }), 'flex-1')}>
+        <Link href="/" className={cn(buttonVariants({ variant: 'outline' }), 'sm:flex-1')}>
           <Home />
           トップへ戻る
         </Link>
-        <Button onClick={reset} className="flex-1">
+        <Button onClick={reset} className="sm:flex-1">
           <RotateCw />
           再試行
         </Button>

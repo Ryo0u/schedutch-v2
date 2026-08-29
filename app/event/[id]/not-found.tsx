@@ -18,11 +18,11 @@ export default function EventNotFound() {
         </p>
       </div>
       <div className="flex w-full max-w-xs flex-col gap-2 sm:flex-row">
-        <Link href="/" className={cn(buttonVariants({ variant: 'outline' }), 'flex-1')}>
+        <Link href="/" className={cn(buttonVariants({ variant: 'outline' }), 'sm:flex-1')}>
           <Home />
           トップへ戻る
         </Link>
-        <Link href="/new" className={cn(buttonVariants(), 'flex-1')}>
+        <Link href="/new" className={cn(buttonVariants(), 'sm:flex-1')}>
           <Plus />
           イベントを作成する
         </Link>

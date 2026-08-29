@@ -27,7 +27,8 @@ export type User = Omit<Tables<'users'>, 'event_id' | 'comment' | 'password_dige
   responses: Response[];
 };
 
-export type EventData = Omit<Tables<'events'>, 'comment' | 'password_digest' | 'created_at'> & {
+// created_at は自動削除予定日の表示に使うため保持する（Row 型では nullable）。
+export type EventData = Omit<Tables<'events'>, 'comment' | 'password_digest'> & {
   comment: string;
   candidates: Candidate[];
   users: User[];

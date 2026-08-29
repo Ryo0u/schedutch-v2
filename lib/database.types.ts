@@ -202,6 +202,7 @@ export type Database = {
           id: string
           name: string
           password_digest: string | null
+          updated_at: string
         }
         Insert: {
           comment?: string | null
@@ -210,6 +211,7 @@ export type Database = {
           id?: string
           name: string
           password_digest?: string | null
+          updated_at?: string
         }
         Update: {
           comment?: string | null
@@ -218,6 +220,7 @@ export type Database = {
           id?: string
           name?: string
           password_digest?: string | null
+          updated_at?: string
         }
         Relationships: [
           {
@@ -257,6 +260,7 @@ export type Database = {
         Args: { p_event_id: string; p_password: string }
         Returns: undefined
       }
+      delete_expired_events: { Args: never; Returns: number }
       delete_plan: { Args: { p_plan_id: string }; Returns: undefined }
       delete_user: {
         Args: { p_password: string; p_user_id: string }
