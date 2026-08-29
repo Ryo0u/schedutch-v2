@@ -23,6 +23,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { useDeviceType } from '@/hooks/useDeviceType';
+import { useIsClient } from '@/hooks/useIsClient';
 import { buildNewCandidateDates, startOfToday } from '@/features/event-create/lib/candidateDates';
 import TimeSelect from './TimeSelect';
 
@@ -42,10 +43,11 @@ const CandidatesFields = ({ control, fields, append }: CandidatesFieldsProps) =>
   });
 
   const device = useDeviceType();
-  const calendarColumns = (device: 'mobile' | 'tablet' | 'desktop') => {
-    if (device === 'desktop') return 2;
-    else return 1;
-  };
+  // useDeviceType は SSR 時に 'desktop' を返すため、そのまま numberOfMonths に渡すと
+  // モバイルの初回描画で 2 ヶ月分のカレンダーが縦に伸び、直下の時間選択に重なる。
+  // ハイドレーション後にのみ複数月表示へ切り替え、SSR/初回描画は 1 ヶ月に固定する。
+  const isClient = useIsClient();
+  const numberOfMonths = isClient && device === 'desktop' ? 2 : 1;
 
   // 追加された候補日はカレンダーから除外する
   const disabledDates = fields.map((item) => new Date(item.date));
@@ -99,8 +101,7 @@ const CandidatesFields = ({ control, fields, append }: CandidatesFieldsProps) =>
                         selected={selectedDates}
                         onSelect={setSelectedDates}
                         disabled={disabledDates}
-                        numberOfMonths={calendarColumns(device)}
-                        className="h-full lg:h-80"
+                        numberOfMonths={numberOfMonths}
                       />
                     </Field>
 
