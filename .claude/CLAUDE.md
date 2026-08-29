@@ -22,7 +22,7 @@ npm run env:local  # .env.localをローカルSupabase向けに設定（既定�
 npm run env:prod   # .env.localを本番Supabase向けに切り替え（稀なケースのみ）
 ```
 
-DBスキーマ・RPC・RLSの変更検証はローカルSupabaseで行う（→ [docs/overview.md](../docs/overview.md#ローカルsupabase環境)）。本番への反映前に `supabase db diff --linked` でdriftがないか確認する。
+DBスキーマ・RPC・RLSの変更検証はローカルSupabaseで行う（→ [docs/overview.md](../docs/overview.md#ローカルsupabase環境)）。本番反映は `main` への push で GitHub Actions が `supabase db push` を自動実行する。破壊的変更を含む場合はマージ前に `supabase db diff --linked` でdriftを確認する。
 
 ## テスト
 

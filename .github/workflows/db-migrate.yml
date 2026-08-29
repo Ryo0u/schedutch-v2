@@ -1,0 +1,36 @@
+name: Deploy Migrations to Production
+
+# supabase/migrations/ に変更が入った main への push で、本番 Supabase に
+# 未適用のマイグレーションを自動で db push する。
+# develop -> main のリリースマージ時にスキーマ反映を手動 db push に頼らずに済ませる。
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/migrations/**'
+      - '.github/workflows/db-migrate.yml'
+  workflow_dispatch:
+
+# 複数の push が続いたときにマイグレーションが並行適用されないようにする。
+concurrency:
+  group: db-migrate-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - run: supabase link --project-ref "$SUPABASE_PROJECT_ID"
+
+      - name: Push pending migrations
+        run: supabase db push
