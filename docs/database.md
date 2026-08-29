@@ -78,6 +78,7 @@
   - users: `id, event_id, name, comment, created_at, updated_at` のみ SELECT 可
   - candidates / responses / plans / plan_participants: 全列 SELECT 可
 - 注意: `select("*")` は権限のない列が 1 つでもあるとクエリ全体が拒否されるため、取得クエリ（`features/event-detail/api/eventApi.ts` の `getEvent`）は列を明示指定する。
+- 注意: `20260705041653` で列単位 revoke を行って以降、`events` / `users` はテーブルレベル GRANT が列ごとの明示 GRANT に分解されている。**この 2 テーブルに列を追加しても anon / authenticated には自動で SELECT 権限が付かない**。列追加時は同じマイグレーションに `grant select ("新列") on ... to anon, authenticated;` を書く（例: `20260829130000_grant_select_users_updated_at.sql`）。
 
 ## RPC 関数
 
