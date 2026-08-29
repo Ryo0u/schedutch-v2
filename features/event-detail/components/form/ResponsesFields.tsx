@@ -75,7 +75,7 @@ function ResponsesFields<T extends FormWithResponses>({ control, data }: Respons
               <tbody>
                 <tr className="h-8">
                   {/* 日付ラベル */}
-                  <td className="bg-foreground text-background sticky left-0 z-20 h-8 border text-center text-[11px] sm:h-10 sm:text-sm">
+                  <td className="bg-primary/80 text-primary-foreground sticky left-0 z-20 h-8 border text-center text-[11px] sm:h-10 sm:text-sm">
                     {dateKey}
                   </td>
 
