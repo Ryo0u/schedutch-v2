@@ -66,7 +66,9 @@ npm run db:stop    # ローカルスタック停止
 ```
 
 - `supabase/seed.sql` に、複数候補日 × 複数参加者 × ok/maybe/ng が混在するサンプルデータが定義されている（パスワードは全員 `test1234`）。
-- 本番へマイグレーションを反映する前に `supabase db diff --linked` で drift（本番とマイグレーション履歴のズレ）がないか確認する。反映自体は従来通り `supabase db push`。
+- 本番へのマイグレーション反映は、`main` に `supabase/migrations/` の変更が push されると GitHub Actions（`.github/workflows/db-migrate.yml`）が `supabase db push` を自動実行する。`develop` → `main` のリリースマージで反映される。
+- 破壊的変更（列削除・NOT NULL 追加など）を含む場合は、マージ前にローカルで `supabase db diff --linked` を実行し、本番とマイグレーション履歴の drift がないか確認する。
+- ワークフローに必要な GitHub Secrets: `SUPABASE_ACCESS_TOKEN` / `SUPABASE_DB_PASSWORD` / `SUPABASE_PROJECT_ID`。
 
 ### 本番 Supabase への一時切り替え
 
