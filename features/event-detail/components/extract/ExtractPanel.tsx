@@ -7,7 +7,7 @@ import { useEvent } from '@/features/event-detail/hooks/useEvent';
 import { useExtractSlotsContext } from './ExtractSlotsContext';
 import ParticipantSelector from './ParticipantSelector';
 import ExtractFilters from './ExtractFilters';
-import ExtractResultPanel from './ExtractResultPanel';
+import ExtractBlockList from './ExtractBlockList';
 
 function ExtractPanel({ eventId }: { eventId: string }) {
   const { data } = useEvent(eventId);
@@ -74,7 +74,10 @@ function ExtractPanel({ eventId }: { eventId: string }) {
         </div>
 
         <div className="flex flex-1 flex-col gap-3">
-          <ExtractResultPanel slots={extract.availableSlots} />
+          <div className="border-input rounded-md border">
+            <div className="text-muted-foreground border-b px-3 py-2 text-sm">抽出結果</div>
+            <ExtractBlockList eventId={eventId} />
+          </div>
           <Field orientation="horizontal" className="justify-start gap-2">
             <Checkbox
               id="highlight-toggle"

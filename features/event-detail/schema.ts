@@ -50,3 +50,35 @@ export const eventEditFormSchema = z.object({
   password: passwordConfirmSchema,
 });
 export type EventEditFormData = z.infer<typeof eventEditFormSchema>;
+
+const PLAN_MEMO_MAX_LENGTH = 100;
+
+/**
+ * 開催予定のメモ。予定は用途がイベントごとに違うため場所・費用等の専用項目を持たせず、
+ * この自由記述で吸収する。一覧の行内に収まる程度に上限を切る。
+ */
+export const planMemoFormSchema = z.object({
+  memo: z
+    .string()
+    .max(PLAN_MEMO_MAX_LENGTH, `メモは${PLAN_MEMO_MAX_LENGTH}文字以内で入力してください`),
+});
+export type PlanMemoFormData = z.infer<typeof planMemoFormSchema>;
+
+/**
+ * 開催予定の新規作成。日時は候補日の範囲から選んだ UTC ISO 文字列を値に持つ
+ * （選択肢を候補日そのものから作るため、範囲外の時刻は入力できない）。
+ * 既存の予定との重なりは候補一覧に依存するのでフォーム側では検証しない。
+ */
+export const planFormSchema = z
+  .object({
+    candidateId: z.string().min(1, '日付を選択してください'),
+    startTime: z.string().min(1, '開始時間を選択してください'),
+    endTime: z.string().min(1, '終了時間を選択してください'),
+    participants: z.array(z.string()).min(1, 'メンバーを1人以上選択してください'),
+  })
+  .refine((data) => new Date(data.startTime) < new Date(data.endTime), {
+    message: '開始時間は終了時間より前に選択してください',
+    path: ['endTime'],
+  });
+
+export type PlanFormData = z.infer<typeof planFormSchema>;

@@ -13,6 +13,7 @@ const MAIN_NAV = [
   { id: SECTION_IDS.usersInfo, label: '参加者' },
   { id: SECTION_IDS.responsesInfo, label: '予定一覧' },
   { id: SECTION_IDS.extractResponses, label: '集計・抽出' },
+  { id: SECTION_IDS.plansInfo, label: '開催予定' },
 ];
 
 export default function EventSideNav({ eventId }: { eventId: string }) {

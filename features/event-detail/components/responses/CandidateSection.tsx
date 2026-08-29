@@ -2,9 +2,11 @@ import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { formatJSTTime, formatJSTCandidateDateLabel, jstWallTimeToISO } from '@/lib/datetime';
 import { STATUS_META } from '@/features/event-detail/lib/status';
+import { SLOT_INTERVAL_MS } from '@/lib/constants';
 import type { TimeBlock } from '@/features/event-detail/lib/extractSlots';
-import type { Candidate, ResponseStatus, User } from '@/features/event-detail/types';
+import type { Candidate, Plan, ResponseStatus, User } from '@/features/event-detail/types';
 import { candidateAnchorId } from '@/features/event-detail/lib/anchors';
+import { PLAN_STRIPE_CLASS } from '@/features/event-detail/lib/plans';
 import { responseSlotKey } from '@/features/event-detail/lib/responses';
 
 interface CandidateSectionProps {
@@ -12,15 +14,20 @@ interface CandidateSectionProps {
   users: User[];
   displayedTimes: string[];
   extractedBlocks: TimeBlock[];
+  plans: Pick<Plan, 'id' | 'start_time' | 'end_time'>[];
 }
 
 type HighlightFlags = { inBlock: boolean; isStart: boolean; isEnd: boolean };
+
+/** 開催予定が重なるスロット。ホバー時に出す時間帯のラベルだけ持つ */
+type PlanFlags = { label: string };
 
 export default function CandidateSection({
   candidate,
   users,
   displayedTimes,
   extractedBlocks,
+  plans,
 }: CandidateSectionProps) {
   const startHHMM = formatJSTTime(candidate.start_time);
   const endHHMM = formatJSTTime(candidate.end_time);
@@ -61,6 +68,32 @@ export default function CandidateSection({
     return map;
   }, [extractedBlocks, candidate.start_time, displayedTimes]);
 
+  // 各時刻スロットが開催予定の範囲内かどうかを事前計算
+  // （予定の end_time は終了そのものなので、スロットの終わりと比較する）
+  const planMap = useMemo(() => {
+    const map = new Map<string, PlanFlags>();
+    if (plans.length === 0) return map;
+
+    const candidateDate = new Date(candidate.start_time);
+    for (const time of displayedTimes) {
+      const slotStart = new Date(jstWallTimeToISO(candidateDate, time)).getTime();
+      const slotEnd = slotStart + SLOT_INTERVAL_MS;
+
+      const plan = plans.find((p) => {
+        const start = new Date(p.start_time).getTime();
+        const end = new Date(p.end_time).getTime();
+        return start <= slotStart && slotEnd <= end;
+      });
+
+      if (plan) {
+        map.set(time, {
+          label: `${formatJSTTime(plan.start_time)} - ${formatJSTTime(plan.end_time)} の予定`,
+        });
+      }
+    }
+    return map;
+  }, [plans, candidate.start_time, displayedTimes]);
+
   return (
     <tbody id={candidateAnchorId(candidate.id)} className="scroll-mt-24">
       <tr>
@@ -93,11 +126,18 @@ export default function CandidateSection({
         <th className="border-border border-r" />
       </tr>
 
-      {/* 予定の範囲行 */}
+      {/* 予定の範囲行。開催予定はここに帯で重ねる */}
       <tr className="h-3 border-b sm:h-5">
         {displayedTimes.map((time) => {
           const isInRange = time >= startHHMM && time < endHHMM;
-          return <td key={time} className={cn(!isInRange && 'bg-muted')} />;
+          const plan = planMap.get(time);
+          return (
+            <td
+              key={time}
+              title={plan?.label}
+              className={cn(!isInRange && 'bg-muted', plan && PLAN_STRIPE_CLASS)}
+            />
+          );
         })}
         <td className="border-border border-r" />
       </tr>
