@@ -22,6 +22,8 @@
 
 サイドナビの「予定一覧」アコーディオンを開くと、候補日一覧を `CandidateList.tsx` がカレンダー形式（`components/ui/calendar.tsx`）で表示する。候補日以外の日付は選択不可、スクロール中の現在アクティブな候補日はハイライトされ表示月も自動追従する。候補日をクリックすると該当セクションへ `scrollIntoView` する。
 
+リンクカード（OGP）用に、`app/event/[id]/page.tsx` の `generateMetadata` がサーバー側で `getEventTitle` によりイベントのタイトルだけを取得し、`title`（`<イベント名> | schedutch`）と `openGraph` に流す。description は固定文で、コメント本文は URL 転送先で内容が見えないよう載せない。イベントが存在しない場合・取得に失敗した場合は `app/layout.tsx` の既定メタデータにフォールバックする。
+
 `EventInfo` は自動削除予定日も表示する（`features/event-detail/lib/deletion.ts`）。削除ロジックは DB の `delete_expired_events` RPC と揃えており、残り3日以内・期限超過は日付を出さず「まもなく自動的に削除されます」と表示する。削除の仕組み自体は → [database.md](database.md#自動削除)。
 
 ## 回答フロー（新規参加）

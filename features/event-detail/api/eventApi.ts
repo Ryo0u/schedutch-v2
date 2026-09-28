@@ -26,6 +26,21 @@ export async function getEvent(eventId: string): Promise<EventData> {
   return data as EventData;
 }
 
+/**
+ * OGP 用にイベントのタイトルだけを取得する（Server Component の generateMetadata から呼ぶ）。
+ * イベントが存在しない場合は null を返す。
+ */
+export async function getEventTitle(eventId: string): Promise<string | null> {
+  const { data, error } = await supabase
+    .from('events')
+    .select('title')
+    .eq('id', eventId)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data?.title ?? null;
+}
+
 export interface UpdateEventInput {
   eventId: string;
   /** イベントのパスワード（平文）。DB 側 RPC で照合する */
