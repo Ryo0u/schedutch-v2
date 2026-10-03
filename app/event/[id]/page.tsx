@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
-import { EventContainer, getEventTitle } from '@/features/event-detail';
+import { notFound } from 'next/navigation';
+import { EventContainer, getEventTitle, isValidEventId } from '@/features/event-detail';
 
 /** URL 転送先でイベント内容が見えないよう、コメント本文は載せず固定文にする */
 const OG_DESCRIPTION = 'schedutch で日程を調整しています';
@@ -8,6 +9,8 @@ type Props = { params: Promise<{ id: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
+  // 本体側で notFound() になるため、問い合わせずに既定メタデータへフォールバックする
+  if (!isValidEventId(id)) return {};
   try {
     const title = await getEventTitle(id);
     // 存在しないイベントは layout.tsx の既定メタデータにフォールバックする
@@ -26,5 +29,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function Event({ params }: Props) {
   const eventId = (await params).id;
+  if (!isValidEventId(eventId)) notFound();
   return <EventContainer eventId={eventId} />;
 }
