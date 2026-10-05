@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from 'sonner';
 import { Field, FieldError } from '@/components/ui/field';
 import { Textarea } from '@/components/ui/textarea';
 import { useUpdatePlanMemo } from '@/features/event-detail/hooks/usePlanMutations';
@@ -45,9 +44,8 @@ function PlanMemoForm({ eventId, plan }: PlanMemoFormProps) {
     try {
       await updateMemo.mutateAsync({ planId: plan.id, memo });
       setIsEditing(false);
-    } catch (error) {
-      console.error('Failed to update plan memo:', error);
-      toast.error('メモの保存に失敗しました', { position: 'top-center' });
+    } catch {
+      // 失敗の通知は QueryProvider の MutationCache が行う
     }
   };
 

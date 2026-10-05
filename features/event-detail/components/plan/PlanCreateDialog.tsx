@@ -81,9 +81,8 @@ function PlanCreateDialog({ eventId, open, onOpenChange }: PlanCreateDialogProps
 
       toast.success('予定を追加しました', { position: 'top-center' });
       onOpenChange(false);
-    } catch (error) {
-      console.error('Failed to create plan:', error);
-      toast.error('予定の追加に失敗しました', { position: 'top-center' });
+    } catch {
+      // 失敗の通知は QueryProvider の MutationCache が行う
     }
   };
 

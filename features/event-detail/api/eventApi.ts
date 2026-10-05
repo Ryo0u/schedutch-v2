@@ -1,6 +1,6 @@
 import { supabase } from '@/utils/supabase/client';
 import type { EventData } from '@/features/event-detail/types';
-import { createEventNotFoundError } from '@/features/event-detail/api/errors';
+import { createNotFoundError } from '@/lib/rpcErrors';
 
 /**
  * イベント・候補日・参加者・回答を1クエリで取得。
@@ -22,7 +22,7 @@ export async function getEvent(eventId: string): Promise<EventData> {
     .single();
 
   if (error) throw error;
-  if (!data) throw createEventNotFoundError();
+  if (!data) throw createNotFoundError('イベントが見つかりませんでした');
   return data as EventData;
 }
 

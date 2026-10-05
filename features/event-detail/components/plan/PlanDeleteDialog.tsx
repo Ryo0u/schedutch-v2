@@ -24,9 +24,8 @@ function PlanDeleteDialog({ eventId, data, open, onOpenChange }: PlanDeleteDialo
       await deletePlan.mutateAsync(plan.id);
       toast.success('予定を削除しました', { position: 'top-center' });
       onOpenChange(false);
-    } catch (error) {
-      console.error('Failed to delete plan:', error);
-      toast.error('予定の削除に失敗しました', { position: 'top-center' });
+    } catch {
+      // 失敗の通知は QueryProvider の MutationCache が行う
     }
   };
 
