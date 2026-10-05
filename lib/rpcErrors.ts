@@ -57,6 +57,35 @@ export function classifyError(error: unknown): RpcErrorKind {
   }
 }
 
+function getErrorMessage(error: unknown): string | undefined {
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const { message } = error as { message: unknown };
+    return typeof message === 'string' && message !== '' ? message : undefined;
+  }
+  return undefined;
+}
+
+/**
+ * エラーをユーザーに見せるトーストの文言に変換する。
+ * fallback は操作名を含む文言（例: 「予定の追加に失敗しました」）で、
+ * ユーザーに対処しようがない unexpected のときにだけ使う。
+ */
+export function toErrorMessage(error: unknown, fallback: string): string {
+  switch (classifyError(error)) {
+    case 'password-mismatch':
+      return 'パスワードが違います';
+    case 'not-found':
+      return '対象が見つかりませんでした。削除された可能性があります';
+    case 'conflict':
+      // CNF01 の RPC メッセージは何が競合したかをユーザー向けに書いているため、そのまま見せる
+      return getErrorMessage(error) ?? '他の人の更新と競合しました。最新の状態を確認してください';
+    case 'network':
+      return '通信に失敗しました。接続を確認して、もう一度お試しください';
+    case 'unexpected':
+      return fallback;
+  }
+}
+
 /** パスワード不一致で投げられた例外かどうか */
 export function isPasswordError(error: unknown): boolean {
   return classifyError(error) === 'password-mismatch';

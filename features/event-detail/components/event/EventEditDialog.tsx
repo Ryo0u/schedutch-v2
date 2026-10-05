@@ -58,11 +58,9 @@ function EventEditDialog({ eventId, open, onOpenChange, data }: DialogProps) {
       toast.success('イベントを更新しました', { position: 'top-center' });
       onOpenChange(false);
     } catch (error) {
+      // パスワード不一致以外の失敗は QueryProvider の MutationCache が通知する
       if (isPasswordError(error)) {
         form.setError('password', { message: 'パスワードが正しくありません' });
-      } else {
-        console.error('Failed to update event:', error);
-        toast.error('更新に失敗しました', { position: 'top-center' });
       }
     }
   };

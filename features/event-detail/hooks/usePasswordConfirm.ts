@@ -1,13 +1,10 @@
 import { useState } from 'react';
-import { toast } from 'sonner';
 import { passwordConfirmSchema } from '@/lib/validation';
 import { isPasswordError } from '@/lib/rpcErrors';
 import { useResetOnClose } from './useResetOnClose';
 
 interface UsePasswordConfirmOptions {
   open: boolean;
-  /** パスワード不一致以外で失敗したときに出すトーストの文言 */
-  errorMessage: string;
 }
 
 /**
@@ -16,7 +13,7 @@ interface UsePasswordConfirmOptions {
  * ダイアログのラッパーは閉じてもアンマウントされず入力値が次回に持ち越されるため、
  * 値を所有するこのフックがリセットまで持つ。open を取る都合上ダイアログ専用。
  */
-export function usePasswordConfirm({ open, errorMessage }: UsePasswordConfirmOptions) {
+export function usePasswordConfirm({ open }: UsePasswordConfirmOptions) {
   const [password, setPasswordValue] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -31,6 +28,10 @@ export function usePasswordConfirm({ open, errorMessage }: UsePasswordConfirmOpt
     setErrorMsg(null);
   };
 
+  /**
+   * action には mutation（mutateAsync）を渡す。パスワード不一致以外の失敗は
+   * QueryProvider の MutationCache がトーストで通知するため、ここでは扱わない
+   */
   const confirm = async (action: () => Promise<unknown>): Promise<boolean> => {
     setIsSubmitting(true);
     setErrorMsg(null);
@@ -41,9 +42,6 @@ export function usePasswordConfirm({ open, errorMessage }: UsePasswordConfirmOpt
     } catch (error) {
       if (isPasswordError(error)) {
         setErrorMsg('パスワードが間違っています');
-      } else {
-        console.error('password confirm action failed', error);
-        toast.error(errorMessage, { position: 'top-center' });
       }
       return false;
     } finally {

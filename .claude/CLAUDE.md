@@ -102,10 +102,11 @@ schedutch-v2/
 
 ### エラーハンドリング
 
-mutation の catch 節では、ユーザー影響の有無で通知先を分ける。
-
-- **ユーザー影響あり**（保存・削除など操作結果を伝える必要がある場合）: `sonner` の `toast.error(...)` でユーザーに通知する。`alert()` は使わない。
-- **詳細情報**（デバッグ用のエラーオブジェクト等）: `console.error(...)` に出力する（`console.log` は使わない）。
+- **mutation の失敗通知は `QueryProvider` の `MutationCache.onError` に集約する**。mutation hook には `meta: { errorMessage: '〜に失敗しました' }` を必ず付け、コンポーネントの catch で `toast.error` / `console.error` を書かない。catch にはダイアログを閉じない等の後処理と、パスワード不一致の入力欄エラー表示だけを書く。
+- エラーの判定は `lib/rpcErrors.ts`（`classifyError` / `isPasswordError` / `isNotFoundError`）を使い、メッセージ文言で判定しない。
+- **RPC で新しい業務エラーを投げるときは、ユーザーの取るべき行動に応じて errcode を付ける**（`PWD01` / `NTF01` / `CNF01`。→ [docs/database.md](../docs/database.md#エラーコードsqlstate)）。UI 側で防いでいる値の検証は errcode なし（`P0001`）でよい。`exception when others` で投げ直すときは `using errcode = sqlstate` で元のコードを保つ。
+- mutation に `retry` を設定しない。RPC は POST で、再送すると二重作成になりうる。
+- mutation 以外でユーザーに伝える失敗は `sonner` の `toast.error(...)` で通知する。`alert()` は使わない。詳細情報は `console.error(...)` に出力する（`console.log` は使わない）。
 
 ### 命名・ファイル
 

@@ -15,5 +15,6 @@ export function useVerifyUserPassword() {
       const isMatch = await verifyUserPassword(userId, password);
       if (!isMatch) throw createPasswordMismatchError();
     },
+    meta: { errorMessage: 'パスワードの確認に失敗しました' },
   });
 }

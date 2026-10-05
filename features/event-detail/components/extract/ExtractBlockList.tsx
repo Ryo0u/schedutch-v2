@@ -51,9 +51,8 @@ function ExtractBlockList({ eventId }: { eventId: string }) {
         userIds: block.participants.map((p) => p.id),
       });
       toast.success('予定に追加しました', { position: 'top-center' });
-    } catch (error) {
-      console.error('Failed to create plan from extracted block:', error);
-      toast.error('予定の追加に失敗しました', { position: 'top-center' });
+    } catch {
+      // 失敗の通知は QueryProvider の MutationCache が行う
     }
   };
 

@@ -27,7 +27,7 @@
 
 1. 各候補の日付 + 時刻を `jstWallTimeToISO`（`lib/datetime.ts`）で JST 壁時計 → UTC の ISO 文字列に変換し、配列 index を `index_number` として付与する。
 2. `useCreateEvent` hook 経由（パスワードは平文で渡し、RPC 内でハッシュ化される）で RPC `create_event_with_candidates` を呼ぶ（イベントと候補日をトランザクションで作成）。
-3. 成功: `EventCreatedDialog` を表示。失敗: sonner トースト「イベント作成に失敗しました」。
+3. 成功: `EventCreatedDialog` を表示。失敗: sonner トースト（通知の仕組みは → [event-detail.md](event-detail.md#データ更新パターン)。想定外の失敗では「イベントの作成に失敗しました」）。
 
 「リセット」ボタンで `form.reset()` により全項目を初期化できる。
 

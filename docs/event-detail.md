@@ -109,3 +109,15 @@
 mutation は `hooks/useEventMutations.ts` の hook（`useSaveResponses` / `useUpdateUser` / `useDeleteUser` / `useDeleteEvent`）と `hooks/usePlanMutations.ts` の hook（`useCreatePlan` / `useUpdatePlanMemo` / `useDeletePlan`）を使う。成功時に hook 内で `eventKeys.detail(eventId)` / `planKeys.list(eventId)` を `invalidateQueries` するため、`onSuccess` / `refresh` の prop drilling は行わない。
 
 `useDeleteUser` だけは両方を invalidate する。参加者を消すと `plan_participants` も CASCADE で消えるため、別 query の予定一覧を更新しないと消えたメンバーが残って見えるため。
+
+失敗時の通知は `components/providers/QueryProvider.tsx` の `MutationCache.onError` に集約している。各 mutation hook は `meta.errorMessage` に操作名を含む文言（例: 「予定の追加に失敗しました」）を宣言するだけで、コンポーネントの catch はダイアログを閉じない等の後処理だけを持つ。通知内容は `lib/rpcErrors.ts` の分類で決まる。
+
+| 分類 | 通知 |
+|---|---|
+| パスワード不一致（`PWD01`） | トーストは出さず、各フォームが入力欄のエラーとして表示する |
+| 未存在（`NTF01`） | 「削除された可能性があります」のトーストを出し、全 query を再取得する。イベント自体が消えていれば not-found 画面に切り替わる |
+| 競合（`CNF01`） | RPC のメッセージ（「既に登録されている予定と時間が重なっています」等）をトーストに出し、全 query を再取得する |
+| 通信エラー | 「接続を確認して、もう一度お試しください」のトースト |
+| 想定外 | `meta.errorMessage` のトースト |
+
+mutation は自動で再試行しない（TanStack Query の既定のまま）。RPC は POST で、応答だけが失われた場合に再送すると回答や予定が二重に作成されるため。query は未存在（`PGRST116`）のときだけ再試行せず即座に失敗させ、not-found 画面を遅らせない。

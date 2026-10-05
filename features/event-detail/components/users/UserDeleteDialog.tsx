@@ -21,7 +21,6 @@ function UserDeleteDialog({ eventId, data, open, onOpenChange }: UserDeleteDialo
   const deleteUser = useDeleteUser(eventId);
   const { password, setPassword, isSubmitting, errorMsg, canSubmit, confirm } = usePasswordConfirm({
     open,
-    errorMessage: '削除に失敗しました',
   });
 
   const handleDelete = async (e: React.SubmitEvent<HTMLFormElement>) => {

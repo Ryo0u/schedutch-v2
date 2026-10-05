@@ -25,7 +25,6 @@ function UserDeletePickerDialog({ eventId, data, open, onOpenChange }: DialogPro
   const deleteUser = useDeleteUser(eventId);
   const { password, setPassword, isSubmitting, errorMsg, canSubmit, confirm } = usePasswordConfirm({
     open,
-    errorMessage: '参加者の削除に失敗しました',
   });
 
   useResetOnClose(open, () => setUserId(''));

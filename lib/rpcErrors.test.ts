@@ -5,6 +5,7 @@ import {
   isNotFoundError,
   createPasswordMismatchError,
   createNotFoundError,
+  toErrorMessage,
 } from './rpcErrors';
 
 /** postgrest-js が返すエラーオブジェクトの形（message / details / hint / code）を模す */
@@ -42,6 +43,40 @@ describe('classifyError', () => {
     expect(classifyError('boom')).toBe('unexpected');
     expect(classifyError(null)).toBe('unexpected');
     expect(classifyError(undefined)).toBe('unexpected');
+  });
+});
+
+describe('toErrorMessage', () => {
+  const fallback = '予定の追加に失敗しました';
+
+  it('競合は RPC のメッセージをそのまま返す', () => {
+    expect(
+      toErrorMessage(
+        { message: '既に登録されている予定と時間が重なっています', code: 'CNF01' },
+        fallback,
+      ),
+    ).toBe('既に登録されている予定と時間が重なっています');
+  });
+
+  it('メッセージを持たない競合は既定の文言を返す', () => {
+    expect(toErrorMessage({ code: 'CNF01' }, fallback)).toBe(
+      '他の人の更新と競合しました。最新の状態を確認してください',
+    );
+  });
+
+  it('未存在・通信エラーは分類ごとの文言を返し、操作名の文言は使わない', () => {
+    expect(toErrorMessage(postgrestError('NTF01'), fallback)).toBe(
+      '対象が見つかりませんでした。削除された可能性があります',
+    );
+    expect(toErrorMessage(postgrestError(''), fallback)).toBe(
+      '通信に失敗しました。接続を確認して、もう一度お試しください',
+    );
+  });
+
+  it('想定外のエラーは RPC のメッセージを見せず操作名の文言を返す', () => {
+    expect(
+      toErrorMessage({ message: '保存に失敗しました: 不正な候補日', code: 'P0001' }, fallback),
+    ).toBe(fallback);
   });
 });
 
