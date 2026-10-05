@@ -111,6 +111,20 @@
 
 予定の日時・メンバーを更新する RPC は用意しない。任意の日時・メンバーに書き換えられると回答の状態と予定の内容がずれるため、**後から変えられるのはメモだけ**にしている。日時やメンバーを変えたいときは削除して作り直す。
 
+### エラーコード（SQLSTATE）
+
+RPC は、クライアントがユーザーの取るべき行動で分類できるよう、業務エラーに独自の SQLSTATE を付けて例外を投げる。PostgREST はこれを JSON の `code` にそのまま載せ（HTTP 400）、クライアントは `lib/rpcErrors.ts` の `classifyError()` で分類する。
+
+| SQLSTATE | 意味 | 投げる RPC |
+|---|---|---|
+| `PWD01` | パスワード不一致 | `update_event` / `delete_event` / `update_user_with_responses` / `delete_user` |
+| `NTF01` | 操作対象（イベント・参加者・予定）が存在しない | `update_event` / `delete_event` / `save_user_responses` / `update_user_with_responses` / `delete_user` / `create_plan` / `update_plan_memo` |
+| `CNF01` | 他の人の更新と競合した（予定の時間帯の重なり・参加できないメンバーを含む） | `create_plan` |
+
+「不正な候補日/回答時刻/参加者」「開始時刻は終了時刻より前」「候補日の時間帯から外れた」など、UI 側で入力を防いでいる値の検証は errcode を付けず `P0001` のまま投げる。通常の操作では起きず、起きたらバグか改ざんのため、クライアントでは想定外として扱う。
+
+`save_user_responses` / `create_event_with_candidates` は末尾の `exception when others` で例外を投げ直す。`save_user_responses` は `using errcode = sqlstate` で元の SQLSTATE を引き継ぐ（付けないと `P0001` に上書きされ、`NTF01` が届かない）。
+
 ## 自動削除
 
 放置されたイベントを `delete_expired_events()` で定期削除する。Vercel Cron（`app/api/cron/delete-expired-events/route.ts` + `vercel.json`）が1日1回叩く。本番 Supabase（無料プラン）の自動停止対策（write を発生させる keep-alive）も兼ねる。
@@ -130,7 +144,7 @@ Cron 経路は `CRON_SECRET`（Vercel が Cron リクエストに付与する Be
 
 - **保存**: 作成系 RPC（`create_event_with_candidates` / `save_user_responses`）が平文を受け取り、`extensions.crypt(平文, extensions.gen_salt('bf', 10))` でハッシュ化して保存する。クライアントはハッシュ化しない。
 - **照合**: サーバー（RPC 内 `crypt()`）側でのみ行う。`password_digest` はクライアントに一切配信しない（型にも持たせない）。
-- **不一致エラー**: パスワード不一致時、RPC は SQLSTATE **`PWD01`** の例外を投げる（`20260705051246_use_errcode_for_password_mismatch.sql`）。クライアントは `isPasswordError()`（`lib/rpcErrors.ts`）で判定してエラー表示にマッピングする。`verify_user_password` は真偽値を返すため、呼び出し側で `createPasswordMismatchError()` により同じ分類に載せる。
+- **不一致エラー**: パスワード不一致時、RPC は SQLSTATE **`PWD01`** の例外を投げる（→ [エラーコード](#エラーコードsqlstate)）。クライアントは `isPasswordError()`（`lib/rpcErrors.ts`）で判定してエラー表示にマッピングする。`verify_user_password` は真偽値を返すため、呼び出し側で `createPasswordMismatchError()` により同じ分類に載せる。
 
 ## 時刻の扱い
 
