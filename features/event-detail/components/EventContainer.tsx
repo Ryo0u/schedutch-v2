@@ -8,7 +8,7 @@ import UsersInfo from '@/features/event-detail/components/users/UsersInfo';
 import { Separator } from '@/components/ui/separator';
 import EventSkeleton from '@/features/event-detail/components/EventSkeleton';
 import { useEvent } from '@/features/event-detail/hooks/useEvent';
-import { isEventNotFoundError } from '@/features/event-detail/api/errors';
+import { isNotFoundError } from '@/lib/rpcErrors';
 import ResponsesInfo from './responses/ResponsesInfo';
 import ExtractPanel from './extract/ExtractPanel';
 import PlanSection from './plan/PlanSection';
@@ -24,7 +24,7 @@ export default function EventContainer({ eventId }: { eventId: string }) {
   }
 
   if (isError) {
-    if (isEventNotFoundError(error)) {
+    if (isNotFoundError(error)) {
       notFound();
     }
     throw error;

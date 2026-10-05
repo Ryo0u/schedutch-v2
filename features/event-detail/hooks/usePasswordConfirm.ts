@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { passwordConfirmSchema } from '@/lib/validation';
-import { isPasswordError } from '@/features/event-detail/api/errors';
+import { isPasswordError } from '@/lib/rpcErrors';
 import { useResetOnClose } from './useResetOnClose';
 
 interface UsePasswordConfirmOptions {

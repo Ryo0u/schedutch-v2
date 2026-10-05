@@ -130,7 +130,7 @@ Cron 経路は `CRON_SECRET`（Vercel が Cron リクエストに付与する Be
 
 - **保存**: 作成系 RPC（`create_event_with_candidates` / `save_user_responses`）が平文を受け取り、`extensions.crypt(平文, extensions.gen_salt('bf', 10))` でハッシュ化して保存する。クライアントはハッシュ化しない。
 - **照合**: サーバー（RPC 内 `crypt()`）側でのみ行う。`password_digest` はクライアントに一切配信しない（型にも持たせない）。
-- **不一致エラー**: パスワード不一致時、RPC は SQLSTATE **`PWD01`** の例外を投げる（`20260705051246_use_errcode_for_password_mismatch.sql`）。クライアントは `isPasswordError()`（`features/event-detail/api/errors.ts`）で `error.code === 'PWD01'` を判定してエラー表示にマッピングする。`verify_user_password` は真偽値を返すため、呼び出し側で `createPasswordMismatchError()` により同じ分類に載せる。
+- **不一致エラー**: パスワード不一致時、RPC は SQLSTATE **`PWD01`** の例外を投げる（`20260705051246_use_errcode_for_password_mismatch.sql`）。クライアントは `isPasswordError()`（`lib/rpcErrors.ts`）で判定してエラー表示にマッピングする。`verify_user_password` は真偽値を返すため、呼び出し側で `createPasswordMismatchError()` により同じ分類に載せる。
 
 ## 時刻の扱い
 

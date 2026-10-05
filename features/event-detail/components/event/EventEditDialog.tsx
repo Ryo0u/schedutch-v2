@@ -17,7 +17,7 @@ import TextareaCounterField from '@/components/form/TextareaCounterField';
 import { Edit } from 'lucide-react';
 import { toast } from 'sonner';
 import { useUpdateEvent } from '@/features/event-detail/hooks/useEventMutations';
-import { isPasswordError } from '@/features/event-detail/api/errors';
+import { isPasswordError } from '@/lib/rpcErrors';
 import { EVENT_COMMENT_MAX_LENGTH } from '@/lib/validation';
 import { eventEditFormSchema, type EventEditFormData } from '@/features/event-detail/schema';
 
