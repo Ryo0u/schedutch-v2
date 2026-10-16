@@ -72,7 +72,10 @@ function Calendar({
             : 'flex items-center gap-1 rounded-(--cell-radius) text-sm [&>svg]:size-3.5 [&>svg]:text-muted-foreground',
           defaultClassNames.caption_label,
         ),
-        table: 'w-full border-collapse',
+        // tr を flex にしているため、table レイアウトのままだと一部ブラウザで行高の計算と実描画がずれて
+        // 最終週がはみ出す。month_grid(table) / weeks(tbody) も flex にして高さを flex で決める。
+        month_grid: cn('flex w-full flex-col border-collapse', defaultClassNames.month_grid),
+        weeks: cn('flex flex-col', defaultClassNames.weeks),
         weekdays: cn('flex', defaultClassNames.weekdays),
         weekday: cn(
           'flex-1 rounded-(--cell-radius) text-[0.8rem] font-normal text-muted-foreground select-none',
