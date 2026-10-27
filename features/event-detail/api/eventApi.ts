@@ -1,29 +1,28 @@
 import { supabase } from '@/utils/supabase/client';
 import type { EventData } from '@/features/event-detail/types';
-import { createEventNotFoundError } from '@/features/event-detail/api/errors';
 
 /**
- * イベント・候補日・参加者・回答を1クエリで取得。
- *
- * events/users は password_digest 列の SELECT 権限を anon から剥奪しているため、
- * `select("*")` を使うと（1列でも権限がない列があるとクエリ全体が拒否される
- * という Postgres の列権限の仕様により）取得自体が失敗する。そのため
- * password_digest を含まない列を明示的に指定する。
+ * イベント・候補日・参加者・回答をまとめて取得する（RPC 経由）。
+ * テーブルへの直接 select は RLS / 権限で封鎖しており、イベント id を指定した RPC でしか読めない。
+ * イベントが存在しない場合、RPC は NTF01 を投げる。
  */
 export async function getEvent(eventId: string): Promise<EventData> {
-  const { data, error } = await supabase
-    .from('events')
-    .select(
-      `id, title, comment, created_at, candidates (*), users (id, event_id, name, comment, created_at, updated_at, responses (*))`,
-    )
-    .eq('id', eventId)
-    .order('start_time', { referencedTable: 'candidates', ascending: true })
-    .order('created_at', { referencedTable: 'users', ascending: true })
-    .single();
+  const { data, error } = await supabase.rpc('get_event', { p_event_id: eventId });
 
   if (error) throw error;
-  if (!data) throw createEventNotFoundError();
-  return data as EventData;
+  return data as unknown as EventData;
+}
+
+/**
+ * OGP 用にイベントのタイトルだけを取得する（Server Component の generateMetadata から呼ぶ）。
+ * イベントが存在しない場合は null を返す。
+ */
+export async function getEventTitle(eventId: string): Promise<string | null> {
+  // 生成型は戻り値を string とするが、未存在のイベントでは RPC が null を返す
+  const { data, error } = await supabase.rpc('get_event_title', { p_event_id: eventId });
+
+  if (error) throw error;
+  return data ?? null;
 }
 
 export interface UpdateEventInput {

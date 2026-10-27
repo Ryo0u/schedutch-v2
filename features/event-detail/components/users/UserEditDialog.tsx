@@ -83,9 +83,8 @@ function UserEditDialog({ eventId, data, password, open, onOpenChange }: UserEdi
 
       toast.success('回答を更新しました', { position: 'top-center' });
       onOpenChange(false);
-    } catch (error) {
-      console.error('Failed to update user:', error);
-      toast.error('更新に失敗しました', { position: 'top-center' });
+    } catch {
+      // 失敗の通知は QueryProvider の MutationCache が行う
     }
   };
 

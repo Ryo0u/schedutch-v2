@@ -91,9 +91,8 @@ schedutch-v2/
 ### データアクセス
 
 - Supabase への実アクセス（select / rpc / insert 等）は `features/{feature}/api/` の関数に集約し、コンポーネントから直接 `supabase` を呼ばない。api 関数は TanStack Query hook（`features/{feature}/hooks/`）から呼ぶ。
-- **write（作成・更新・削除）は全て Supabase RPC 経由**。RLS で直叩き write を封鎖しているため、`supabase.from(...).update()/.delete()/.insert()` をコンポーネントや api から直接呼ばない。
+- **read / write ともに全て Supabase RPC 経由**。RLS と権限で anon のテーブル直叩き（select / insert / update / delete）を全面封鎖しているため、`supabase.from(...)` をコンポーネントや api から呼ばない。read RPC は引数のイベント配下だけを返し、イベント id を知らない第三者が列挙できないようにする（→ [docs/database.md](../docs/database.md#rls--権限)）。
 - **パスワードのハッシュ化・照合はサーバー（RPC 内 `crypt()`）側で行う**。クライアントでハッシュ化・照合をしない。`password_digest` はクライアントに配信しない（型にも持たせない）。
-- **`events` / `users` に列を追加するマイグレーションは、同じファイルに `grant select ("新列") on ... to anon, authenticated;` を書く**。この 2 テーブルは列単位 revoke 済みでテーブルレベル GRANT が効かず、足さないと新列を含む select が 401 になる（→ [docs/database.md](../docs/database.md#rls--権限)）。
 - 取得データは `data` を prop で配布せず、各セクションが `eventId` を受けて自身で query hook を呼ぶ。mutation 成功時の再取得は hook 内の `invalidateQueries` で行い、`onSuccess` / `refresh` を prop drilling しない。
 - 型の置き場: feature 固有なら `features/{feature}/types.ts`、複数 feature で共有するもののみ `lib/`。
 - 時刻は UTC 保存・表示時に `lib/datetime.ts` の JST 変換関数で変換する。時刻選択肢は `lib/constants.ts` の `TIME_OPTIONS` を共通使用する。
@@ -102,10 +101,11 @@ schedutch-v2/
 
 ### エラーハンドリング
 
-mutation の catch 節では、ユーザー影響の有無で通知先を分ける。
-
-- **ユーザー影響あり**（保存・削除など操作結果を伝える必要がある場合）: `sonner` の `toast.error(...)` でユーザーに通知する。`alert()` は使わない。
-- **詳細情報**（デバッグ用のエラーオブジェクト等）: `console.error(...)` に出力する（`console.log` は使わない）。
+- **mutation の失敗通知は `QueryProvider` の `MutationCache.onError` に集約する**。mutation hook には `meta: { errorMessage: '〜に失敗しました' }` を必ず付け、コンポーネントの catch で `toast.error` / `console.error` を書かない。catch にはダイアログを閉じない等の後処理と、パスワード不一致の入力欄エラー表示だけを書く。
+- エラーの判定は `lib/rpcErrors.ts`（`classifyError` / `isPasswordError` / `isNotFoundError`）を使い、メッセージ文言で判定しない。
+- **RPC で新しい業務エラーを投げるときは、ユーザーの取るべき行動に応じて errcode を付ける**（`PWD01` / `NTF01` / `CNF01`。→ [docs/database.md](../docs/database.md#エラーコードsqlstate)）。UI 側で防いでいる値の検証は errcode なし（`P0001`）でよい。`exception when others` で投げ直すときは `using errcode = sqlstate` で元のコードを保つ。
+- mutation に `retry` を設定しない。RPC は POST で、再送すると二重作成になりうる。
+- mutation 以外でユーザーに伝える失敗は `sonner` の `toast.error(...)` で通知する。`alert()` は使わない。詳細情報は `console.error(...)` に出力する（`console.log` は使わない）。
 
 ### 命名・ファイル
 

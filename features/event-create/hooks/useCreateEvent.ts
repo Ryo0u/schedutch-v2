@@ -5,5 +5,6 @@ import { createEvent } from '@/features/event-create/api/eventApi';
 export function useCreateEvent() {
   return useMutation({
     mutationFn: createEvent,
+    meta: { errorMessage: 'イベントの作成に失敗しました' },
   });
 }

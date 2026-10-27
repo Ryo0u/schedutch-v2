@@ -16,7 +16,6 @@ import { useSaveResponses } from '@/features/event-detail/hooks/useEventMutation
 import { buildInitialResponses, toResponseInputs } from '@/features/event-detail/lib/responses';
 import { useDirtyCloseGuard } from '@/features/event-detail/hooks/useDirtyCloseGuard';
 import { useResponseDraft } from '@/features/event-detail/hooks/useResponseDraft';
-import { toast } from 'sonner';
 
 interface ResponsesFormProps {
   eventId: string;
@@ -104,9 +103,8 @@ function ResponsesForm({ eventId, data, onOpenChange }: ResponsesFormProps) {
 
       responseDraft.clear();
       onOpenChange(false);
-    } catch (error) {
-      console.error('Failed to create user:', error);
-      toast.error('回答の保存に失敗しました。', { position: 'top-center' });
+    } catch {
+      // 失敗の通知は QueryProvider の MutationCache が行う
     }
   };
 

@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from 'sonner';
 import { eventCreateFormSchema, type EventCreateFormData } from '@/features/event-create/schema';
 import { useCreateEvent } from '@/features/event-create/hooks/useCreateEvent';
 import { jstWallTimeToISO } from '@/lib/datetime';
@@ -55,9 +54,8 @@ export default function CreateEventContainer() {
       // ダイアログを表示
       setCreatedEventId(eventId);
       setShowDialog(true);
-    } catch (error) {
-      console.error('Failed to create event:', error);
-      toast.error('イベント作成に失敗しました', { position: 'top-center' });
+    } catch {
+      // 失敗の通知は QueryProvider の MutationCache が行う
     }
   };
 

@@ -1,4 +1,6 @@
+import { formatJSTDate, formatJSTTime } from '@/lib/datetime';
 import { SLOT_INTERVAL_MS, MS_PER_MINUTE } from '@/lib/constants';
+import { STATUS_META } from '@/features/event-detail/lib/status';
 import type { ResponseStatus, User } from '@/features/event-detail/types';
 
 export type ParticipantInfo = { id: string; name: string; status: ResponseStatus };
@@ -158,4 +160,37 @@ export function extractSlots({
   const finalBlocks = mergedBlocks.filter((b) => checkBlockConditions(b, conditions));
 
   return finalBlocks;
+}
+
+/**
+ * 抽出結果を共有用のテキストに整形する。
+ * 日付でグループ化し、時間帯と参加者名を1行にまとめる（maybe の人には記号を付ける）。
+ */
+export function formatExtractedBlocks(blocks: TimeBlock[]): string {
+  const lines: string[] = [];
+
+  const grouped = blocks.reduce(
+    (acc, block) => {
+      const dateKey = formatJSTDate(block.start, { month: 'numeric', day: 'numeric' });
+      (acc[dateKey] ??= []).push(block);
+      return acc;
+    },
+    {} as Record<string, TimeBlock[]>,
+  );
+
+  Object.entries(grouped).forEach(([date, daysBlocks]) => {
+    lines.push(date);
+    daysBlocks.forEach((block) => {
+      const start = formatJSTTime(block.start);
+      // block.end は最終コマの開始時刻なので、1コマ分足したものが実際の終了時刻
+      const end = formatJSTTime(block.end + SLOT_INTERVAL_MS);
+      const names = block.participants
+        .map((p) => (p.status === 'maybe' ? `${p.name}(${STATUS_META.maybe.symbol})` : p.name))
+        .join(', ');
+      lines.push(`${start} - ${end} : ${names}`);
+    });
+    lines.push('');
+  });
+
+  return lines.join('\n');
 }

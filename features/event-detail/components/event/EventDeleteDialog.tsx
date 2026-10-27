@@ -19,7 +19,6 @@ function EventDeleteDialog({ open, onOpenChange, data }: DialogProps) {
   const deleteEvent = useDeleteEvent();
   const { password, setPassword, isSubmitting, errorMsg, canSubmit, confirm } = usePasswordConfirm({
     open,
-    errorMessage: 'イベントの削除に失敗しました',
   });
 
   const handleDelete = async (e: React.SubmitEvent<HTMLFormElement>) => {

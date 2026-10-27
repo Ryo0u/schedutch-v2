@@ -35,7 +35,6 @@ function UserEditPasswordDialog({
   const verifyPassword = useVerifyUserPassword();
   const { password, setPassword, isSubmitting, errorMsg, canSubmit, confirm } = usePasswordConfirm({
     open,
-    errorMessage: '確認に失敗しました',
   });
 
   // 編集ダイアログを開く前にサーバー側で事前検証する
