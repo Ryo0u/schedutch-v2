@@ -12,9 +12,6 @@ const RPC_ERRCODES = {
   conflict: 'CNF01',
 } as const;
 
-/** PostgREST が `.single()` で対象行が0件（または複数件）だった場合に返すエラーコード */
-const POSTGREST_NOT_FOUND_ERRCODE = 'PGRST116';
-
 /**
  * ユーザーが次に取るべき行動で分けたエラーの種類。
  * - password-mismatch: 入力したパスワードを直す
@@ -44,7 +41,6 @@ export function classifyError(error: unknown): RpcErrorKind {
     case RPC_ERRCODES.passwordMismatch:
       return 'password-mismatch';
     case RPC_ERRCODES.notFound:
-    case POSTGREST_NOT_FOUND_ERRCODE:
       return 'not-found';
     case RPC_ERRCODES.conflict:
       return 'conflict';
@@ -91,7 +87,7 @@ export function isPasswordError(error: unknown): boolean {
   return classifyError(error) === 'password-mismatch';
 }
 
-/** 対象が存在しないことで投げられた例外かどうか（RPC の NTF01 と select の PGRST116 の両方） */
+/** 対象が存在しないことで投げられた例外かどうか */
 export function isNotFoundError(error: unknown): boolean {
   return classifyError(error) === 'not-found';
 }
@@ -105,13 +101,4 @@ export function createPasswordMismatchError(): Error & { code: string } {
   return Object.assign(new Error('パスワードが違います'), {
     code: RPC_ERRCODES.passwordMismatch,
   });
-}
-
-/**
- * 対象の未存在を表す例外を生成する。
- * getEvent が `.single()` の結果を防御的にチェックする箇所など、
- * PostgREST のエラーを経由しない場合に classifyError による分類に載せたい場合に使う。
- */
-export function createNotFoundError(message: string): Error & { code: string } {
-  return Object.assign(new Error(message), { code: RPC_ERRCODES.notFound });
 }

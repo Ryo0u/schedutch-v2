@@ -190,6 +190,8 @@ export type Database = {
         Args: { p_password: string; p_user_id: string }
         Returns: undefined
       }
+      get_event: { Args: { p_event_id: string }; Returns: Json }
+      get_event_title: { Args: { p_event_id: string }; Returns: string }
       save_user_responses: {
         Args: {
           p_comment: string

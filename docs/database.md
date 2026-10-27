@@ -50,17 +50,15 @@
 
 ## RLS / 権限
 
-- 4 テーブルすべて RLS 有効。`anon` へのポリシーは `FOR SELECT USING (true)` のみで、INSERT / UPDATE / DELETE のポリシーは付与しない（直叩き write を全面封鎖。write は下記 RPC 経由のみ）。
-- `password_digest` は列単位の GRANT で anon の SELECT 対象から除外する（`20260705041653_fix_column_grants.sql`）:
-  - events: `id, title, comment, created_at` のみ SELECT 可
-  - users: `id, event_id, name, comment, created_at, updated_at` のみ SELECT 可
-  - candidates / responses: 全列 SELECT 可
-- 注意: `select("*")` は権限のない列が 1 つでもあるとクエリ全体が拒否されるため、取得クエリ（`features/event-detail/api/eventApi.ts` の `getEvent`）は列を明示指定する。
-- 注意: `20260705041653` で列単位 revoke を行って以降、`events` / `users` はテーブルレベル GRANT が列ごとの明示 GRANT に分解されている。**この 2 テーブルに列を追加しても anon / authenticated には自動で SELECT 権限が付かない**。列追加時は同じマイグレーションに `grant select ("新列") on ... to anon, authenticated;` を書く（例: `20260829130000_grant_select_users_updated_at.sql`）。
+- 4 テーブルすべて RLS 有効で、**ポリシーを 1 つも持たない**。さらに `anon` / `authenticated` からはテーブルの SELECT / INSERT / UPDATE / DELETE 権限をすべて外している（`20260705041653_fix_column_grants.sql` で write、`20261027000000_read_via_rpc.sql` で read）。PostgREST でテーブルを直接叩くと `42501 permission denied` になる。
+- read・write ともに下記 RPC 経由のみ。read RPC（`get_event` / `get_event_title`）は引数のイベント配下だけを返すため、イベント id（UUID v4）を知らなければ 1 行も引けない。URL の UUID が事実上の秘密になる設計で、「URL を知っている人だけが閲覧できる」をこれで担保する。
+- `password_digest` は read RPC の戻り値に含めない（RPC は列を明示して json を組み立てる）。
+- テーブルに列を追加しても anon 向けの権限設定は不要。クライアントに見せる列は read RPC の json に足す。
+- `service_role` はテーブルの SELECT 権限を持つ（Cron などサーバー側の処理用）。
 
 ## RPC 関数
 
-すべて SECURITY DEFINER（`search_path = public, extensions`）。EXECUTE 権限は `anon, authenticated, service_role` に付与（`delete_expired_events` のみ `service_role` 限定）。パスワード照合は RPC 内で `extensions.crypt(平文, digest) = digest` により行う。
+すべて SECURITY DEFINER（read RPC は加えて STABLE。`search_path = public, extensions`）。EXECUTE 権限は `anon, authenticated, service_role` に付与（`delete_expired_events` のみ `service_role` 限定）。パスワード照合は RPC 内で `extensions.crypt(平文, digest) = digest` により行う。
 
 | 関数 | 引数 | 戻り値 | 挙動 |
 |---|---|---|---|
@@ -71,6 +69,8 @@
 | `delete_event` | `p_event_id, p_password` | void | イベントパスワード照合 → イベント一式を削除 |
 | `delete_user` | `p_user_id, p_password` | void | **本人 or イベントパスワードのいずれか一致**で参加者を削除 |
 | `verify_user_password` | `p_user_id, p_password` | boolean | 編集ダイアログを開く前の事前検証。例外を投げず真偽値を返す（digest が NULL なら false） |
+| `get_event` | `p_event_id` | json | イベント・候補日（`start_time` 昇順）・参加者（`created_at` 昇順、各自の回答を `responses` に内包）を `EventData` の形で返す。未存在なら `NTF01` |
+| `get_event_title` | `p_event_id` | text | OGP 用にタイトルだけを返す。未存在なら null |
 | `delete_expired_events` | なし | integer（削除件数） | **`service_role` 限定・パスワード照合なし**。放置イベントを一括削除する（下記「自動削除」） |
 
 ### エラーコード（SQLSTATE）
@@ -80,8 +80,9 @@ RPC は、クライアントがユーザーの取るべき行動で分類でき�
 | SQLSTATE | 意味 | 投げる RPC |
 |---|---|---|
 | `PWD01` | パスワード不一致 | `update_event` / `delete_event` / `update_user_with_responses` / `delete_user` |
-| `NTF01` | 操作対象（イベント・参加者）が存在しない | `update_event` / `delete_event` / `save_user_responses` / `update_user_with_responses` / `delete_user` |
-| `CNF01` | 他の人の更新と競合した（予定の時間帯の重なり・参加できないメンバーを含む） 
+| `NTF01` | 操作対象（イベント・参加者）が存在しない | `get_event` / `update_event` / `delete_event` / `save_user_responses` / `update_user_with_responses` / `delete_user` |
+| `CNF01` | 他の人の更新と競合した | なし（予約済み。現在この errcode を投げる RPC はない） |
+
 「不正な候補日/回答時刻/参加者」「開始時刻は終了時刻より前」「候補日の時間帯から外れた」など、UI 側で入力を防いでいる値の検証は errcode を付けず `P0001` のまま投げる。通常の操作では起きず、起きたらバグか改ざんのため、クライアントでは想定外として扱う。
 
 `save_user_responses` / `create_event_with_candidates` は末尾の `exception when others` で例外を投げ直す。`save_user_responses` は `using errcode = sqlstate` で元の SQLSTATE を引き継ぐ（付けないと `P0001` に上書きされ、`NTF01` が届かない）。
