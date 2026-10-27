@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { extractSlots } from './extractSlots';
+import { extractSlots, formatExtractedBlocks } from './extractSlots';
 import { SLOT_INTERVAL_MS } from '@/lib/constants';
 import type { ResponseStatus } from '@/features/event-detail/types';
 
@@ -214,5 +214,39 @@ describe('extractSlots', () => {
 
   it('回答が空なら空の結果を返す', () => {
     expect(run([makeUser('u1', '太郎', [])])).toEqual([]);
+  });
+});
+
+describe('formatExtractedBlocks', () => {
+  it('JSTの日付見出し＋時間帯＋参加者名（maybeは記号付き）で整形する', () => {
+    const u1 = makeUser('u1', '太郎', [
+      { time: slotISO(0), status: 'ok' },
+      { time: slotISO(1), status: 'ok' },
+    ]);
+    const u2 = makeUser('u2', '花子', [
+      { time: slotISO(0), status: 'maybe' },
+      { time: slotISO(1), status: 'maybe' },
+    ]);
+
+    // JST 2024-03-15 09:00〜10:00
+    expect(formatExtractedBlocks(run([u1, u2], { includeMaybe: true }))).toBe(
+      ['3/15', '09:00 - 10:00 : 太郎, 花子(▲)', ''].join('\n'),
+    );
+  });
+
+  it('日付をまたぐ塊は日付ごとに見出しが付く', () => {
+    const nextDay = 48; // 24時間後
+    const user = makeUser('u1', '太郎', [
+      { time: slotISO(0), status: 'ok' },
+      { time: slotISO(nextDay), status: 'ok' },
+    ]);
+
+    expect(formatExtractedBlocks(run([user]))).toBe(
+      ['3/15', '09:00 - 09:30 : 太郎', '', '3/16', '09:00 - 09:30 : 太郎', ''].join('\n'),
+    );
+  });
+
+  it('塊が空なら空文字を返す', () => {
+    expect(formatExtractedBlocks([])).toBe('');
   });
 });

@@ -1,9 +1,12 @@
+import { Check, Copy } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Field, FieldLabel } from '@/components/ui/field';
+import { useCopyToClipboard } from '@/hooks/useCopyToClipboard';
 import { useEvent } from '@/features/event-detail/hooks/useEvent';
+import { formatExtractedBlocks } from '@/features/event-detail/lib/extractSlots';
 import { useExtractSlotsContext } from './ExtractSlotsContext';
 import ParticipantSelector from './ParticipantSelector';
 import ExtractFilters from './ExtractFilters';
@@ -12,6 +15,7 @@ import ExtractBlockList from './ExtractBlockList';
 function ExtractPanel({ eventId }: { eventId: string }) {
   const { data } = useEvent(eventId);
   const extract = useExtractSlotsContext();
+  const { copied, copy } = useCopyToClipboard();
 
   if (!data) return null;
 
@@ -75,8 +79,19 @@ function ExtractPanel({ eventId }: { eventId: string }) {
 
         <div className="flex flex-1 flex-col gap-3">
           <div className="border-input rounded-md border">
-            <div className="text-muted-foreground border-b px-3 py-2 text-sm">抽出結果</div>
-            <ExtractBlockList eventId={eventId} />
+            <div className="text-muted-foreground flex items-center justify-between border-b px-3 py-1 text-sm">
+              抽出結果
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                aria-label="抽出結果をコピー"
+                disabled={extract.extractedBlocks.length === 0}
+                onClick={() => copy(formatExtractedBlocks(extract.extractedBlocks))}
+              >
+                {copied ? <Check /> : <Copy />}
+              </Button>
+            </div>
+            <ExtractBlockList />
           </div>
           <Field orientation="horizontal" className="justify-start gap-2">
             <Checkbox

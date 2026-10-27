@@ -6,7 +6,6 @@ import {
   deleteUser,
 } from '@/features/event-detail/api/userApi';
 import { eventKeys } from './useEvent';
-import { planKeys } from './usePlans';
 
 /**
  * 成功後に該当イベントの再取得（invalidate）を行う mutation の定型をまとめる。
@@ -42,22 +41,13 @@ export function useUpdateEvent(eventId: string) {
   return useEventMutation(eventId, updateEvent, 'イベントの更新に失敗しました');
 }
 
-/**
- * 参加者を削除し、成功後にイベントと予定を再取得する。
- * 参加者を消すと plan_participants も CASCADE で消えるため、
- * 別 query になっている予定一覧も invalidate しないと消えたメンバーが残って見える。
- */
+/** 参加者を削除し、成功後にイベントを再取得する */
 export function useDeleteUser(eventId: string) {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ userId, password }: { userId: string; password: string }) =>
-      deleteUser(userId, password),
-    meta: { errorMessage: '参加者の削除に失敗しました' },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: eventKeys.detail(eventId) });
-      queryClient.invalidateQueries({ queryKey: planKeys.list(eventId) });
-    },
-  });
+  return useEventMutation(
+    eventId,
+    ({ userId, password }: { userId: string; password: string }) => deleteUser(userId, password),
+    '参加者の削除に失敗しました',
+  );
 }
 
 /** イベントを削除する（削除後は画面遷移するため invalidate は不要） */
