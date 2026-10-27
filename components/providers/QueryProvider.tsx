@@ -28,7 +28,7 @@ function createQueryClient() {
           position: 'top-center',
         });
         // 削除済み・競合はいま見えている内容が古いので取り直す。
-        // イベント自体が消えていれば再取得が PGRST116 になり、not-found 画面に切り替わる
+        // イベント自体が消えていれば再取得（get_event）が NTF01 になり、not-found 画面に切り替わる
         if (kind === 'not-found' || kind === 'conflict') {
           queryClient.invalidateQueries();
         }

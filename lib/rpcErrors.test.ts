@@ -4,7 +4,6 @@ import {
   isPasswordError,
   isNotFoundError,
   createPasswordMismatchError,
-  createNotFoundError,
   toErrorMessage,
 } from './rpcErrors';
 
@@ -18,9 +17,8 @@ describe('classifyError', () => {
     expect(classifyError(postgrestError('PWD01'))).toBe('password-mismatch');
   });
 
-  it('RPC の NTF01 と select の PGRST116 を未存在に分類する', () => {
+  it('NTF01 を未存在に分類する', () => {
     expect(classifyError(postgrestError('NTF01'))).toBe('not-found');
-    expect(classifyError(postgrestError('PGRST116'))).toBe('not-found');
   });
 
   it('CNF01 を競合に分類する', () => {
@@ -89,9 +87,8 @@ describe('isPasswordError / isNotFoundError', () => {
   });
 });
 
-describe('createPasswordMismatchError / createNotFoundError', () => {
-  it('生成した例外が対応する分類に載る', () => {
+describe('createPasswordMismatchError', () => {
+  it('生成した例外がパスワード不一致に分類される', () => {
     expect(classifyError(createPasswordMismatchError())).toBe('password-mismatch');
-    expect(classifyError(createNotFoundError('イベントが見つかりませんでした'))).toBe('not-found');
   });
 });

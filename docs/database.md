@@ -72,17 +72,15 @@
 
 ## RLS / 権限
 
-- 6 テーブルすべて RLS 有効。`anon` へのポリシーは `FOR SELECT USING (true)` のみで、INSERT / UPDATE / DELETE のポリシーは付与しない（直叩き write を全面封鎖。write は下記 RPC 経由のみ）。
-- `password_digest` は列単位の GRANT で anon の SELECT 対象から除外する（`20260705041653_fix_column_grants.sql`）:
-  - events: `id, title, comment, created_at` のみ SELECT 可
-  - users: `id, event_id, name, comment, created_at, updated_at` のみ SELECT 可
-  - candidates / responses / plans / plan_participants: 全列 SELECT 可
-- 注意: `select("*")` は権限のない列が 1 つでもあるとクエリ全体が拒否されるため、取得クエリ（`features/event-detail/api/eventApi.ts` の `getEvent`）は列を明示指定する。
-- 注意: `20260705041653` で列単位 revoke を行って以降、`events` / `users` はテーブルレベル GRANT が列ごとの明示 GRANT に分解されている。**この 2 テーブルに列を追加しても anon / authenticated には自動で SELECT 権限が付かない**。列追加時は同じマイグレーションに `grant select ("新列") on ... to anon, authenticated;` を書く（例: `20260829130000_grant_select_users_updated_at.sql`）。
+- 6 テーブルすべて RLS 有効で、**ポリシーを 1 つも持たない**。さらに `anon` / `authenticated` からはテーブルの SELECT / INSERT / UPDATE / DELETE 権限をすべて外している（`20260705041653_fix_column_grants.sql` で write、`20261027000000_read_via_rpc.sql` で read）。PostgREST でテーブルを直接叩くと `42501 permission denied` になる。
+- read・write ともに下記 RPC 経由のみ。read RPC（`get_event` / `get_event_title` / `get_plans`）は引数のイベント配下だけを返すため、イベント id（UUID v4）を知らなければ 1 行も引けない。URL の UUID が事実上の秘密になる設計で、「URL を知っている人だけが閲覧できる」をこれで担保する。
+- `password_digest` は read RPC の戻り値に含めない（RPC は列を明示して json を組み立てる）。
+- テーブルに列を追加しても anon 向けの権限設定は不要。クライアントに見せる列は read RPC の json に足す。
+- `service_role` はテーブルの SELECT 権限を持つ（Cron などサーバー側の処理用）。
 
 ## RPC 関数
 
-すべて SECURITY DEFINER（`search_path = public, extensions`）。EXECUTE 権限は `anon, authenticated, service_role` に付与（`delete_expired_events` のみ `service_role` 限定）。パスワード照合は RPC 内で `extensions.crypt(平文, digest) = digest` により行う。
+すべて SECURITY DEFINER（read RPC は加えて STABLE。`search_path = public, extensions`）。EXECUTE 権限は `anon, authenticated, service_role` に付与（`delete_expired_events` のみ `service_role` 限定）。パスワード照合は RPC 内で `extensions.crypt(平文, digest) = digest` により行う。
 
 | 関数 | 引数 | 戻り値 | 挙動 |
 |---|---|---|---|
@@ -96,6 +94,9 @@
 | `create_plan` | `p_event_id, p_start_time, p_end_time, p_memo, p_user_ids uuid[]` | uuid | **パスワード照合なし**。下記 4 つを検証 → 予定とメンバーを作成 |
 | `update_plan_memo` | `p_plan_id, p_memo` | void | **パスワード照合なし**。メモだけを更新する（日時・メンバーは変更できない） |
 | `delete_plan` | `p_plan_id` | void | **パスワード照合なし**。予定を削除（メンバーは CASCADE） |
+| `get_event` | `p_event_id` | json | イベント・候補日（`start_time` 昇順）・参加者（`created_at` 昇順、各自の回答を `responses` に内包）を `EventData` の形で返す。未存在なら `NTF01` |
+| `get_event_title` | `p_event_id` | text | OGP 用にタイトルだけを返す。未存在なら null |
+| `get_plans` | `p_event_id` | json | 開催予定を参加メンバー（`participants`）込みで `Plan[]` の形で返す（開始→終了時刻の昇順）。未存在のイベントなら空配列 |
 | `delete_expired_events` | なし | integer（削除件数） | **`service_role` 限定・パスワード照合なし**。放置イベントを一括削除する（下記「自動削除」） |
 
 **予定の 3 関数（`create_plan` / `update_plan_memo` / `delete_plan`）だけはパスワード照合を行わない。** URL を知る人なら誰でも予定を追加・編集・削除できるという仕様上の決定によるもので、write を RPC 経由に限定する権限モデル自体は他と同じ。メンバーの所属イベント検証は `validate_plan_participants`（内部用。EXECUTE は PUBLIC から revoke 済み）が担う。
@@ -118,7 +119,7 @@ RPC は、クライアントがユーザーの取るべき行動で分類でき�
 | SQLSTATE | 意味 | 投げる RPC |
 |---|---|---|
 | `PWD01` | パスワード不一致 | `update_event` / `delete_event` / `update_user_with_responses` / `delete_user` |
-| `NTF01` | 操作対象（イベント・参加者・予定）が存在しない | `update_event` / `delete_event` / `save_user_responses` / `update_user_with_responses` / `delete_user` / `create_plan` / `update_plan_memo` |
+| `NTF01` | 操作対象（イベント・参加者・予定）が存在しない | `get_event` / `update_event` / `delete_event` / `save_user_responses` / `update_user_with_responses` / `delete_user` / `create_plan` / `update_plan_memo` |
 | `CNF01` | 他の人の更新と競合した（予定の時間帯の重なり・参加できないメンバーを含む） | `create_plan` |
 
 「不正な候補日/回答時刻/参加者」「開始時刻は終了時刻より前」「候補日の時間帯から外れた」など、UI 側で入力を防いでいる値の検証は errcode を付けず `P0001` のまま投げる。通常の操作では起きず、起きたらバグか改ざんのため、クライアントでは想定外として扱う。

@@ -120,4 +120,4 @@ mutation は `hooks/useEventMutations.ts` の hook（`useSaveResponses` / `useUp
 | 通信エラー | 「接続を確認して、もう一度お試しください」のトースト |
 | 想定外 | `meta.errorMessage` のトースト |
 
-mutation は自動で再試行しない（TanStack Query の既定のまま）。RPC は POST で、応答だけが失われた場合に再送すると回答や予定が二重に作成されるため。query は未存在（`PGRST116`）のときだけ再試行せず即座に失敗させ、not-found 画面を遅らせない。
+mutation は自動で再試行しない（TanStack Query の既定のまま）。RPC は POST で、応答だけが失われた場合に再送すると回答や予定が二重に作成されるため。query は未存在（`get_event` の `NTF01`）のときだけ再試行せず即座に失敗させ、not-found 画面を遅らせない。
