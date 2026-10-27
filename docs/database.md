@@ -48,32 +48,10 @@
 | status | text | NOT NULL, CHECK (`'ok'` / `'ng'` / `'maybe'`) |
 | time | timestamptz | NOT NULL。UNIQUE (user_id, candidate_id, time) |
 
-### plans
-
-開催予定。抽出結果や手動入力から作られ、URL を知る全員が同じものを見る。
-
-| 列 | 型 | 制約 |
-|---|---|---|
-| id | uuid | PK |
-| event_id | uuid | NOT NULL, FK → events(id) ON DELETE CASCADE |
-| start_time | timestamptz | NOT NULL |
-| end_time | timestamptz | NOT NULL |
-| memo | text | 場所・持ち物などの自由記述（100 文字以内はクライアント側で検証） |
-| created_at | timestamptz | default `now()` |
-
-### plan_participants
-
-| 列 | 型 | 制約 |
-|---|---|---|
-| plan_id | uuid | NOT NULL, FK → plans(id) ON DELETE CASCADE, PK の一部 |
-| user_id | uuid | NOT NULL, FK → users(id) ON DELETE CASCADE, PK の一部 |
-
-**▲（未定）かどうかは列として持たない。** 表示のたびに `responses` から「その予定の時間帯に `maybe` の回答があるか」を判定する（`lib/plans.ts` の `findMaybeParticipantIds`）。回答が `ok` に変われば ▲ も自動で外れる。メンバーは `users` への FK 参照（名前のスナップショットではない）なので、参加者を削除すればその予定のメンバーからも消え、名前変更にも追従する。
-
 ## RLS / 権限
 
-- 6 テーブルすべて RLS 有効で、**ポリシーを 1 つも持たない**。さらに `anon` / `authenticated` からはテーブルの SELECT / INSERT / UPDATE / DELETE 権限をすべて外している（`20260705041653_fix_column_grants.sql` で write、`20261027000000_read_via_rpc.sql` で read）。PostgREST でテーブルを直接叩くと `42501 permission denied` になる。
-- read・write ともに下記 RPC 経由のみ。read RPC（`get_event` / `get_event_title` / `get_plans`）は引数のイベント配下だけを返すため、イベント id（UUID v4）を知らなければ 1 行も引けない。URL の UUID が事実上の秘密になる設計で、「URL を知っている人だけが閲覧できる」をこれで担保する。
+- 4 テーブルすべて RLS 有効で、**ポリシーを 1 つも持たない**。さらに `anon` / `authenticated` からはテーブルの SELECT / INSERT / UPDATE / DELETE 権限をすべて外している（`20260705041653_fix_column_grants.sql` で write、`20261027000000_read_via_rpc.sql` で read）。PostgREST でテーブルを直接叩くと `42501 permission denied` になる。
+- read・write ともに下記 RPC 経由のみ。read RPC（`get_event` / `get_event_title`）は引数のイベント配下だけを返すため、イベント id（UUID v4）を知らなければ 1 行も引けない。URL の UUID が事実上の秘密になる設計で、「URL を知っている人だけが閲覧できる」をこれで担保する。
 - `password_digest` は read RPC の戻り値に含めない（RPC は列を明示して json を組み立てる）。
 - テーブルに列を追加しても anon 向けの権限設定は不要。クライアントに見せる列は read RPC の json に足す。
 - `service_role` はテーブルの SELECT 権限を持つ（Cron などサーバー側の処理用）。
@@ -91,26 +69,9 @@
 | `delete_event` | `p_event_id, p_password` | void | イベントパスワード照合 → イベント一式を削除 |
 | `delete_user` | `p_user_id, p_password` | void | **本人 or イベントパスワードのいずれか一致**で参加者を削除 |
 | `verify_user_password` | `p_user_id, p_password` | boolean | 編集ダイアログを開く前の事前検証。例外を投げず真偽値を返す（digest が NULL なら false） |
-| `create_plan` | `p_event_id, p_start_time, p_end_time, p_memo, p_user_ids uuid[]` | uuid | **パスワード照合なし**。下記 4 つを検証 → 予定とメンバーを作成 |
-| `update_plan_memo` | `p_plan_id, p_memo` | void | **パスワード照合なし**。メモだけを更新する（日時・メンバーは変更できない） |
-| `delete_plan` | `p_plan_id` | void | **パスワード照合なし**。予定を削除（メンバーは CASCADE） |
 | `get_event` | `p_event_id` | json | イベント・候補日（`start_time` 昇順）・参加者（`created_at` 昇順、各自の回答を `responses` に内包）を `EventData` の形で返す。未存在なら `NTF01` |
 | `get_event_title` | `p_event_id` | text | OGP 用にタイトルだけを返す。未存在なら null |
-| `get_plans` | `p_event_id` | json | 開催予定を参加メンバー（`participants`）込みで `Plan[]` の形で返す（開始→終了時刻の昇順）。未存在のイベントなら空配列 |
 | `delete_expired_events` | なし | integer（削除件数） | **`service_role` 限定・パスワード照合なし**。放置イベントを一括削除する（下記「自動削除」） |
-
-**予定の 3 関数（`create_plan` / `update_plan_memo` / `delete_plan`）だけはパスワード照合を行わない。** URL を知る人なら誰でも予定を追加・編集・削除できるという仕様上の決定によるもので、write を RPC 経由に限定する権限モデル自体は他と同じ。メンバーの所属イベント検証は `validate_plan_participants`（内部用。EXECUTE は PUBLIC から revoke 済み）が担う。
-
-`create_plan` は回答と予定の内容が食い違わないよう、次を検証して例外を投げる（クライアント側でも入力段階で防ぐが、RPC を直接叩かれても崩れないようサーバー側を正とする）。
-
-1. 開始 < 終了
-2. **候補日の時間帯に収まっていること**（回答が存在しない時間に予定を作らせない）
-3. **既存の予定と時間帯が重ならないこと**（同じ時間に複数の予定が並ぶ状態を作らせない）
-4. メンバーが当該イベントの参加者で、かつ**全員がその時間帯の全コマを `ok` / `maybe` で回答していること**
-
-4 のコマ数の計算には回答の刻み幅が要るため、`plan_slot_interval()`（30 分。クライアントの `SLOT_INTERVAL_MS` と対応）を内部用の関数として置いている。
-
-予定の日時・メンバーを更新する RPC は用意しない。任意の日時・メンバーに書き換えられると回答の状態と予定の内容がずれるため、**後から変えられるのはメモだけ**にしている。日時やメンバーを変えたいときは削除して作り直す。
 
 ### エラーコード（SQLSTATE）
 
@@ -119,8 +80,8 @@ RPC は、クライアントがユーザーの取るべき行動で分類でき�
 | SQLSTATE | 意味 | 投げる RPC |
 |---|---|---|
 | `PWD01` | パスワード不一致 | `update_event` / `delete_event` / `update_user_with_responses` / `delete_user` |
-| `NTF01` | 操作対象（イベント・参加者・予定）が存在しない | `get_event` / `update_event` / `delete_event` / `save_user_responses` / `update_user_with_responses` / `delete_user` / `create_plan` / `update_plan_memo` |
-| `CNF01` | 他の人の更新と競合した（予定の時間帯の重なり・参加できないメンバーを含む） | `create_plan` |
+| `NTF01` | 操作対象（イベント・参加者）が存在しない | `get_event` / `update_event` / `delete_event` / `save_user_responses` / `update_user_with_responses` / `delete_user` |
+| `CNF01` | 他の人の更新と競合した | なし（予約済み。現在この errcode を投げる RPC はない） |
 
 「不正な候補日/回答時刻/参加者」「開始時刻は終了時刻より前」「候補日の時間帯から外れた」など、UI 側で入力を防いでいる値の検証は errcode を付けず `P0001` のまま投げる。通常の操作では起きず、起きたらバグか改ざんのため、クライアントでは想定外として扱う。
 
@@ -130,7 +91,7 @@ RPC は、クライアントがユーザーの取るべき行動で分類でき�
 
 放置されたイベントを `delete_expired_events()` で定期削除する。Vercel Cron（`app/api/cron/delete-expired-events/route.ts` + `vercel.json`）が1日1回叩く。本番 Supabase（無料プラン）の自動停止対策（write を発生させる keep-alive）も兼ねる。
 
-削除条件（どちらか該当したら削除。`events` の削除で candidates / users / responses / plans / plan_participants は FK CASCADE で連鎖削除される）:
+削除条件（どちらか該当したら削除。`events` の削除で candidates / users / responses は FK CASCADE で連鎖削除される）:
 
 | 状態 | 保持期間 | 起点 |
 |---|---|---|
