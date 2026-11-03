@@ -42,6 +42,9 @@ export function responseSlotKey(candidateId: string, hhmm: string): string {
   return `${candidateId}-${hhmm}`;
 }
 
+/** buildResponseSlotMap で作ったマップ。表示用コンポーネントの props で受け渡すために名前を付ける */
+export type ResponseSlotMap = Record<string, ResponseFormValue & { index: number }>;
+
 /** 回答フィールド配列を「candidate_id-HHmm」キーのマップに変換する（ResponsesFieldsのセル検索用） */
 export function buildResponseSlotMap<T extends { candidate_id: string; time: Date }>(
   fields: T[],
