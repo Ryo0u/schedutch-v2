@@ -55,16 +55,14 @@
   }
 
   a.card-pop,
-  button.card-pop,
-  .card-pop-interactive {
+  button.card-pop {
     transition:
       transform 150ms ease,
       box-shadow 150ms ease;
   }
 
   a.card-pop:hover,
-  button.card-pop:hover,
-  .card-pop-interactive:hover {
+  button.card-pop:hover {
     transform: translate(-2px, -2px);
     box-shadow: 7px 7px 0 var(--shadow-ink);
   }
