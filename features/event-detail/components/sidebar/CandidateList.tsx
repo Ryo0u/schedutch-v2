@@ -4,6 +4,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { ja } from 'date-fns/locale';
 import { Calendar } from '@/components/ui/calendar';
 import { toJSTDateOnly } from '@/lib/datetime';
+import {
+  buildCandidateDateMap,
+  toCalendarDateKey,
+} from '@/features/event-detail/lib/candidateDates';
 import type { Candidate } from '@/features/event-detail/types';
 import { candidateAnchorId } from '@/features/event-detail/lib/anchors';
 
@@ -11,10 +15,6 @@ interface CandidateListProps {
   candidates: Candidate[];
   activeId: string;
   onClickCandidate: (id: string) => void;
-}
-
-function dateKey(date: Date): string {
-  return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
 }
 
 export default function CandidateList({
@@ -28,11 +28,7 @@ export default function CandidateList({
     [candidates],
   );
 
-  const candidateByDateKey = useMemo(() => {
-    const map = new Map<string, { id: string; date: Date }>();
-    candidateEntries.forEach((entry) => map.set(dateKey(entry.date), entry));
-    return map;
-  }, [candidateEntries]);
+  const candidateByDateKey = useMemo(() => buildCandidateDateMap(candidates), [candidates]);
 
   const activeEntry = candidateEntries.find((entry) => entry.id === activeId);
   const [month, setMonth] = useState<Date>(
@@ -57,10 +53,10 @@ export default function CandidateList({
         selected={activeEntry?.date}
         onSelect={(date) => {
           if (!date) return;
-          const entry = candidateByDateKey.get(dateKey(date));
-          if (entry) onClickCandidate(entry.id);
+          const entry = candidateByDateKey.get(toCalendarDateKey(date));
+          if (entry) onClickCandidate(candidateAnchorId(entry.id));
         }}
-        disabled={(date) => !candidateByDateKey.has(dateKey(date))}
+        disabled={(date) => !candidateByDateKey.has(toCalendarDateKey(date))}
         className="p-0 [--cell-size:--spacing(8)]"
       />
     </div>
