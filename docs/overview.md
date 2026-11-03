@@ -23,7 +23,7 @@
 
 | ルート | 実装 | 役割 |
 |---|---|---|
-| `/` | `app/page.tsx` + `features/home/` | LP（静的な紹介ページ。Hero / Steps / 比較 / 抽出紹介 / 特長 / CTA の各セクション） |
+| `/` | `app/page.tsx` + `features/home/` | LP（静的な紹介ページ。Hero / Steps / 比較 / 抽出紹介 / CTA の各セクション） |
 | `/new` | `app/new/page.tsx` → `CreateEventContainer` | イベント作成フォーム（→ [event-create.md](event-create.md)） |
 | `/event/[id]` | `app/event/[id]/page.tsx` → `EventContainer` | イベント閲覧・回答・編集・抽出（→ [event-detail.md](event-detail.md)） |
 
