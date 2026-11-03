@@ -62,3 +62,5 @@ export function useResponseDrag<T extends DraggableField>(
 
   return { containerHandlers, handleTouchMove, cellHandlers };
 }
+
+export type ResponseCellHandlers = ReturnType<typeof useResponseDrag>['cellHandlers'];

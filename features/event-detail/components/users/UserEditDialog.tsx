@@ -90,12 +90,15 @@ function UserEditDialog({ eventId, data, password, open, onOpenChange }: UserEdi
 
   return (
     <Dialog open={open} onOpenChange={closeGuard.handleOpenChange} disablePointerDismissal>
-      <DialogContent className="flex max-h-[90vh] max-w-[95vw] flex-col overflow-hidden p-0 md:max-w-2xl lg:max-w-6xl">
-        <DialogHeader className="shrink-0 p-6 pb-2 text-center">
+      <DialogContent className="flex max-h-[92svh] max-w-[95vw] flex-col overflow-hidden p-0 sm:max-h-[90vh] md:max-w-2xl lg:max-w-6xl">
+        <DialogHeader className="shrink-0 p-4 pb-2 text-center sm:p-6 sm:pb-2">
           <DialogTitle className="text-xl font-black">
             {data.user.name} の回答を編集する
           </DialogTitle>
-          <DialogDescription>名前・コメント・回答を編集してください</DialogDescription>
+          {/* スマホは固定領域を小さくするため見た目だけ隠す（各入力欄のラベルと内容が重なる） */}
+          <DialogDescription className="sr-only sm:not-sr-only">
+            名前・コメント・回答を編集してください
+          </DialogDescription>
         </DialogHeader>
 
         <Separator className="shrink-0" />
@@ -120,11 +123,24 @@ function UserEditDialog({ eventId, data, password, open, onOpenChange }: UserEdi
           <ResponsesFields control={form.control} data={data} />
         </form>
 
-        <DialogFooter className="m-3">
-          <Button size="lg" variant="ghost" type="button" onClick={closeGuard.requestClose}>
+        {/* スマホは固定領域を小さくするため 1 段にし、キャンセルは右上の × に任せる */}
+        <DialogFooter className="m-0 flex-row p-3 sm:m-3 sm:p-4">
+          <Button
+            size="lg"
+            variant="ghost"
+            type="button"
+            className="hidden sm:inline-flex"
+            onClick={closeGuard.requestClose}
+          >
             キャンセル
           </Button>
-          <Button size="lg" type="submit" form="user-edit-form" disabled={updateUser.isPending}>
+          <Button
+            size="lg"
+            type="submit"
+            form="user-edit-form"
+            className="flex-1 sm:flex-none"
+            disabled={updateUser.isPending}
+          >
             {updateUser.isPending ? '保存中...' : '保存する'}
           </Button>
         </DialogFooter>
