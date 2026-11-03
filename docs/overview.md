@@ -73,6 +73,7 @@ npm run db:stop    # ローカルスタック停止
 
 - `supabase/seed.sql` に、複数候補日 × 複数参加者 × ok/maybe/ng が混在するサンプルデータが定義されている（パスワードは全員 `test1234`）。
 - 本番へのマイグレーション反映は、`main` に `supabase/migrations/` の変更が push されると GitHub Actions（`.github/workflows/db-migrate.yml`）が `supabase db push` を自動実行する。`develop` → `main` のリリースマージで反映される。
+- `supabase/migrations/` / `seed.sql` / `config.toml` を変更する PR・push では、GitHub Actions（`.github/workflows/db-ci.yml`）が空のDBに対して `supabase db reset`（全マイグレーション + seed）と `supabase db lint --fail-on error` を実行し、本番適用前に失敗を検出する。既存データに依存する失敗（既存行への NOT NULL 追加など）は検出できないため、上記の drift 確認は引き続き必要。
 - 破壊的変更（列削除・NOT NULL 追加など）を含む場合は、マージ前にローカルで `supabase db diff --linked` を実行し、本番とマイグレーション履歴の drift がないか確認する。
 - ワークフローに必要な GitHub Secrets: `SUPABASE_ACCESS_TOKEN` / `SUPABASE_DB_PASSWORD` / `SUPABASE_PROJECT_ID`。
 
