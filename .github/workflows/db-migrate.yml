@@ -34,6 +34,7 @@ jobs:
 
       - run: supabase link --project-ref "$SUPABASE_PROJECT_ID"
 
-      # v3 以降は --remote を付けないとローカルの DB に向く。
+      # v3 以降は --remote を付けないとローカルの DB に向き、--yes を付けないと
+      # 非対話環境では確認プロンプトで何も適用せずに終了する。
       - name: Push pending migrations
-        run: supabase db push --remote
+        run: supabase db push --remote --yes
