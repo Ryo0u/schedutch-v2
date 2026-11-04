@@ -26,11 +26,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # latest だとメジャーアップデートで挙動が変わる（v3 で db push の既定がローカルになり
+      # 本番に適用されなかった）ため、バージョンを固定する。
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 3.0.0
 
       - run: supabase link --project-ref "$SUPABASE_PROJECT_ID"
 
+      # v3 以降は --remote を付けないとローカルの DB に向く。
       - name: Push pending migrations
-        run: supabase db push
+        run: supabase db push --remote
