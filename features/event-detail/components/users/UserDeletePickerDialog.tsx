@@ -29,6 +29,9 @@ function UserDeletePickerDialog({ eventId, data, open, onOpenChange }: DialogPro
 
   useResetOnClose(open, () => setUserId(''));
 
+  // 選び間違いに押す前に気づけるよう、送信ボタンに対象者名を出す
+  const selectedUser = data.users.find((user) => user.id === userId);
+
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!userId) return;
@@ -55,6 +58,7 @@ function UserDeletePickerDialog({ eventId, data, open, onOpenChange }: DialogPro
       onSubmit={handleSubmit}
       isSubmitting={isSubmitting}
       submitDisabled={!canSubmit || !userId}
+      submitLabel={selectedUser ? `${selectedUser.name} さんを削除する` : '削除する'}
     >
       <FieldSet className="mb-5 w-full">
         <Field data-invalid={!!errorMsg}>

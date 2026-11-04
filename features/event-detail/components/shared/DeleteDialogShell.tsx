@@ -18,6 +18,7 @@ interface DeleteDialogShellProps {
   onSubmit: (e: React.SubmitEvent<HTMLFormElement>) => void;
   isSubmitting: boolean;
   submitDisabled?: boolean;
+  submitLabel?: string;
   children: React.ReactNode;
 }
 
@@ -29,6 +30,7 @@ function DeleteDialogShell({
   onSubmit,
   isSubmitting,
   submitDisabled,
+  submitLabel = '削除する',
   children,
 }: DeleteDialogShellProps) {
   return (
@@ -56,7 +58,7 @@ function DeleteDialogShell({
               }
             />
             <Button type="submit" variant="destructive" disabled={isSubmitting || submitDisabled}>
-              {isSubmitting ? '削除中...' : '削除する'}
+              {isSubmitting ? '削除中...' : submitLabel}
             </Button>
           </DialogFooter>
         </form>

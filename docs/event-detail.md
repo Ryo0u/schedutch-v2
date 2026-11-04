@@ -72,7 +72,7 @@
 削除は 2 経路あり、どちらも RPC `delete_user`（**本人パスワード or イベントパスワードのいずれか一致**で削除可）:
 
 - 参加者行のゴミ箱ボタン → `UserDeleteDialog`（本人による削除を想定）
-- 幹事メニュー → `UserDeletePickerDialog`（パスワード入力 + ラジオで対象参加者を選択）
+- 幹事メニュー → `UserDeletePickerDialog`（パスワード入力 + ラジオで対象参加者を選択。選び間違いに気づけるよう、送信ボタンに「◯◯ さんを削除する」と対象者名を出す）
 
 ## 幹事用メニュー（`components/event/MenuButton.tsx`）
 
