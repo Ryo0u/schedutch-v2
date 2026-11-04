@@ -82,7 +82,7 @@
 |---|---|---|---|
 | イベント編集 | `EventEditDialog` | `update_event` | タイトル・コメントを編集用パスワードで更新 |
 | 共有 | `EventShareDialog` | — | 現在の URL を表示・クリップボードコピー |
-| イベント削除 | `EventDeleteDialog` | `delete_event` | イベント一式を削除し、成功で `/` へ遷移 |
+| イベント削除 | `EventDeleteWarningDialog` → `EventDeleteDialog` | `delete_event` | 先に警告（回答者数と取り消せない旨）を出し、「削除に進む」でパスワード入力へ。イベント一式を削除し、成功で `/` へ遷移 |
 | 参加者削除 | `UserDeletePickerDialog` | `delete_user` | 上記参照 |
 
 ## データ更新パターン
