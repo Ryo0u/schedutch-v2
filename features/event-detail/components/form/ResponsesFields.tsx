@@ -110,15 +110,7 @@ function ResponsesFields<T extends FormWithResponses>({ control, data }: Respons
           </Button>
         </div>
       )}
-      {/*
-        左寄せだと追従中に左の時刻ラベルと重なるため右に寄せる。
-        行の空白部分が「一覧を見る」のタップを遮らないよう、ボタン以外はタップを素通りさせる
-      */}
-      <StatusToggle
-        value={currentState}
-        onChange={setCurrentState}
-        className="pointer-events-none justify-end *:pointer-events-auto"
-      />
+      <StatusToggle value={currentState} onChange={setCurrentState} />
       <ResponsesDayFields
         candidateId={activeCandidateId}
         responseMap={responseMap}

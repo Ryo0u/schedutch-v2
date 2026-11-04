@@ -11,7 +11,14 @@ interface StatusToggleProps {
 
 function StatusToggle({ value, onChange, className }: StatusToggleProps) {
   return (
-    <div className={cn('sticky top-0 left-0 z-40 mb-2 flex justify-start', className)}>
+    // 左寄せだと追従中に左の日付・時刻ラベルと重なるため右に寄せる。
+    // 行の空白部分が下のセルや同じ行のボタンへの操作を遮らないよう、ボタン以外は素通りさせる
+    <div
+      className={cn(
+        'pointer-events-none sticky top-0 left-0 z-40 mb-2 flex justify-end *:pointer-events-auto',
+        className,
+      )}
+    >
       <ToggleGroup
         size="sm"
         spacing={2}
@@ -28,7 +35,10 @@ function StatusToggle({ value, onChange, className }: StatusToggleProps) {
             <ToggleGroupItem
               key={status}
               value={status}
-              className={cn('bg-background', value === status && meta.toggleActiveClass)}
+              className={cn(
+                'bg-background text-muted-foreground',
+                value === status && cn('shadow-sm', meta.toggleActiveClass),
+              )}
             >
               <span className="sm:hidden">{meta.symbol}</span>
               <span className="hidden sm:inline">

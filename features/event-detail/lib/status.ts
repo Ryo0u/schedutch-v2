@@ -10,7 +10,7 @@ export type ResponseStatus = (typeof RESPONSE_STATUSES)[number];
 interface StatusMeta {
   symbol: string;
   label: string;
-  /** ResponsesFields.tsx のトグルボタン選択中スタイル */
+  /** StatusToggle.tsx のトグルボタン選択中スタイル。入力セルと同じ塗りにして、どの状態で塗るかを一目で分かるようにする */
   toggleActiveClass: string;
   /** ResponsesFields.tsx の回答入力セルの背景色 */
   inputCellClass: string;
@@ -24,7 +24,7 @@ export const STATUS_META: Record<ResponseStatus, StatusMeta> = {
   ok: {
     symbol: '⚫︎',
     label: '参加',
-    toggleActiveClass: 'border-blue-400! text-blue-400!',
+    toggleActiveClass: 'border-blue-400! bg-blue-400! text-white!',
     inputCellClass: 'bg-blue-400 text-white',
     candidateCellClass: 'bg-blue-400/70 text-white',
     legendDotClass: 'bg-blue-400/80',
@@ -32,7 +32,7 @@ export const STATUS_META: Record<ResponseStatus, StatusMeta> = {
   maybe: {
     symbol: '▲',
     label: '未定',
-    toggleActiveClass: 'border-yellow-300! text-yellow-400',
+    toggleActiveClass: 'border-yellow-400! bg-yellow-300! text-yellow-800!',
     inputCellClass: 'bg-yellow-300 text-yellow-800',
     candidateCellClass: 'bg-yellow-300/70 text-yellow-800',
     legendDotClass: 'bg-yellow-300/80',
@@ -40,7 +40,7 @@ export const STATUS_META: Record<ResponseStatus, StatusMeta> = {
   ng: {
     symbol: '✖︎',
     label: '不参加',
-    toggleActiveClass: 'border-gray-400! text-gray-400',
+    toggleActiveClass: 'border-gray-400! bg-gray-400! text-gray-800!',
     inputCellClass: 'bg-gray-400 text-gray-600',
     candidateCellClass: 'bg-gray-400/70 text-gray-600',
     legendDotClass: 'bg-gray-400/80',
