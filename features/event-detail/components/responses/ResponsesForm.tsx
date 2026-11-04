@@ -128,14 +128,22 @@ function ResponsesForm({ eventId, data, onOpenChange }: ResponsesFormProps) {
         </p>
       )}
 
-      <DialogFooter className="m-3">
-        <Button size="lg" variant="ghost" type="button" onClick={closeGuard.requestClose}>
+      {/* スマホは固定領域を小さくするため 1 段にし、キャンセルは右上の × に任せる */}
+      <DialogFooter className="m-0 flex-row p-3 sm:m-3 sm:p-4">
+        <Button
+          size="lg"
+          variant="ghost"
+          type="button"
+          className="hidden sm:inline-flex"
+          onClick={closeGuard.requestClose}
+        >
           キャンセル
         </Button>
         <Button
           size="lg"
           variant="default"
           type="submit"
+          className="flex-1 sm:flex-none"
           form="responses-form"
           disabled={saveResponses.isPending}
         >

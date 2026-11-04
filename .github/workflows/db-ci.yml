@@ -1,0 +1,48 @@
+name: DB Migration Check
+
+# supabase/ 配下に変更がある PR・push のときだけ実行する。
+# 本番適用（db-migrate.yml）の前に、まっさらなローカルDBへ
+# 全マイグレーション + seed が通ることを検証する。
+# paths で絞っているため、ブランチ保護の必須チェックには設定しない（対象外の PR でマージが詰まる）。
+on:
+  pull_request:
+    paths:
+      - 'supabase/migrations/**'
+      - 'supabase/seed.sql'
+      - 'supabase/config.toml'
+      - '.github/workflows/db-ci.yml'
+  push:
+    branches: [develop, main]
+    paths:
+      - 'supabase/migrations/**'
+      - 'supabase/seed.sql'
+      - 'supabase/config.toml'
+      - '.github/workflows/db-ci.yml'
+  workflow_dispatch:
+
+jobs:
+  migration-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # devDependency（package.json の supabase）と同じ版に固定する。
+      # latest だとメジャー更新（v3 系）で lint の終了コード等の挙動が変わりうるため、
+      # ローカルで検証済みの版に揃える
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.109.0
+
+      # DB のみ起動（supabase start の全スタックより軽い）
+      - name: Start local DB
+        run: supabase db start
+
+      # ローカルの npm run db:reset と同じ経路を通す
+      # （マイグレーション全適用 + seed 投入がゼロから成功するか）
+      - name: Reset DB (migrations + seed)
+        run: supabase db reset
+
+      # plpgsql 関数の型エラー等を検出する（RLS の有効化漏れは対象外）。
+      # --fail-on を付けないと検出しても終了コードが 0 のままになる
+      - name: Lint database schema
+        run: supabase db lint --fail-on error

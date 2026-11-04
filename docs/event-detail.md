@@ -40,6 +40,7 @@
 
 - 背景クリックでは閉じない（`disablePointerDismissal`）。
 - × と Esc は確認なしで閉じる。入力は下書きとして残るため失われない。
+- スマホ幅では入力領域を広く取るため、フッターのキャンセルボタンを出さず（閉じるのは右上の ×）、ボタンを 1 段に並べる。編集ダイアログもキャンセルボタンを出さない点は同じ。
 - キャンセルボタンは破棄の意思表示として扱い、未保存の変更があれば `shared/UnsavedChangesDialog.tsx` で確認する（`hooks/useDirtyCloseGuard.ts`）。
 - 下書きは `hooks/useResponseDraft.ts` が sessionStorage に保存する。入力が始まってから（`isDirty`）500ms のデバウンスで書き込み、閉じる直前に書き切る。
 - 入力中はフッター上部に「入力内容は自動で保存されます」と表示する。閉じても消えないことを、閉じる前に伝えるため。
@@ -53,8 +54,12 @@
 ### 回答グリッドの操作（新規・編集で共用）
 
 - 上部の `ToggleGroup` で塗るステータスを選択: `ok` = 参加（⚫︎ 青）/ `maybe` = 未定（▲ 黄）/ `ng` = 不参加（✖︎ 灰）。
-- 候補日ごとのテーブルに `TIME_OPTIONS` の 30 分刻みで列が並び、候補の時間範囲外のセルは無効表示。
+- PC・タブレット（`components/form/ResponsesGridFields.tsx`）: 候補日ごとのテーブルに `TIME_OPTIONS` の 30 分刻みで列が並び、候補の時間範囲外のセルは無効表示。
+- スマホ（`components/form/ResponsesDayFields.tsx`）: 1 日ずつ、30 分 1 行で縦に並べる。候補の時間範囲外の行は描画しない。塗るセルは `touch-none` でなぞり操作に使うため、縦スクロールは左の時刻ラベル列か右の余白で行う。
+  - 候補日が 2 日以上のときは `components/form/CandidateDaySwitchActions.tsx` で日付を切り替える。前日・翌日ボタンのほか、日付ラベルから Popover のカレンダーを開いて任意の候補日へ移動できる（候補日以外は選択不可。サイドナビのカレンダーと `lib/candidateDates.ts` を共用）。
+  - 候補日が 2 日以上のときは「一覧を見る」で、入力の途中でもいつでも全日の縮小グリッド（`ResponsesOverviewList.tsx`）を開ける。行をタップするとその日の入力に移る。
 - PC はマウスドラッグ、スマホはタッチスワイプ（`elementFromPoint` + `data-index` でセル特定）で連続して塗れる。
+- 表示の切り替えは `ResponsesFields.tsx` が行い、フォームの状態（`responses`）・塗り操作（`useResponseDrag`）・下書きは画面幅によらず共通。
 
 ## 参加者の編集・削除
 

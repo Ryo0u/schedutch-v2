@@ -6,13 +6,15 @@
 
 拡張: `uuid-ossp` / `pgcrypto`（`extensions` スキーマ）。
 
+文字数の CHECK 制約はクライアントの zod（`lib/validation.ts` / `features/event-detail/schema.ts`）と同じ上限で、RPC を直接叩いた場合も保存させないためのもの。導入前の既存行を検証しないよう `NOT VALID` で追加している。違反時の SQLSTATE は `23514` で、クライアントでは想定外として扱う。
+
 ### events
 
 | 列 | 型 | 制約 |
 |---|---|---|
 | id | uuid | PK, default `uuid_generate_v4()` |
-| title | text | NOT NULL |
-| comment | text | |
+| title | text | NOT NULL, CHECK (1〜10 文字) |
+| comment | text | CHECK (200 文字以内) |
 | password_digest | text | クライアントには配信しない |
 | created_at | timestamptz | default `now()` |
 
@@ -32,8 +34,8 @@
 |---|---|---|
 | id | uuid | PK |
 | event_id | uuid | FK → events(id) ON DELETE CASCADE |
-| name | text | NOT NULL |
-| comment | text | |
+| name | text | NOT NULL, CHECK (1〜10 文字) |
+| comment | text | CHECK (100 文字以内) |
 | password_digest | text | クライアントには配信しない |
 | created_at | timestamptz | default `now()` |
 | updated_at | timestamptz | NOT NULL, default `now()`。`update_user_with_responses` の update で現在時刻に更新する。自動削除の「最終アクティビティ」判定に使う |
@@ -83,9 +85,9 @@ RPC は、クライアントがユーザーの取るべき行動で分類でき�
 | `NTF01` | 操作対象（イベント・参加者）が存在しない | `get_event` / `update_event` / `delete_event` / `save_user_responses` / `update_user_with_responses` / `delete_user` |
 | `CNF01` | 他の人の更新と競合した | なし（予約済み。現在この errcode を投げる RPC はない） |
 
-「不正な候補日/回答時刻/参加者」「開始時刻は終了時刻より前」「候補日の時間帯から外れた」など、UI 側で入力を防いでいる値の検証は errcode を付けず `P0001` のまま投げる。通常の操作では起きず、起きたらバグか改ざんのため、クライアントでは想定外として扱う。
+「不正な候補日/回答時刻/参加者」「候補日が 0 件」「開始時刻は終了時刻より前」「候補日の時間帯から外れた」など、UI 側で入力を防いでいる値の検証は errcode を付けず `P0001` のまま投げる。通常の操作では起きず、起きたらバグか改ざんのため、クライアントでは想定外として扱う。
 
-`save_user_responses` / `create_event_with_candidates` は末尾の `exception when others` で例外を投げ直す。`save_user_responses` は `using errcode = sqlstate` で元の SQLSTATE を引き継ぐ（付けないと `P0001` に上書きされ、`NTF01` が届かない）。
+`save_user_responses` / `create_event_with_candidates` は末尾の `exception when others` で例外を投げ直す。どちらも `using errcode = sqlstate` で元の SQLSTATE を引き継ぐ（付けないと `P0001` に上書きされ、`NTF01` や CHECK 違反の `23514` が届かない）。
 
 ## 自動削除
 

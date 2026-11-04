@@ -6,11 +6,12 @@ import type { ResponseStatus } from '@/features/event-detail/types';
 interface StatusToggleProps {
   value: ResponseStatus;
   onChange: (status: ResponseStatus) => void;
+  className?: string;
 }
 
-function StatusToggle({ value, onChange }: StatusToggleProps) {
+function StatusToggle({ value, onChange, className }: StatusToggleProps) {
   return (
-    <div className="sticky top-0 left-0 z-40 mb-2 flex justify-start">
+    <div className={cn('sticky top-0 left-0 z-40 mb-2 flex justify-start', className)}>
       <ToggleGroup
         size="sm"
         spacing={2}

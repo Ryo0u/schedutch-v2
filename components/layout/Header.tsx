@@ -56,7 +56,7 @@ function Header() {
 
           <Link
             href="/new"
-            className="border-foreground bg-primary text-primary-foreground focus-visible:ring-ring dark:border-foreground/25 rounded-lg border-2 px-4 py-2 text-sm font-bold shadow-[2px_2px_0_var(--shadow-ink-primary)] transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[3px_3px_0_var(--shadow-ink-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+            className="border-foreground bg-primary text-primary-foreground focus-visible:ring-ring dark:border-foreground/25 rounded-lg border-2 px-4 py-2 text-sm font-bold transition-all duration-150 hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
           >
             イベントを作成
           </Link>

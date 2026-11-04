@@ -4,7 +4,6 @@ import {
   StepsSection,
   ComparisonSection,
   ExtractSection,
-  FeaturesSection,
   CtaSection,
   MobileCtaBar,
 } from '@/features/home';
@@ -16,7 +15,6 @@ export default function Page() {
       <StepsSection />
       <ComparisonSection />
       <ExtractSection />
-      <FeaturesSection />
       <CtaSection />
       <MobileCtaBar />
     </div>
