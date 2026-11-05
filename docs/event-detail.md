@@ -72,7 +72,7 @@
 削除は 2 経路あり、どちらも RPC `delete_user`（**本人パスワード or イベントパスワードのいずれか一致**で削除可）:
 
 - 参加者行のゴミ箱ボタン → `UserDeleteDialog`（本人による削除を想定）
-- 幹事メニュー → `UserDeletePickerDialog`（パスワード入力 + ラジオで対象参加者を選択）
+- 幹事メニュー → `UserDeletePickerDialog`（パスワード入力 + ラジオで対象参加者を選択。選び間違いに気づけるよう、送信ボタンに「◯◯ さんを削除する」と対象者名を出す）
 
 ## 幹事用メニュー（`components/event/MenuButton.tsx`）
 
@@ -82,7 +82,7 @@
 |---|---|---|---|
 | イベント編集 | `EventEditDialog` | `update_event` | タイトル・コメントを編集用パスワードで更新 |
 | 共有 | `EventShareDialog` | — | 現在の URL を表示・クリップボードコピー |
-| イベント削除 | `EventDeleteDialog` | `delete_event` | イベント一式を削除し、成功で `/` へ遷移 |
+| イベント削除 | `EventDeleteWarningDialog` → `EventDeleteDialog` | `delete_event` | 先に警告（回答者数と取り消せない旨）を出し、「削除に進む」でパスワード入力へ。イベント一式を削除し、成功で `/` へ遷移 |
 | 参加者削除 | `UserDeletePickerDialog` | `delete_user` | 上記参照 |
 
 ## データ更新パターン

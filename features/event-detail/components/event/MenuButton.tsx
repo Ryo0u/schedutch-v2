@@ -14,12 +14,18 @@ import {
 import { useState } from 'react';
 import EventEditDialog from './EventEditDialog';
 import EventDeleteDialog from './EventDeleteDialog';
+import EventDeleteWarningDialog from './EventDeleteWarningDialog';
 import UserDeletePickerDialog from '../users/UserDeletePickerDialog';
 import EventShareDialog from './EventShareDialog';
 import { useEvent } from '@/features/event-detail/hooks/useEvent';
 
 /** 幹事用メニューから開けるダイアログの種別 */
-type EventMenuAction = 'eventEdit' | 'eventShare' | 'eventDelete' | 'usersDelete';
+type EventMenuAction =
+  | 'eventEdit'
+  | 'eventShare'
+  | 'eventDeleteWarning'
+  | 'eventDelete'
+  | 'usersDelete';
 
 interface MenuProps {
   eventId: string;
@@ -59,7 +65,10 @@ function MenuButton({ eventId }: MenuProps) {
               <Share2 />
               共有
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setOpenDialog('eventDelete')} variant="destructive">
+            <DropdownMenuItem
+              onClick={() => setOpenDialog('eventDeleteWarning')}
+              variant="destructive"
+            >
               <Trash2 />
               削除
             </DropdownMenuItem>
@@ -84,6 +93,12 @@ function MenuButton({ eventId }: MenuProps) {
         onOpenChange={closeDialog}
       />
       <EventShareDialog open={openDialog === 'eventShare'} onOpenChange={closeDialog} />
+      <EventDeleteWarningDialog
+        open={openDialog === 'eventDeleteWarning'}
+        onOpenChange={closeDialog}
+        userCount={data.users.length}
+        onProceed={() => setOpenDialog('eventDelete')}
+      />
       <EventDeleteDialog
         data={data}
         open={openDialog === 'eventDelete'}
